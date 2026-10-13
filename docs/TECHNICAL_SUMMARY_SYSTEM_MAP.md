@@ -650,3 +650,104 @@ flowchart LR
    - Compliance status is calculated directly via SQL indexed date queries (`target_date`, `expiry_date` in `compliance_items` and `licensing_records`).
    - Dashboard renders instantly without traversing local OneDrive folders.
 
+---
+
+## 14. Deployment Architecture
+
+### A. Target Workstation Environment
+Sprout is engineered as a zero-cloud, standalone desktop-local web application. It requires zero remote infrastructure, zero paid cloud licenses, and zero external hosting services.
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                      LOCAL WORKSTATION ARCHITECTURE                    │
+│                                                                        │
+│   Windows 10 / 11 Host                                                 │
+│   ├── Python 3.10+ Runtime                                             │
+│   │   └── Bottle WSGI Server (127.0.0.1:5858)                          │
+│   ├── Browser Client (Chrome, Edge, Firefox, Safari)                   │
+│   ├── Local Storage Repository                                         │
+│   │   ├── %LOCALAPPDATA%\CaregiverCommandCenter\data\foster_binder.db │
+│   │   ├── %LOCALAPPDATA%\CaregiverCommandCenter\backups\             │
+│   │   └── %LOCALAPPDATA%\CaregiverCommandCenter\exports\             │
+│   └── Authorized OneDrive Document Root                                │
+│       └── OneDrive\Davis & VTDCF Shared Folder\                       │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+### B. Hardware & Software Requirements
+- **Operating System**: Windows 10 (Build 19041+) or Windows 11 64-bit.
+- **Hardware Minimums**: 4 GB RAM, Dual-Core 2.0 GHz CPU, 500 MB free disk space for application runtime + storage for OneDrive PDFs.
+- **Software Dependencies**:
+  - Python 3.10 or higher (`python.exe` added to system PATH).
+  - Web Browser with ES6 JavaScript support (Chrome 90+, Edge 90+, Firefox 88+).
+  - Standard Python packages: `bottle`, `python-docx` (for DOCX exports).
+
+### C. Standard Deployment & Startup Procedure
+1. **Clone or Extract Application**:
+   ```powershell
+   git clone https://github.com/candysuec/Sprout.git
+   cd Sprout/app
+   ```
+2. **Install Runtime Dependencies**:
+   ```powershell
+   pip install -r requirements.txt
+   ```
+3. **Launch Local Server**:
+   ```powershell
+   python server.py
+   ```
+4. **Access Caregiver Portal**:
+   Open browser to `http://127.0.0.1:5858/`. The server binds strictly to the loopback interface, completely inaccessible from external networks.
+
+---
+
+## 15. Testing Strategy
+
+### A. Testing Methodology & Pyramid
+To prevent regressions across complex child-welfare workflows, Sprout follows a 5-tier verification matrix:
+
+```mermaid
+flowchart TD
+    subgraph Test_Pyramid["Verification Matrix"]
+        T1["Security & Privacy Isolation Tests<br/>(Zero-Leakage & Sphere Boundary Checks)"]
+        T2["API Contract & Schema Tests<br/>(Payload Validation & Error Response Codes)"]
+        T3["Compliance & Rule Engine Tests<br/>(Statutory Expiration & Alert Calculations)"]
+        T4["Audit Trail Integrity Tests<br/>(Hash Chain Tamper Detection)"]
+        T5["UI State Machine & Router Tests<br/>(Unselected Welcome vs Scoped Navigation)"]
+    end
+```
+
+### B. Required Test Protocols & Verification Checklist
+
+| Test Suite | Target Component | Verification Criteria & Success Condition |
+| :--- | :--- | :--- |
+| **Mode Isolation Test** | `/api/households` & `/api/children` | When headers are absent or mode is unselected, API returns `[]` with **zero SQLite queries executed**. |
+| **Disk Traversal Guard Test** | `/api/open-doc` | Path traversal attempts (e.g. `../../Windows/System32`) or file requests made while in `sample` mode return `403 Forbidden`. |
+| **Child PII Shield Test** | Frontend & Backend API | Full legal names are never exposed in JSON responses or rendered in DOM. Only initials (`CD`, `SJ`) appear in dropdowns. |
+| **Audit Chain Validation Test** | `db.py -> verify_audit_chain()` | Modifying a single character in an existing `audit_log` row causes `verify_audit_chain()` to return `(False, row_id)`. |
+| **Compliance State Machine Test**| `/api/compliance` & Dashboard | Documents expiring in < 30 days emit warning flags; expired documents emit urgent action drafts. |
+| **Welcome Navigation Test** | `app.js -> loadTabContent()` | Clicking the Sprout logo hides `#mainNavigationContainer`, clears `localStorage`, and displays the public State Resource Hub. |
+
+---
+
+## 17. Performance & Scalability Boundaries
+
+### A. Target Volumetric Capacity
+Sprout is tuned for high-speed local performance on resource-constrained caregiver laptops and tablets.
+
+| Dimension | Typical Foster Household | Maximum Designed Capacity | Performance Target |
+| :--- | :--- | :--- | :--- |
+| **Active Households** | 1 – 2 homes | Up to 25 homes | Query latency < 10ms |
+| **Children in Care** | 1 – 3 children | Up to 50 children | Filter/render < 20ms |
+| **Timeline Records / Journals**| 500 – 1,500 entries | Up to 50,000 entries | Indexed lookup < 15ms |
+| **OneDrive Document Registry** | 50 – 200 documents | Up to 10,000 files | Indexed metadata < 10ms |
+| **Database File Size** | 5 MB – 25 MB | Up to 500 MB SQLite file | Zero memory exhaustion |
+
+### B. SQLite Optimization Architecture
+1. **Write-Ahead Logging (WAL)**:
+   - Configured with `PRAGMA journal_mode = WAL;`, enabling concurrent reads while write transactions execute.
+2. **Synchronous Normal**:
+   - `PRAGMA synchronous = NORMAL;` delivers maximum I/O throughput on modern solid-state drives while retaining ACID crash resistance.
+3. **Compound Indexing**:
+   - Optimized compound indexes (`idx_audit_child ON audit_log(child_id, id)`, `idx_timeline_child_date ON timeline_records(child_id, event_date)`) guarantee sub-millisecond timeline retrieval regardless of dataset depth.
+
