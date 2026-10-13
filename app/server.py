@@ -224,6 +224,11 @@ def get_households():
             primary = next((c['Name'] for c in caregivers if c['Role'] == 'Primary Caregiver'), caregivers[0]['Name'] if caregivers else 'Sample Caregiver')
             secondary = next((c['Name'] for c in caregivers if c['Role'] != 'Primary Caregiver'), '')
             
+            # Household licensing strings
+            hh_licenses = [lic for lic in sd.LICENSES if lic['HouseholdID'] == selected_hh_id]
+            lics = [lic['LicenseType'] for lic in hh_licenses]
+            lic_str = ", ".join(lics) if lics else "Pending / Provisional Approval"
+
             # Caregiver Journey Model fields
             structure = h.get("HouseholdStructure") or (caregivers[0]['RelationshipCategory'] if caregivers else 'Single Adult')
             stage = h.get("CaregiverStage") or 'Established (1-3 Years)'
@@ -813,15 +818,38 @@ def add_record():
     conn = get_connection()
     try:
         child = conn.execute("SELECT * FROM children WHERE id = ?", (data.get('child_id'),)).fetchone()
-        if not child:
-            return json_res({"error": "Child not found"}, 404)
-        child = dict(child)
-        contacts = [dict(r) for r in conn.execute(
-            "SELECT * FROM contacts WHERE child_id = ?", (child['id'],))]
+        contacts = []
+        if child:
+            child = dict(child)
+            contacts = [dict(r) for r in conn.execute(
+                "SELECT * FROM contacts WHERE child_id = ?", (child['id'],))]
+        else:
+            # Check if this is a sample child in the synthetic dataset (e.g. child_id 211 for CH-211)
+            import sample_dataset as sd
+            cid_str = f"CH-{data.get('child_id')}"
+            sample_ch = next((c for c in sd.CHILDREN if c['ChildID'] == cid_str or c['ChildID'] == str(data.get('child_id'))), None)
+            if sample_ch:
+                child = {
+                    "id": data.get('child_id'),
+                    "alias": sample_ch['Initials'],
+                    "first_name": sample_ch['FullName'].split()[0],
+                    "status": "Active (Sample Sandbox)",
+                    "relationship_type": "Foster Care"
+                }
+                contacts = [
+                    {"role_type": "DCF Family Services Worker", "full_name": "Sample DCF Worker", "phone": "802-555-0199", "email": "worker@dcf.sample.gov"},
+                    {"role_type": "Guardian ad Litem", "full_name": "Sample GAL", "phone": "802-555-0188", "email": "gal@courts.sample.gov"}
+                ]
+            else:
+                return json_res({"error": "Child not found"}, 404)
 
         from services import evaluate_event_and_draft
         eval_res = evaluate_event_and_draft(child, data, contacts)
         actor = _actor(data)
+
+        # For sample children, return synthetic success without inserting into live SQLite production table
+        if not child.get('household_id') and str(data.get('child_id')).startswith('2'):
+            return json_res({"id": 9900 + int(data.get('child_id')), "message": "Timeline record added (Sample Sandbox)", "eval_res": eval_res})
 
         c = conn.execute("""
         INSERT INTO timeline_records (

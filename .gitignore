@@ -25,6 +25,7 @@ exports/
 *.gif
 *.txt
 !requirements.txt
+!app/static/*.png
 
 # Python execution caches
 __pycache__/
