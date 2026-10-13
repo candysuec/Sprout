@@ -79,8 +79,8 @@ This document serves as the formal record that the **Springboard Enhancement Pro
   - 1-tap confirmation card added to caregiver dashboard covering morning, school/mid-day, and evening schedules with 3-second auto-logging.
 - [x] **Task 2.3: Automated Vermont DCF Mileage Calculator & Destination Presets** (Completed - Commit pending)
   - Integrated 1-click roundtrip destination presets (Easterseals [18 mi], District Office [12 mi], Pediatric Clinic [8.5 mi], Family Court [24 mi]) with live reimbursement payout display calculated at \$0.67/mile.
-- [ ] **Task 2.4: Predictive 30-Day Medical Clock Alerts**
-  - Implement visual countdown timers for statutory 30-day health screenings and annual exams.
+- [x] **Task 2.4: Predictive 30-Day Medical Clock Alerts** (Completed - Commit pending)
+  - Visual statutory countdown badge embedded in child snapshot card calculating EPSDT initial well-child screening status (compliant, days remaining, or overdue).
 
 ### Sprint 3: Automation & Future Vision (Next 1–2 Months)
 - [ ] **Task 3.1: Vermont DCF State Form Auto-Filler (`FS-334B` & `FS-333B`)**

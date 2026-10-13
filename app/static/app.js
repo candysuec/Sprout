@@ -357,6 +357,49 @@ async function renderChildSnapshot() {
     statusBadgeClass = 'bg-amber-50 text-amber-800 border-amber-200';
   }
 
+  // Statutory 30-Day Health Screening Clock (VT DCF EPSDT Policy)
+  let healthClockHtml = '';
+  if (child.placement_date && !['Former Placement'].includes(relType) && episodeStatus !== 'Former') {
+    const pDate = new Date(child.placement_date);
+    if (!isNaN(pDate.getTime())) {
+      const now = new Date();
+      const diffDays = Math.floor((now - pDate) / (1000 * 60 * 60 * 24));
+      const daysRemaining = 30 - diffDays;
+      const hasCompletedExam = records.some(r => r.category === 'medical' && (r.title.toLowerCase().includes('30-day') || r.title.toLowerCase().includes('well-child') || r.title.toLowerCase().includes('intake physical') || r.title.toLowerCase().includes('epsdt')));
+
+      if (hasCompletedExam) {
+        healthClockHtml = `
+          <div class="bg-emerald-50 border border-emerald-200 rounded-xl px-3.5 py-2">
+            <div class="text-[10px] uppercase font-bold tracking-wider text-emerald-700 flex items-center gap-1">
+              <i data-lucide="check-circle" class="w-3 h-3 text-emerald-600"></i> 30-Day Health Clock
+            </div>
+            <div class="text-xs font-bold text-emerald-900 mt-0.5">Compliant (Exam on File)</div>
+          </div>
+        `;
+      } else if (daysRemaining >= 0) {
+        const urgencyColor = daysRemaining <= 7 ? 'bg-rose-50 border-rose-300 text-rose-900' : (daysRemaining <= 15 ? 'bg-amber-50 border-amber-300 text-amber-900' : 'bg-sky-50 border-sky-300 text-sky-900');
+        const iconColor = daysRemaining <= 7 ? 'text-rose-600' : (daysRemaining <= 15 ? 'text-amber-600' : 'text-sky-600');
+        healthClockHtml = `
+          <div class="${urgencyColor} border rounded-xl px-3.5 py-2">
+            <div class="text-[10px] uppercase font-bold tracking-wider flex items-center gap-1">
+              <i data-lucide="clock" class="w-3 h-3 ${iconColor}"></i> 30-Day Health Clock
+            </div>
+            <div class="text-xs font-bold mt-0.5">${daysRemaining} Days Left (Due Day 30)</div>
+          </div>
+        `;
+      } else {
+        healthClockHtml = `
+          <div class="bg-rose-100 border border-rose-300 text-rose-950 rounded-xl px-3.5 py-2">
+            <div class="text-[10px] uppercase font-bold tracking-wider text-rose-700 flex items-center gap-1">
+              <i data-lucide="alert-octagon" class="w-3 h-3 text-rose-600"></i> 30-Day Health Clock
+            </div>
+            <div class="text-xs font-bold mt-0.5">${Math.abs(daysRemaining)} Days Overdue</div>
+          </div>
+        `;
+      }
+    }
+  }
+
   card.innerHTML = `
     <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
       <div class="flex items-center gap-4">
@@ -383,12 +426,14 @@ async function renderChildSnapshot() {
         </div>
       </div>
 
-      <!-- Vital Alerts & Emergency Handoff Section -->
+      <!-- Vital Alerts, Health Clock & Emergency Handoff Section -->
       <div class="flex flex-wrap items-center gap-3">
         <button onclick="openEmergencyHandoffCard()" class="bg-rose-700 hover:bg-rose-800 text-white rounded-xl px-3.5 py-2 text-xs font-bold flex items-center gap-2 shadow transition" title="Print/View 1-Click Care Handoff Card for ER, Doctor, or Babysitter">
           <i data-lucide="shield-alert" class="w-4 h-4 text-rose-200"></i>
           <span>Emergency / Babysitter Card</span>
         </button>
+
+        ${healthClockHtml}
 
         <div class="bg-rose-50 border border-rose-200 rounded-xl px-3.5 py-2">
           <div class="text-[10px] uppercase font-bold tracking-wider text-rose-600 flex items-center gap-1">
