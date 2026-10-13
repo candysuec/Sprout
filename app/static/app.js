@@ -1424,6 +1424,31 @@ async function logTodayMedDose(slotName = 'Daily Dose') {
   }
 }
 
+// Automated Vermont DCF Travel Mileage Helper ($0.67/mile)
+function updateMileagePayoutDisplay() {
+  const input = document.getElementById('recMileage');
+  const display = document.getElementById('recMileagePayout');
+  if (!input || !display) return;
+
+  const miles = parseFloat(input.value) || 0;
+  const payout = (miles * 0.67).toFixed(2);
+  display.textContent = `$${payout} Est. Payout`;
+}
+
+function applyMileagePreset(miles, destinationDescription) {
+  const input = document.getElementById('recMileage');
+  const summary = document.getElementById('recSummary');
+  if (input) {
+    input.value = miles;
+    updateMileagePayoutDisplay();
+  }
+  if (summary && destinationDescription) {
+    if (!summary.value.trim() || summary.value.includes('Visit') || summary.value.includes('mileage')) {
+      summary.value = `Transported child for ${destinationDescription}. Round-trip: ${miles} miles.`;
+    }
+  }
+}
+
 // Resources Tab 20: Folder File Viewer with DCF Category Classification
 async function renderResourcesView(container) {
   const res = await apiFetch('/api/shared-docs');
@@ -2375,6 +2400,7 @@ function openRecordModal() {
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('recDate').value = today;
   toggleFollowUpFields();
+  updateMileagePayoutDisplay();
   document.getElementById('recordModal').classList.remove('hidden');
 }
 

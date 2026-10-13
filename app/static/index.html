@@ -337,11 +337,32 @@
         <!-- Optional Mileage & Reimbursement Strip (For Visits, Doctor trips, and DCF Runs) -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-emerald-50/70 border border-emerald-200 rounded-xl p-3.5 text-sm">
           <div>
-            <label class="block font-bold text-emerald-950 mb-1 flex items-center gap-1.5 text-xs">
-              <i data-lucide="navigation" class="w-4 h-4 text-emerald-600"></i> Round-Trip Mileage (DCF Reimbursable)
-            </label>
-            <input type="number" step="0.5" id="recMileage" placeholder="Miles driven (e.g. 14.5)" class="w-full text-sm border border-emerald-300 rounded-lg p-2.5 bg-white focus:ring-2 focus:ring-emerald-500" />
-            <p class="text-xs text-emerald-800 mt-1">Calculated at current DCF state travel reimbursement rate ($0.67/mi).</p>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block font-bold text-emerald-950 flex items-center gap-1.5 text-xs">
+                <i data-lucide="navigation" class="w-4 h-4 text-emerald-600"></i> Round-Trip Mileage (DCF Reimbursable)
+              </label>
+              <span id="recMileagePayout" class="text-xs font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded border border-emerald-300">$0.00 Est. Payout</span>
+            </div>
+            
+            <!-- Quick Preset Destinations -->
+            <div class="flex flex-wrap items-center gap-1.5 mb-2">
+              <span class="text-[10px] uppercase font-bold text-emerald-800">Presets:</span>
+              <button type="button" onclick="applyMileagePreset(18.0, 'Family Time Visit — Easterseals Center')" class="px-2 py-0.5 rounded bg-white hover:bg-emerald-100 text-emerald-900 border border-emerald-300 text-[11px] font-semibold transition">
+                Easterseals (18 mi)
+              </button>
+              <button type="button" onclick="applyMileagePreset(12.0, 'DCF District Office Case Review')" class="px-2 py-0.5 rounded bg-white hover:bg-emerald-100 text-emerald-900 border border-emerald-300 text-[11px] font-semibold transition">
+                DCF District (12 mi)
+              </button>
+              <button type="button" onclick="applyMileagePreset(8.5, 'Pediatric Health Clinic / Well-Child Check')" class="px-2 py-0.5 rounded bg-white hover:bg-emerald-100 text-emerald-900 border border-emerald-300 text-[11px] font-semibold transition">
+                Pediatric Clinic (8.5 mi)
+              </button>
+              <button type="button" onclick="applyMileagePreset(24.0, 'Family Court / Legal Hearing')" class="px-2 py-0.5 rounded bg-white hover:bg-emerald-100 text-emerald-900 border border-emerald-300 text-[11px] font-semibold transition">
+                Court (24 mi)
+              </button>
+            </div>
+
+            <input type="number" step="0.5" id="recMileage" oninput="updateMileagePayoutDisplay()" placeholder="Miles driven (e.g. 14.5)" class="w-full text-sm border border-emerald-300 rounded-lg p-2.5 bg-white focus:ring-2 focus:ring-emerald-500" />
+            <p class="text-xs text-emerald-800 mt-1">Calculated automatically at state foster/kinship rate ($0.67/mile).</p>
           </div>
           <div>
             <label class="block font-bold text-emerald-950 mb-1 flex items-center gap-1.5 text-xs">

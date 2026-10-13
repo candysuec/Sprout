@@ -77,8 +77,8 @@ This document serves as the formal record that the **Springboard Enhancement Pro
   - Consolidate 11 main nav buttons into 4 unified action hubs (*Today*, *My Children*, *Binder*, *Household & Compliance*).
 - [x] **Task 2.2: Daily Medication Dose Check-Off** (Completed - Commit pending)
   - 1-tap confirmation card added to caregiver dashboard covering morning, school/mid-day, and evening schedules with 3-second auto-logging.
-- [ ] **Task 2.3: Automated Vermont DCF Mileage Calculator**
-  - Integrate preset driving destinations with automatic reimbursement calculation at \$0.67/mile.
+- [x] **Task 2.3: Automated Vermont DCF Mileage Calculator & Destination Presets** (Completed - Commit pending)
+  - Integrated 1-click roundtrip destination presets (Easterseals [18 mi], District Office [12 mi], Pediatric Clinic [8.5 mi], Family Court [24 mi]) with live reimbursement payout display calculated at \$0.67/mile.
 - [ ] **Task 2.4: Predictive 30-Day Medical Clock Alerts**
   - Implement visual countdown timers for statutory 30-day health screenings and annual exams.
 
