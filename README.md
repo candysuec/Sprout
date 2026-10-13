@@ -76,12 +76,15 @@ Sprout normalizes caregiver management across real-world dimensions:
 
 ---
 
-## 📚 Architecture & Engineering Documentation
+## 📚 Architecture & Project Management Documentation
 
-Production specifications, system topologies, and roadmap artifacts are maintained in the [`docs/`](docs/) directory:
+Production specifications, system topologies, UX audits, and project governance boards are maintained in the [`docs/`](docs/) directory:
 
-- [Technical Summary & System Map](docs/TECHNICAL_SUMMARY_SYSTEM_MAP.md): Complete architectural breakdown, security boundaries, dual-sphere routing, and Vermont caregiver tools.
-- [Springboard Enhancement Project Plan (v2)](docs/SPRINGBOARD_ENHANCEMENT_PLAN_V2.md): 5-phase engineering roadmap covering all 18 operational and security sections.
+- [Project Management Board & Plan Approvals](docs/PROJECT_MANAGEMENT_BOARD.md): Formal sign-off record, stakeholder governance, and sprint backlogs.
+- [Technical Summary & System Map (v2)](docs/TECHNICAL_SUMMARY_SYSTEM_MAP.md): Production architectural reference covering all 18 technical sections.
+- [UX Enhancement & Caregiver Usability Audit](docs/UX_ENHANCEMENT_AUDIT.md): Comprehensive evaluation of daily friction, cognitive load, and automation opportunities.
+- [UI Process Flow & Button Interaction Blueprint](docs/UI_PROCESS_FLOW_BLUEPRINT.md): Finite state machine mapping every button and modal to deterministic flows.
+- [Springboard Enhancement Plan (v2)](docs/SPRINGBOARD_ENHANCEMENT_PLAN_V2.md): 5-phase engineering roadmap and milestone tracking.
 
 ---
 
