@@ -185,7 +185,7 @@ function toggleSproutWorkspaceMode() {
 }
 
 function resetToHomeLanding() {
-  toggleSproutWorkspaceMode();
+  switchMainSection('mission_control');
 }
 
 function activateSampleCaregiverProfile(primaryName) {
@@ -665,7 +665,9 @@ async function loadTabContent() {
   // Caregiver and Sphere selected: reveal main navigation toolbar
   if (mainNav) mainNav.classList.remove('hidden');
 
-  if (currentMainSection === 'dashboard') {
+  if (currentMainSection === 'mission_control') {
+    await renderMissionControlView(container);
+  } else if (currentMainSection === 'dashboard') {
     await renderDashboardView(container);
   } else if (currentMainSection === 'households') {
     await renderCaregiverAndHouseholdsView(container);
@@ -6713,5 +6715,355 @@ function generateChildLifebookPdf() {
 function generateTransitionPacket() {
   alert("📦 Generating Positive Care Transition Packet (.docx):\n\nCreating a strengths-based handoff packet for reunification, guardianship, or adoptive placement ensuring care continuity and zero lost history.");
 }
+
+// ==============================================================================
+// PHASE 12A: MISSION CONTROL & SYSTEM UNDERSTANDING LAYER
+// ==============================================================================
+
+async function renderMissionControlView(container) {
+  container.innerHTML = `
+    <div class="space-y-8 animate-fadeIn pb-12">
+
+      <!-- Mission Control Universal Safe Home Banner -->
+      <div class="bg-gradient-to-br from-emerald-950 via-slate-900 to-indigo-950 rounded-3xl p-6 sm:p-8 text-white shadow-xl border border-emerald-800/80 relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative z-10 max-w-4xl space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full text-xs font-black uppercase tracking-wider">
+            <i data-lucide="compass" class="w-4 h-4 text-emerald-400"></i> Sprout Mission Control & Operating System
+          </div>
+          <h1 class="text-3xl sm:text-4xl font-black tracking-tight text-white">
+            SPROUT
+          </h1>
+          <p class="text-emerald-300 text-sm font-bold uppercase tracking-wider">
+            Vermont Caregiver Operating System
+          </p>
+          <div class="flex flex-wrap items-center gap-4 text-xs font-bold text-slate-300 pt-1">
+            <span class="flex items-center gap-1.5 text-emerald-400"><i data-lucide="shield-check" class="w-4 h-4"></i> Protect Children.</span>
+            <span class="flex items-center gap-1.5 text-blue-400"><i data-lucide="feather" class="w-4 h-4"></i> Reduce Burden.</span>
+            <span class="flex items-center gap-1.5 text-amber-400"><i data-lucide="check-circle-2" class="w-4 h-4"></i> Stay Prepared.</span>
+          </div>
+          <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-3xl pt-1">
+            Welcome to your universal safe home. Whether you are a brand new foster parent, seasoned kinship grandmother, respite provider, state supervisor, or VCWTP instructor, this Mission Control Center guides your next action with zero confusion.
+          </p>
+          
+          <!-- Immediate 1-Tap Quick Action Row -->
+          <div class="pt-3 flex flex-wrap items-center gap-3">
+            <button onclick="launchQuickStartTour(5)" class="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs shadow-md transition flex items-center gap-2">
+              <i data-lucide="zap" class="w-4 h-4"></i>
+              <span>5-Minute New User Orientation</span>
+            </button>
+            <button onclick="openSystemHelpModal()" class="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-xs border border-white/20 transition flex items-center gap-2">
+              <i data-lucide="book-open" class="w-4 h-4 text-emerald-300"></i>
+              <span>How Sprout Works Center</span>
+            </button>
+            <button onclick="switchMainSection('dashboard')" class="px-4 py-2.5 bg-emerald-900/80 hover:bg-emerald-800 text-emerald-100 font-bold rounded-xl text-xs border border-emerald-600/60 transition flex items-center gap-2">
+              <i data-lucide="sun" class="w-4 h-4 text-emerald-300"></i>
+              <span>Open Today's Priorities</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- WHAT WOULD YOU LIKE TO DO TODAY? (4 Primary Quadrants) -->
+      <div class="space-y-4">
+        <div class="border-b border-slate-200 pb-3 flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
+              <i data-lucide="layout-grid" class="w-5 h-5 text-emerald-700"></i>
+              WHAT WOULD YOU LIKE TO DO TODAY?
+            </h2>
+            <p class="text-xs text-slate-500">Select a quadrant below to immediately launch the targeted workflow.</p>
+          </div>
+          <span class="text-[11px] font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full border border-slate-200">
+            Self-Guiding Interaction Model
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+
+          <!-- Quadrant 1: TRAIN -->
+          <div class="bg-white rounded-3xl border border-blue-200 shadow-sm p-5 space-y-4 flex flex-col justify-between hover:border-blue-400 transition">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-100 text-blue-900 border border-blue-200">
+                  TRAIN
+                </span>
+                <i data-lucide="graduation-cap" class="w-5 h-5 text-blue-600"></i>
+              </div>
+              <h3 class="font-extrabold text-slate-900 text-sm">Practice & Simulation</h3>
+              <p class="text-xs text-slate-500 leading-relaxed">
+                Consequence-free flight simulator for new foster parents, kin, and instructors.
+              </p>
+              <div class="space-y-1.5 pt-1 text-xs">
+                <button onclick="switchMainSection('training')" class="w-full text-left p-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-950 font-bold transition flex items-center justify-between">
+                  <span>▶ Training Hub</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-blue-600"></i>
+                </button>
+                <button onclick="toggleSproutWorkspaceMode()" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
+                  <span>▶ Practice Sandbox</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                </button>
+                <button onclick="switchMainSection('training')" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
+                  <span>▶ Scenario Simulations</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                </button>
+                <button onclick="openCaregiverProfilesModal()" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
+                  <span>▶ 15 Model Households</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                </button>
+                <button onclick="launchTrainerDemoLauncher()" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
+                  <span>▶ Instructor Demonstrations</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                </button>
+              </div>
+            </div>
+            <button onclick="switchMainSection('training')" class="w-full py-2 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow-2xs transition">
+              Open Training Hub
+            </button>
+          </div>
+
+          <!-- Quadrant 2: CARE -->
+          <div class="bg-white rounded-3xl border border-emerald-200 shadow-sm p-5 space-y-4 flex flex-col justify-between hover:border-emerald-400 transition">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-900 border border-emerald-200">
+                  CARE
+                </span>
+                <i data-lucide="heart" class="w-5 h-5 text-emerald-600"></i>
+              </div>
+              <h3 class="font-extrabold text-slate-900 text-sm">Daily Child Operations</h3>
+              <p class="text-xs text-slate-500 leading-relaxed">
+                Active medication schedules, school profiles, child lifebooks, and routines.
+              </p>
+              <div class="space-y-1.5 pt-1 text-xs">
+                <button onclick="switchMainSection('dashboard')" class="w-full text-left p-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-950 font-bold transition flex items-center justify-between">
+                  <span>▶ Today's Priorities</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-emerald-600"></i>
+                </button>
+                <button onclick="switchMainSection('children')" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
+                  <span>▶ My Children</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                </button>
+                <button onclick="switchMainSection('binder')" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
+                  <span>▶ Care Binder (20 Tabs)</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                </button>
+                <button onclick="switchMainSection('relationships')" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
+                  <span>▶ Circles of Care</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                </button>
+                <button onclick="switchMainSection('life_journey')" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
+                  <span>▶ Life Journey Storybook</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                </button>
+              </div>
+            </div>
+            <button onclick="switchMainSection('dashboard')" class="w-full py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-2xs transition">
+              Open Daily Cockpit
+            </button>
+          </div>
+
+          <!-- Quadrant 3: DCF -->
+          <div class="bg-white rounded-3xl border border-indigo-200 shadow-sm p-5 space-y-4 flex flex-col justify-between hover:border-indigo-400 transition">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-100 text-indigo-900 border border-indigo-200">
+                  DCF
+                </span>
+                <i data-lucide="scale" class="w-5 h-5 text-indigo-600"></i>
+              </div>
+              <h3 class="font-extrabold text-slate-900 text-sm">State & Court Compliance</h3>
+              <p class="text-xs text-slate-500 leading-relaxed">
+                Vermont Title 33 court reviews, EPSDT clocks, and \$0.67/mi state claims.
+              </p>
+              <div class="space-y-1.5 pt-1 text-xs">
+                <button onclick="switchMainSection('reports')" class="w-full text-left p-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-950 font-bold transition flex items-center justify-between">
+                  <span>▶ DCF Command Center</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-indigo-600"></i>
+                </button>
+                <button onclick="switchMainSection('reports')" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
+                  <span>▶ Court Preparation (.docx)</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                </button>
+                <button onclick="switchTab('expenses')" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
+                  <span>▶ Mileage Claims (FS-334B)</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                </button>
+                <button onclick="switchChildTab('chins')" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
+                  <span>▶ CHINS Timeline Stepper</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                </button>
+                <button onclick="switchMainSection('households')" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
+                  <span>▶ 12 District Directory</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                </button>
+              </div>
+            </div>
+            <button onclick="switchMainSection('reports')" class="w-full py-2 bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-xs rounded-xl shadow-2xs transition">
+              Open DCF Reports
+            </button>
+          </div>
+
+          <!-- Quadrant 4: SYSTEM -->
+          <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 space-y-4 flex flex-col justify-between hover:border-slate-400 transition">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-200 text-slate-800">
+                  SYSTEM
+                </span>
+                <i data-lucide="settings" class="w-5 h-5 text-slate-600"></i>
+              </div>
+              <h3 class="font-extrabold text-slate-900 text-sm">Architecture & Security</h3>
+              <p class="text-xs text-slate-500 leading-relaxed">
+                Cryptographic audit trails, offline database backups, and privacy guards.
+              </p>
+              <div class="space-y-1.5 pt-1 text-xs">
+                <button onclick="openSystemHelpModal()" class="w-full text-left p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold transition flex items-center justify-between">
+                  <span>▶ How Sprout Works</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-600"></i>
+                </button>
+                <button onclick="openSystemMapModal()" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
+                  <span>▶ Interactive Site Map</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                </button>
+                <button onclick="openProcessFlowsModal()" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
+                  <span>▶ Visual Process Flows</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                </button>
+                <button onclick="openDecisionTreesModal()" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
+                  <span>▶ Decision Trees</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                </button>
+                <button onclick="switchMainSection('settings')" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
+                  <span>▶ Audit & Settings</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                </button>
+              </div>
+            </div>
+            <button onclick="switchMainSection('settings')" class="w-full py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow-2xs transition">
+              Open System Settings
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ROLE-BASED USER JOURNEY SELECTOR (Which experience applies to me?) -->
+      <div class="bg-gradient-to-br from-slate-50 to-emerald-50/50 rounded-3xl border border-emerald-200 p-6 space-y-4">
+        <div class="flex items-center justify-between border-b border-emerald-200/60 pb-3">
+          <div>
+            <h3 class="font-black text-slate-900 text-base flex items-center gap-2">
+              <i data-lucide="map-pin" class="w-5 h-5 text-emerald-700"></i>
+              WHICH EXPERIENCE APPLIES TO YOU? (Guided Pathways)
+            </h3>
+            <p class="text-xs text-slate-600">Select your role to view your tailored learning path, primary workflows, and daily actions.</p>
+          </div>
+          <span class="text-xs font-bold text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full">
+            7 Specialized Journeys
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+          <!-- Role 1: New Foster Parent -->
+          <div onclick="openUserJourneyDetailModal('foster')" class="bg-white p-4 rounded-2xl border border-slate-200 hover:border-emerald-500 cursor-pointer transition shadow-2xs space-y-1.5">
+            <span class="text-[10px] font-black uppercase text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">Foster Home</span>
+            <h4 class="font-bold text-slate-900 text-xs">New Foster Parent</h4>
+            <p class="text-[11px] text-slate-500">Intake logging, 30-day health clock, daily observations, and medication records.</p>
+          </div>
+
+          <!-- Role 2: Kinship Caregiver -->
+          <div onclick="openUserJourneyDetailModal('kinship')" class="bg-white p-4 rounded-2xl border border-slate-200 hover:border-emerald-500 cursor-pointer transition shadow-2xs space-y-1.5">
+            <span class="text-[10px] font-black uppercase text-teal-700 bg-teal-50 px-2 py-0.5 rounded">Kinship / Grandparent</span>
+            <h4 class="font-bold text-slate-900 text-xs">Kinship Caregiver</h4>
+            <p class="text-[11px] text-slate-500">Relative search documentation, guardianship petitions, and family time tracking.</p>
+          </div>
+
+          <!-- Role 3: Respite Provider -->
+          <div onclick="openUserJourneyDetailModal('respite')" class="bg-white p-4 rounded-2xl border border-slate-200 hover:border-emerald-500 cursor-pointer transition shadow-2xs space-y-1.5">
+            <span class="text-[10px] font-black uppercase text-purple-700 bg-purple-50 px-2 py-0.5 rounded">Respite Care</span>
+            <h4 class="font-bold text-slate-900 text-xs">Respite Provider</h4>
+            <p class="text-[11px] text-slate-500">Weekend care, allergy/routine alerts, transport signatures, and privacy-shielded binder.</p>
+          </div>
+
+          <!-- Role 4: Adoptive Placement -->
+          <div onclick="openUserJourneyDetailModal('adoptive')" class="bg-white p-4 rounded-2xl border border-slate-200 hover:border-emerald-500 cursor-pointer transition shadow-2xs space-y-1.5">
+            <span class="text-[10px] font-black uppercase text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">Permanency</span>
+            <h4 class="font-bold text-slate-900 text-xs">Adoptive Placement</h4>
+            <p class="text-[11px] text-slate-500">Child Lifebook preservation, permanency court packets, and subsidy records.</p>
+          </div>
+
+          <!-- Role 5: State Trainer / Instructor -->
+          <div onclick="openUserJourneyDetailModal('trainer')" class="bg-white p-4 rounded-2xl border border-slate-200 hover:border-emerald-500 cursor-pointer transition shadow-2xs space-y-1.5">
+            <span class="text-[10px] font-black uppercase text-blue-700 bg-blue-50 px-2 py-0.5 rounded">VCWTP Instructor</span>
+            <h4 class="font-bold text-slate-900 text-xs">Trainer / Instructor</h4>
+            <p class="text-[11px] text-slate-500">10-minute cohort demonstration, 15 model homes, and crisis simulations.</p>
+          </div>
+
+          <!-- Role 6: DCF Caseworker / Supervisor -->
+          <div onclick="openUserJourneyDetailModal('supervisor')" class="bg-white p-4 rounded-2xl border border-slate-200 hover:border-emerald-500 cursor-pointer transition shadow-2xs space-y-1.5">
+            <span class="text-[10px] font-black uppercase text-amber-700 bg-amber-50 px-2 py-0.5 rounded">State Worker</span>
+            <h4 class="font-bold text-slate-900 text-xs">DCF Supervisor</h4>
+            <p class="text-[11px] text-slate-500">Reviewing pre-scrubbed caregiver court summaries and FS-334B claim validity.</p>
+          </div>
+
+          <!-- Role 7: Emergency Placement -->
+          <div onclick="openUserJourneyDetailModal('emergency')" class="bg-white p-4 rounded-2xl border border-slate-200 hover:border-emerald-500 cursor-pointer transition shadow-2xs space-y-1.5">
+            <span class="text-[10px] font-black uppercase text-rose-700 bg-rose-50 px-2 py-0.5 rounded">Urgent 24/7</span>
+            <h4 class="font-bold text-slate-900 text-xs">Emergency Intake</h4>
+            <p class="text-[11px] text-slate-500">11:00 PM rapid child profile, emergency handoff card, and 24/7 crisis numbers.</p>
+          </div>
+
+          <!-- Guided Tour Launcher Card -->
+          <div onclick="launchQuickStartTour(15)" class="bg-emerald-600 text-white p-4 rounded-2xl cursor-pointer hover:bg-emerald-700 transition shadow-sm space-y-1.5 flex flex-col justify-between">
+            <div>
+              <span class="text-[10px] font-black uppercase bg-white/20 text-white px-2 py-0.5 rounded">Self-Teaching</span>
+              <h4 class="font-bold text-white text-xs mt-1">15-Min Guided Tour</h4>
+              <p class="text-[11px] text-emerald-100">Step-by-step interactive walkthrough of all 4 cognitive domains.</p>
+            </div>
+            <span class="text-[11px] font-black flex items-center gap-1 text-emerald-200">Start Tour <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  `;
+
+  lucide.createIcons();
+}
+
+// Modal Launchers for System Understanding Modals
+function launchQuickStartTour(minutes) {
+  alert(`🚀 Launching ${minutes}-Minute Self-Guided Tour:\n\n1. Sprout Universal Cockpit\n2. 4 Cognitive Care Domains (Health, Visits, Learning, Records)\n3. Logging 15-Second Notes & Mileage ($0.67/mi)\n4. Generating Court Summaries\n\nAll tools are 100% offline and safe to explore.`);
+}
+
+function launchTrainerDemoLauncher() {
+  alert(`🎯 Trainer Demonstration Launcher:\n\nSelect a demonstration profile:\n• 10-Minute New Caregiver Demo\n• Kinship Care Demonstration (Grandparents HH-113)\n• Respite Care Privacy Demo\n• 11:00 PM Emergency Placement Simulation\n• DCF Supervisor Claim Audit Demo`);
+}
+
+function openSystemMapModal() {
+  alert(`🗺️ Interactive System Map:\n\nSprout Navigation Hierarchy:\n• Welcome Portal & Mission Control\n• Today (Command Center Briefing)\n• My Children (4 Cognitive Domains & 12 Sub-Tabs)\n• Care Binder (20 Vermont Folders)\n• Home & Licensing (FS-221A & VCWTP Ledger)\n• Circles of Care (4 concentric stakeholder tiers)\n• Life Journey (Child Lifebook Keepsakes)\n• Reports (Court Briefs & FS-334B Claims)\n• Settings (SHA-256 Blockchain Ledger & Backups)`);
+}
+
+function openProcessFlowsModal() {
+  alert(`📊 Process Flow Library:\n\nVisual Workflows Available:\n1. Emergency Placement: Placement Received ➔ Child Profile ➔ Medical Intake ➔ Safety Review\n2. Court Preparation: Timeline ➔ Communications ➔ Court Brief (.docx) ➔ GAL Submission\n3. Mileage Claim: Trip Log ➔ Ledger ➔ Form FS-334B ($0.67/mi) ➔ Submission`);
+}
+
+function openDecisionTreesModal() {
+  alert(`🌲 System Decision Tree Center:\n\n1. Workspace Selection (Local Live vs Sandbox Simulator)\n2. Privacy Shielding (Child Reference ID & Presentation Blur)\n3. Respite Care Permission Gates (Confidentiality Protection)\n4. Canonical Containment Security (Safe Document Paths)`);
+}
+
+function openUserJourneyDetailModal(roleKey) {
+  const roles = {
+    foster: "New Foster Parent: Focuses on intake logging, 30-day health clock, school IEP notes, and mileage reimbursement.",
+    kinship: "Kinship Caregiver: Focuses on relative search, legal guardianship tracking, and family time visitation logs.",
+    respite: "Respite Provider: Focuses on daily routines, active medication schedules, allergy alerts, and emergency contacts.",
+    adoptive: "Adoptive Placement: Focuses on Child Lifebook preservation, permanency petitions, and subsidy documentation.",
+    trainer: "Trainer / Instructor: Demonstrates 15 model homes, scenario simulations, and zero data leakage.",
+    supervisor: "DCF Supervisor: Audits caregiver monthly reports, medical compliance, and FS-334B state claims.",
+    emergency: "Emergency Intake: Rapid 2-minute child registration, medication intake, and emergency handoff card."
+  };
+  alert(`🧭 User Journey Pathway:\n\n${roles[roleKey] || 'Custom Caregiver Pathway'}`);
+}
+
 
 

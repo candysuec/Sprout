@@ -52,8 +52,8 @@
   <header id="topHeader" class="bg-emerald-950 text-white shadow-sm sticky top-0 z-40 border-b border-emerald-900 transition-colors duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
       
-      <!-- Brand & Title: Clickable to Reset to Main Landing Page -->
-      <div onclick="resetToHomeLanding()" class="flex items-center space-x-3 cursor-pointer group" title="Return to Sprout Welcome & Resource Center">
+      <!-- Brand & Title: Clickable to Open Mission Control Center (Universal Safe Home) -->
+      <div onclick="switchMainSection('mission_control')" class="flex items-center space-x-3 cursor-pointer group" title="Return to Sprout Mission Control Center">
         <div class="bg-emerald-800/80 group-hover:bg-emerald-700 p-2 rounded-xl text-emerald-300 border border-emerald-700/60 shadow-sm transition">
           <i data-lucide="sprout" class="w-5 h-5 text-emerald-300"></i>
         </div>
@@ -113,8 +113,14 @@
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div class="flex flex-wrap items-center gap-2">
           
-          <!-- 4 Unified Action Hubs (High-Contrast, Cognitive-Load Reduced) -->
+          <!-- 5 Unified Action Hubs (High-Contrast, Cognitive-Load Reduced) -->
           <div class="flex items-center bg-slate-100/90 p-1.5 rounded-xl border border-slate-200 space-x-1.5 shadow-2xs">
+            <!-- Hub 0: Mission Control (Universal Safe Home & System Guide) -->
+            <button onclick="switchMainSection('mission_control')" id="navBtn-mission_control" class="main-nav-btn px-3.5 py-2 rounded-lg transition text-slate-700 hover:bg-white flex items-center gap-1.5 font-bold text-xs" title="Sprout Mission Control, System Guide, & Decision Trees">
+              <i data-lucide="compass" class="w-4 h-4 text-emerald-600"></i>
+              <span>Mission Control</span>
+            </button>
+
             <!-- Hub 1: Today / Command Center -->
             <button onclick="switchMainSection('dashboard')" id="navBtn-dashboard" class="main-nav-btn active px-4 py-2 rounded-lg transition text-slate-700 hover:bg-white flex items-center gap-2 font-bold text-xs bg-white text-emerald-800 shadow-sm" title="Today's live command center, doses, and actions">
               <i data-lucide="sun" class="w-4 h-4 text-emerald-600"></i>
