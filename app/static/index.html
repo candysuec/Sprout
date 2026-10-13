@@ -335,19 +335,19 @@
         </div>
 
         <!-- Optional Mileage & Reimbursement Strip (For Visits, Doctor trips, and DCF Runs) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-emerald-50/60 border border-emerald-100 rounded-xl p-3 text-xs">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-emerald-50/70 border border-emerald-200 rounded-xl p-3.5 text-sm">
           <div>
-            <label class="block font-semibold text-emerald-900 mb-1 flex items-center gap-1">
-              <i data-lucide="navigation" class="w-3.5 h-3.5 text-emerald-600"></i> Round-Trip Mileage (DCF Reimbursable)
+            <label class="block font-bold text-emerald-950 mb-1 flex items-center gap-1.5 text-xs">
+              <i data-lucide="navigation" class="w-4 h-4 text-emerald-600"></i> Round-Trip Mileage (DCF Reimbursable)
             </label>
-            <input type="number" step="0.5" id="recMileage" placeholder="Miles driven (e.g. 14.5)" class="w-full text-xs border border-emerald-200 rounded-lg p-2 bg-white" />
-            <p class="text-[10px] text-emerald-700 mt-1">Calculated at current DCF state travel reimbursement rate ($0.67/mi).</p>
+            <input type="number" step="0.5" id="recMileage" placeholder="Miles driven (e.g. 14.5)" class="w-full text-sm border border-emerald-300 rounded-lg p-2.5 bg-white focus:ring-2 focus:ring-emerald-500" />
+            <p class="text-xs text-emerald-800 mt-1">Calculated at current DCF state travel reimbursement rate ($0.67/mi).</p>
           </div>
           <div>
-            <label class="block font-semibold text-emerald-900 mb-1 flex items-center gap-1">
-              <i data-lucide="shield" class="w-3.5 h-3.5 text-emerald-600"></i> RPPS Decision Log (Caregiver Prudent Parent)
+            <label class="block font-bold text-emerald-950 mb-1 flex items-center gap-1.5 text-xs">
+              <i data-lucide="shield" class="w-4 h-4 text-emerald-600"></i> RPPS Decision Log (Caregiver Prudent Parent)
             </label>
-            <select id="recRppsCategory" class="w-full text-xs border border-emerald-200 rounded-lg p-2 bg-white">
+            <select id="recRppsCategory" class="w-full text-sm border border-emerald-300 rounded-lg p-2.5 bg-white focus:ring-2 focus:ring-emerald-500">
               <option value="">Not an RPPS Decision</option>
               <option value="Extracurricular / Sports">Extracurricular Activity / Sports / Lessons</option>
               <option value="Social / Sleepover">Social Activity / Peer Sleepover / Playdate</option>
@@ -355,24 +355,24 @@
               <option value="Personal Care / Haircut">Personal Grooming / Haircut / Clothing Choice</option>
               <option value="Job / Driver Ed">Part-Time Work / Driver's Education</option>
             </select>
-            <p class="text-[10px] text-emerald-700 mt-1">Protects caregiver decision authority under Vermont RPPS foster care rules.</p>
+            <p class="text-xs text-emerald-800 mt-1">Protects caregiver decision authority under Vermont RPPS foster care rules.</p>
           </div>
         </div>
 
         <!-- Follow-up action alert -->
-        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 space-y-2">
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3.5 space-y-2">
           <label class="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" id="recFollowUpNeeded" onchange="toggleFollowUpFields()" class="rounded text-amber-600 focus:ring-amber-500 w-4 h-4">
-            <span class="text-xs font-bold text-amber-900">Requires Follow-Up or Action Item</span>
+            <span class="text-sm font-bold text-amber-950">Requires Follow-Up or Action Item</span>
           </label>
           <div id="followUpGroup" class="hidden grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
             <div>
-              <label class="block text-xs text-amber-800 font-medium mb-1">Follow-Up Action Required</label>
-              <input type="text" id="recFollowUpNotes" placeholder="e.g. Schedule 6-month check, send report to GAL" class="w-full text-xs border border-amber-300 rounded-lg p-2 bg-white" />
+              <label class="block text-xs text-amber-900 font-semibold mb-1">Follow-Up Action Required</label>
+              <input type="text" id="recFollowUpNotes" placeholder="e.g. Schedule 6-month check, send report to GAL" class="w-full text-sm border border-amber-300 rounded-lg p-2.5 bg-white focus:ring-2 focus:ring-amber-500" />
             </div>
             <div>
-              <label class="block text-xs text-amber-800 font-medium mb-1">Due Date</label>
-              <input type="date" id="recFollowUpDue" class="w-full text-xs border border-amber-300 rounded-lg p-2 bg-white" />
+              <label class="block text-xs text-amber-900 font-semibold mb-1">Due Date</label>
+              <input type="date" id="recFollowUpDue" class="w-full text-sm border border-amber-300 rounded-lg p-2.5 bg-white focus:ring-2 focus:ring-amber-500" />
             </div>
           </div>
         </div>

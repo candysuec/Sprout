@@ -3008,22 +3008,43 @@ async function loadComplianceAndReimbursementWidgets() {
         if (it.status === 'Completed') badgeColor = 'bg-emerald-100 text-emerald-800 border-emerald-200';
         else if (it.status === 'Submitted') badgeColor = 'bg-blue-100 text-blue-800 border-blue-200';
 
+        // Contextual Vermont DCF regulatory guidance for caregivers
+        let dcfWhyNote = '';
+        const titleLower = (it.title || '').toLowerCase();
+        if (titleLower.includes('fingerprint') || titleLower.includes('background')) {
+          dcfWhyNote = 'Required under VT DCF FS-221A within 90 days for all household adults before full licensing.';
+        } else if (titleLower.includes('water') || titleLower.includes('well')) {
+          dcfWhyNote = 'State health standards require potability and lead test certification for private well systems.';
+        } else if (titleLower.includes('alarm') || titleLower.includes('smoke') || titleLower.includes('detector')) {
+          dcfWhyNote = 'Dual-sensor smoke detectors required on every level and outside each sleeping corridor.';
+        } else if (titleLower.includes('exit') || titleLower.includes('window') || titleLower.includes('bedroom')) {
+          dcfWhyNote = 'Emergency egress: bedroom windows must meet 5.7 sq ft clear opening requirements.';
+        } else if (titleLower.includes('training') || titleLower.includes('vcwtp')) {
+          dcfWhyNote = 'Vermont Child Welfare Training Partnership (VCWTP) foundational pre-service hours.';
+        }
+
         return `
-          <div class="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/70 text-xs">
-            <div class="space-y-0.5">
-              <div class="flex items-center gap-2">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">${it.category}</span>
-                <span class="font-bold text-slate-900">${it.title}</span>
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 text-sm gap-3">
+            <div class="space-y-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">${it.category}</span>
+                <span class="font-bold text-slate-900 text-sm">${it.title}</span>
               </div>
-              <p class="text-[11px] text-slate-500">${it.notes || ''} ${it.target_date ? `• Target: ${it.target_date}` : ''}</p>
+              <p class="text-xs text-slate-600">${it.notes || ''} ${it.target_date ? `• <strong>Target Date:</strong> ${it.target_date}` : ''}</p>
+              ${dcfWhyNote ? `
+                <div class="flex items-center gap-1.5 text-xs text-emerald-800 bg-emerald-50/80 px-2.5 py-1 rounded-lg border border-emerald-200/60 mt-1">
+                  <i data-lucide="info" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+                  <span><strong>Why DCF Requires This:</strong> ${dcfWhyNote}</span>
+                </div>
+              ` : ''}
             </div>
-            <div class="flex items-center gap-2">
-              <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${badgeColor}">
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="px-2.5 py-1 rounded text-xs font-bold border ${badgeColor}">
                 ${it.status}
               </span>
               ${it.status !== 'Completed' ? `
-                <button onclick="markComplianceCompleted(${it.id})" class="text-[10px] bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-2 py-1 rounded shadow-sm">
-                  Mark Done
+                <button onclick="markComplianceCompleted(${it.id})" class="text-xs bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-3 py-1.5 rounded-lg shadow-sm transition flex items-center gap-1">
+                  <i data-lucide="check" class="w-3.5 h-3.5"></i> Mark Done
                 </button>
               ` : ''}
             </div>
@@ -3067,6 +3088,7 @@ async function loadComplianceAndReimbursementWidgets() {
       `;
     }
   }
+  lucide.createIcons();
 }
 
 async function markComplianceCompleted(itemId) {
