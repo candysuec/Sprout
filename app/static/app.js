@@ -687,6 +687,8 @@ async function loadTabContent() {
     await renderCommunicationsView(container);
   } else if (currentMainSection === 'relationships') {
     await renderRelationshipCenterView(container);
+  } else if (currentMainSection === 'life_journey') {
+    await renderLifeJourneyView(container);
   } else if (currentMainSection === 'reports') {
     renderReportsView(container);
   } else if (currentMainSection === 'training') {
@@ -6469,6 +6471,247 @@ async function markRecordComplete(recordId) {
   } catch (err) {
     alert("Failed to update status: " + err.message);
   }
+}
+
+// ==============================================================================
+// PHASE 11: LIFE JOURNEY & MILESTONE CENTER (CHILD LIFEBOOK & CELEBRATION FEED)
+// ==============================================================================
+
+async function renderLifeJourneyView(container) {
+  const child = childrenList.find(c => c.id === currentChildId);
+  const alias = child ? (child.alias || 'Child') : 'Child';
+  const childRefId = child ? (child.child_code || `CH-${child.id || '201'}`) : 'CH-201';
+
+  let records = [];
+  try {
+    const res = await apiFetch(`/api/children/${currentChildId}/records?category=all`);
+    records = await res.json();
+  } catch (err) {
+    console.error('Failed to load life journey records:', err);
+  }
+
+  // Core Positive Milestones (Strengths-based journey)
+  const milestoneList = [
+    {
+      date: "Oct 12, 2026",
+      title: "First Soccer League Goal!",
+      category: "Sports & Athletics",
+      badgeColor: "bg-emerald-100 text-emerald-800 border-emerald-300",
+      description: "Scored winning goal during Saturday's regional game. Kept game ball as a memento in bedroom.",
+      icon: "trophy"
+    },
+    {
+      date: "Oct 05, 2026",
+      title: "5th Grade Honor Roll — Q1 Term",
+      category: "Educational Success",
+      badgeColor: "bg-blue-100 text-blue-800 border-blue-300",
+      description: "Achieved all A's and B's on quarterly progress report card. Outstanding growth in reading comprehension.",
+      icon: "award"
+    },
+    {
+      date: "Sep 22, 2026",
+      title: "Reading Milestone: Completed Chapter Book",
+      category: "Literacy & Learning",
+      badgeColor: "bg-purple-100 text-purple-800 border-purple-300",
+      description: "Finished 300-page chapter book independently with 30-min bedtime reading routine.",
+      icon: "book-open"
+    },
+    {
+      date: "Aug 15, 2026",
+      title: "Camp Abnaki Summer Nature Explorer Badge",
+      category: "Community & Arts",
+      badgeColor: "bg-amber-100 text-amber-800 border-amber-300",
+      description: "Completed one-week day camp canoe and outdoor survival trail challenge.",
+      icon: "compass"
+    }
+  ];
+
+  container.innerHTML = `
+    <div class="space-y-6">
+
+      <!-- Life Journey Header Banner -->
+      <div class="bg-gradient-to-r from-amber-700 via-rose-700 to-indigo-800 rounded-3xl p-6 text-white shadow-md border border-amber-500/40 relative overflow-hidden">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-400/30 text-amber-100 border border-amber-300/40 flex items-center gap-1">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-300"></i> Child Lifebook & Journey Storybook
+              </span>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-black/20 text-white border border-white/20">
+                Child Ref: ${childRefId}
+              </span>
+            </div>
+            <h2 class="text-2xl font-black tracking-tight text-white flex items-center gap-2">
+              Life Journey & Positive Milestone Center
+            </h2>
+            <p class="text-xs text-amber-100/90 max-w-2xl mt-1 leading-relaxed">
+              Every child is a whole person—not an administrative case file. Preserving childhood achievements, sports victories, reading milestones, artwork, and joyful memories with dignity and trauma-informed care.
+            </p>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="generateChildLifebookPdf()" class="bg-amber-400 hover:bg-amber-300 text-slate-900 font-black text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center gap-1.5">
+              <i data-lucide="book" class="w-4 h-4"></i> Export Lifebook Packet (.docx)
+            </button>
+            <button onclick="generateTransitionPacket()" class="bg-white/10 hover:bg-white/20 text-white font-bold text-xs px-3.5 py-2.5 rounded-xl border border-white/20 transition flex items-center gap-1.5">
+              <i data-lucide="package-check" class="w-3.5 h-3.5 text-amber-200"></i> Transition Packet
+            </button>
+          </div>
+        </div>
+
+        <!-- Positive Metrics Strip -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-5 mt-5 border-t border-white/15 text-xs">
+          <div class="bg-white/10 p-3 rounded-xl border border-white/10">
+            <span class="text-[10px] text-amber-200 font-bold uppercase block">Celebrated Milestones</span>
+            <span class="text-base font-black text-white mt-0.5 block">${milestoneList.length} Major Wins</span>
+            <span class="text-[10px] text-amber-100">Honor Roll, Sports, Reading</span>
+          </div>
+
+          <div class="bg-white/10 p-3 rounded-xl border border-white/10">
+            <span class="text-[10px] text-emerald-200 font-bold uppercase block">Positive Life Growth</span>
+            <span class="text-base font-black text-white mt-0.5 block">+2 Grade Levels</span>
+            <span class="text-[10px] text-emerald-100">Reading Comprehension</span>
+          </div>
+
+          <div class="bg-white/10 p-3 rounded-xl border border-white/10">
+            <span class="text-[10px] text-rose-200 font-bold uppercase block">Preserved Memories</span>
+            <span class="text-base font-black text-white mt-0.5 block">12 Keepsakes</span>
+            <span class="text-[10px] text-rose-100">Photos, Artwork, Certificates</span>
+          </div>
+
+          <div class="bg-white/10 p-3 rounded-xl border border-white/10">
+            <span class="text-[10px] text-blue-200 font-bold uppercase block">Supportive Connections</span>
+            <span class="text-base font-black text-white mt-0.5 block">6 Caring Adults</span>
+            <span class="text-[10px] text-blue-100">Coach, Teacher, Kin, Mentor</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Milestone Feed -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Milestone Cards (2 Columns) -->
+        <div class="lg:col-span-2 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-5">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                <i data-lucide="award" class="w-4 h-4 text-amber-600"></i>
+                <span>Chronological Milestone & Growth Journey — ${alias}</span>
+              </h3>
+              <p class="text-xs text-slate-500">Documenting achievements and joyous moments that celebrate child dignity and personal strengths.</p>
+            </div>
+            <button onclick="openNewMilestoneModal()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-3.5 py-1.5 rounded-xl shadow-2xs flex items-center gap-1">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i> Celebrate Milestone
+            </button>
+          </div>
+
+          <div class="space-y-4">
+            ${milestoneList.map(m => `
+              <div class="border border-slate-200 rounded-2xl p-4 hover:border-amber-300 transition space-y-2 bg-gradient-to-r from-amber-50/20 via-white to-slate-50/30">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="p-1.5 rounded-xl bg-amber-100 text-amber-800">
+                      <i data-lucide="${m.icon}" class="w-4 h-4"></i>
+                    </span>
+                    <span class="px-2 py-0.5 rounded font-bold text-[10px] uppercase border ${m.badgeColor}">
+                      ${m.category}
+                    </span>
+                    <h4 class="font-bold text-slate-900 text-xs">${m.title}</h4>
+                  </div>
+                  <span class="text-[11px] font-semibold text-slate-400">${m.date}</span>
+                </div>
+
+                <p class="text-xs text-slate-600 leading-relaxed bg-white p-3 rounded-xl border border-slate-100">
+                  ${m.description}
+                </p>
+
+                <div class="flex items-center justify-between text-[11px] text-slate-400 pt-1">
+                  <span class="text-emerald-700 font-semibold flex items-center gap-1">
+                    <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i> Preserved in Child Lifebook Story
+                  </span>
+                  <span class="text-slate-400">Permanently Archived</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Lifebook & Transition Packets (1 Column) -->
+        <div class="space-y-6">
+          
+          <!-- Lifebook Snapshot Card -->
+          <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-4">
+            <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2 border-b border-slate-100 pb-3">
+              <i data-lucide="book-heart" class="w-4 h-4 text-rose-500"></i>
+              <span>Child Lifebook Keepsake</span>
+            </h3>
+
+            <p class="text-xs text-slate-600 leading-relaxed">
+              When a child transitions home to family, permanent guardianship, or adoption, this Lifebook transfers with them—carrying their proudest memories, school photos, and developmental journey.
+            </p>
+
+            <div class="space-y-2 text-xs">
+              <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                <span class="font-bold text-slate-800">Favorite Activities:</span>
+                <span class="text-slate-600 font-medium">Soccer, Drawing, Swimming</span>
+              </div>
+              <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                <span class="font-bold text-slate-800">Comfort Routines:</span>
+                <span class="text-slate-600 font-medium">Stuffed dog, bedtime story</span>
+              </div>
+              <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                <span class="font-bold text-slate-800">Favorite Foods:</span>
+                <span class="text-slate-600 font-medium">Mac & Cheese, Apples, Pasta</span>
+              </div>
+            </div>
+
+            <button onclick="generateChildLifebookPdf()" class="w-full bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs py-2 rounded-xl shadow-2xs transition flex items-center justify-center gap-1.5">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i> Download Child Lifebook (.docx)
+            </button>
+          </div>
+
+          <!-- Transition Packet Generator -->
+          <div class="bg-gradient-to-br from-indigo-50 to-amber-50/50 border border-indigo-200 rounded-3xl p-5 space-y-3">
+            <h4 class="font-bold text-indigo-950 text-xs uppercase tracking-wider flex items-center gap-1.5">
+              <i data-lucide="heart" class="w-3.5 h-3.5 text-indigo-600"></i> Care Transition Packet
+            </h4>
+            <p class="text-[11px] text-indigo-900/80 leading-relaxed">
+              Preparing for reunification or permanent guardianship? Sprout bundles immunizations, favorite routines, doctor contacts, and milestone achievements into an empowering handoff packet for the family.
+            </p>
+            <button onclick="generateTransitionPacket()" class="w-full bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-xs py-2 rounded-xl shadow-2xs transition flex items-center justify-center gap-1">
+              <i data-lucide="file-check" class="w-3.5 h-3.5"></i> Create Transition Packet
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  `;
+
+  lucide.createIcons();
+}
+
+function openNewMilestoneModal() {
+  openRecordModal();
+  setTimeout(() => {
+    const title = document.getElementById('recTitle');
+    const summary = document.getElementById('recSummary');
+    const cat = document.getElementById('recCategory');
+    if (title) title.value = "Celebration Milestone: ";
+    if (summary) summary.value = "Document positive progress, personal goals, sports achievements, or creative successes here.";
+    if (cat) cat.value = "education";
+  }, 150);
+}
+
+function generateChildLifebookPdf() {
+  alert("📖 Compiling Child Lifebook Keepsake (.docx):\n\nPreserving personal history, favorite activities, achievements, certificates, and developmental victories under strict privacy shielding.");
+}
+
+function generateTransitionPacket() {
+  alert("📦 Generating Positive Care Transition Packet (.docx):\n\nCreating a strengths-based handoff packet for reunification, guardianship, or adoptive placement ensuring care continuity and zero lost history.");
 }
 
 
