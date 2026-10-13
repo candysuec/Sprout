@@ -687,6 +687,8 @@ async function loadTabContent() {
     await renderCommunicationsView(container);
   } else if (currentMainSection === 'reports') {
     renderReportsView(container);
+  } else if (currentMainSection === 'training') {
+    await renderTrainingSimulatorView(container);
   } else if (currentMainSection === 'sample_data') {
     await renderSampleDataExplorerView(container);
   } else if (currentMainSection === 'settings') {
@@ -5581,42 +5583,534 @@ function clearSignatureCanvas() {
   const hint = document.getElementById('signPromptHint');
   if (hint) hint.classList.remove('hidden');
 }
+// ==============================================================================
+// PHASE 8: PRACTICE SANDBOX & CAREGIVER FLIGHT SIMULATOR (TRAINING HUB)
+// ==============================================================================
 
-async function saveSignatureCapture() {
-  const signerName = (document.getElementById('signerName')?.value || '').trim();
-  if (!signerName) {
-    alert('Please enter the signer name or role.');
-    return;
+const TRAINING_SCENARIOS = [
+  {
+    id: "scen-1",
+    title: "Emergency Placement at 11:00 PM",
+    category: "Emergency Intake",
+    urgency: "Immediate",
+    badgeColor: "bg-rose-100 text-rose-900 border-rose-300",
+    situation: "DCF On-Call worker arrives with an 8-year-old child (EC) placed under a 72-hour emergency hold. Child has no belongings except a plastic bag with one change of clothes and a favorite stuffed dog. No medication provided, but worker mentions the child is allergic to amoxicillin.",
+    recommendedActions: [
+      "Conduct non-intrusive physical wellness & allergy check; verify amoxicillin alert in Health domain.",
+      "Ensure comfort items (stuffed dog) stay with child; log food/comfort items in Care Routines.",
+      "Log emergency placement arrival time, DCF duty worker name, and emergency contact in Journal.",
+      "Schedule statutory 30-Day EPSDT Well-Child Exam within 24 hours of intake."
+    ],
+    sampleLogTitle: "Emergency Placement Intake: EC",
+    sampleLogSummary: "Child EC arrived at 11:15 PM via DCF After-Hours worker (Sara Higgins). Allergies confirmed: Amoxicillin. Comfort dog kept at bedside. Settled in bedroom at 11:45 PM after snack."
+  },
+  {
+    id: "scen-2",
+    title: "Missed Family Time / Visit Cancellation",
+    category: "Family Visits",
+    urgency: "High",
+    badgeColor: "bg-amber-100 text-amber-900 border-amber-300",
+    situation: "Biological mother did not show for scheduled 3:00 PM supervised family time at Easterseals. Child waited 25 minutes, became visibly dysregulated and tearful, and threw a notebook in the parking lot before returning to the car.",
+    recommendedActions: [
+      "Document objective, observable behavior without judgment (e.g., 'tearful for 15 minutes, threw notebook' rather than 'child was defiant').",
+      "Record transport arrival and departure times for state reimbursement.",
+      "Log that the visit did not occur and state reason provided by supervisor.",
+      "Flag an automated notification draft to DCF Caseworker."
+    ],
+    sampleLogTitle: "Family Time Cancellation & Emotional Reaction",
+    sampleLogSummary: "Arrived Easterseals 2:50 PM. At 3:15 PM supervisor confirmed parent cancellation. Child cried and threw notebook in parking lot. Offered calm space and water; de-escalated by 3:40 PM."
+  },
+  {
+    id: "scen-3",
+    title: "Medication Refill Warning (3 Days Remaining)",
+    category: "Health & MAR",
+    urgency: "Medium",
+    badgeColor: "bg-blue-100 text-blue-900 border-blue-300",
+    situation: "Child's daily ADHD medication (Methylphenidate 10mg) has only 4 tablets left in the prescription bottle. The prescribing pediatrician requires a 48-hour prior authorization turnaround.",
+    recommendedActions: [
+      "Check Pharmacy Refill Number on MAR ledger.",
+      "Contact pediatric clinic nurse line to request electronic prescription renewal.",
+      "Notify DCF caseworker if court or state medical consent sign-off is needed.",
+      "Log medication follow-up action item on Today Flight Strip."
+    ],
+    sampleLogTitle: "Prescription Refill Request: Methylphenidate 10mg",
+    sampleLogSummary: "Called Dr. Palmer's office for 30-day refill. Nurse confirmed request submitted to Walgreens. 4 doses remaining at home."
+  },
+  {
+    id: "scen-4",
+    title: "Quarterly CHINS Court Review Tomorrow",
+    category: "Court Preparation",
+    urgency: "Urgent",
+    badgeColor: "bg-indigo-100 text-indigo-900 border-indigo-300",
+    situation: "Family Division court review is tomorrow at 9:30 AM. Guardian ad Litem (GAL) and DCF worker request a 90-day progress summary covering school attendance, counseling notes, and caregiver observations.",
+    recommendedActions: [
+      "Generate Confidential Court Progress Report (.docx) in Privacy Mode: Initials Only.",
+      "Verify that all family time visits and doctor appointments are up to date.",
+      "Print or export mileage log (Form FS-334B) for the travel claim.",
+      "Review factual observations and ensure zero unverified emotional assumptions."
+    ],
+    sampleLogTitle: "Court Progress Review Preparation",
+    sampleLogSummary: "Compiled 90-day chronology for minor child. Exported monthly reports and attendance ledger for GAL review."
+  },
+  {
+    id: "scen-5",
+    title: "School IEP & Behavioral Incident",
+    category: "School & Milestones",
+    urgency: "Medium",
+    badgeColor: "bg-purple-100 text-purple-900 border-purple-300",
+    situation: "School principal calls to report child had a sensory meltdown during fire drill and hid under a teacher's desk. Special education coordinator recommends an emergency IEP team meeting.",
+    recommendedActions: [
+      "Record date, teacher name, and exact triggers (loud siren) in Education sub-tab.",
+      "Request written incident report from school special education liaison.",
+      "Update child comfort items and care routines with sensory noise-canceling headphones.",
+      "Coordinate with DCF educational surrogate for IEP signature."
+    ],
+    sampleLogTitle: "School Sensory Incident & IEP Review Request",
+    sampleLogSummary: "Principal reported fire drill overload. Child hid under desk. Coordinated with Ms. Davis to add sensory ear protection to school bag."
+  },
+  {
+    id: "scen-6",
+    title: "Celebration: First Honor Roll & Soccer Goal",
+    category: "Positive Outcomes",
+    urgency: "Celebration",
+    badgeColor: "bg-emerald-100 text-emerald-900 border-emerald-300",
+    situation: "Child achieved Honor Roll in 5th grade and scored their first goal in Saturday's youth soccer league. Child asked to save the game ball and report card.",
+    recommendedActions: [
+      "Log developmental milestone in Milestones domain to build a positive life storybook.",
+      "Photograph report card and save in Education vault.",
+      "Share positive progress update with biological parents during next supervised family time (if permitted by case plan).",
+      "Reinforce to child that their hard work and perseverance matter."
+    ],
+    sampleLogTitle: "Celebration Milestone: Honor Roll & Soccer Goal",
+    sampleLogSummary: "Earned A's and B's on Q1 report card! Scored winning soccer goal on Saturday. Game ball signed and placed in bedroom shelf."
   }
-  if (!hasSigned) {
-    alert('Please draw a signature before saving.');
-    return;
-  }
+];
 
-  const sigDataUrl = sigCanvas.toDataURL('image/png');
-  // Store confirmation in current child timeline as a verified sign-off
-  try {
-    const today = new Date().toISOString().split('T')[0];
-    await apiFetch('/api/children/' + currentChildId + '/records', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        child_id: currentChildId,
-        category: 'legal',
-        severity: 'Routine',
-        title: `Signed Caregiver Verification: ${signerName}`,
-        event_date: today,
-        summary: `Digital signature captured for ${signerName} confirming caregiver handoff / transport attendance.`,
-        participants: signerName
-      })
-    });
-    alert(`Signature for ${signerName} verified and recorded to Binder!`);
-    closeSignatureModal();
-    if (typeof loadChildOverview === 'function') loadChildOverview();
-  } catch (err) {
-    alert('Failed to save signature: ' + err.message);
+const SYNTHETIC_VAULT_DOCS = [
+  {
+    id: "vdoc-1",
+    name: "SAMPLE_CHINS_Court_Order_Temporary_Custody_Redacted.pdf",
+    category: "Court & Legal",
+    description: "Sample Family Division Conditional Custody Order (Title 33 V.S.A.). Practice reading court visitation mandates and legal custody conditions.",
+    badge: "PRACTICE SANDBOX • NO REAL DATA"
+  },
+  {
+    id: "vdoc-2",
+    name: "SAMPLE_Vermont_IEP_Special_Education_Accommodations.pdf",
+    category: "Education & School",
+    description: "Sample Individualized Education Plan (IEP) with sensory breaks, speech therapy schedules, and paraprofessional support guidelines.",
+    badge: "PRACTICE SANDBOX • NO REAL DATA"
+  },
+  {
+    id: "vdoc-3",
+    name: "SAMPLE_DCF_FS-221A_Foster_Caregiver_Placement_Agreement.pdf",
+    category: "DCF Forms & Plans",
+    description: "Sample Department for Children and Families Placement Agreement detailing caregiver authorities, RPPS decision-making, and Medicaid coverage.",
+    badge: "PRACTICE SANDBOX • NO REAL DATA"
+  },
+  {
+    id: "vdoc-4",
+    name: "SAMPLE_EPSDT_30_Day_Well_Child_Health_Screening_Form.docx",
+    category: "Medical & Health",
+    description: "Vermont EPSDT statutory intake physical form. Shows baseline immunizations, growth chart curves, and dental referral blocks.",
+    badge: "PRACTICE SANDBOX • NO REAL DATA"
+  },
+  {
+    id: "vdoc-5",
+    name: "SAMPLE_State_Reimbursement_FS-334B_Mileage_Claim.docx",
+    category: "Financial & Claims",
+    description: "Pre-formatted State Form FS-334B with itemized visitation mileage calculation at $0.67/mile.",
+    badge: "PRACTICE SANDBOX • NO REAL DATA"
+  }
+];
+
+const MOCK_CASEWORKER_MESSAGES = [
+  {
+    id: "cw-1",
+    sender: "Jessica Taylor, MSW (DCF Family Services Worker)",
+    subject: "Quarterly Case Review & Medical Documentation Request",
+    timestamp: "Today at 9:15 AM",
+    body: "Hi Candy,\n\nWe have our quarterly court review scheduled in two weeks. Could you please ensure all doctor visits and medication refills from the last 60 days are logged in your binder? Also, please send over the latest mileage claim (FS-334B) so our business office can approve it.\n\nThank you for all your support,\nJessica",
+    recommendedReply: "Dear Jessica,\n\nI have updated our records in Sprout. The EPSDT well-child exam and immunization logs are current, and the FS-334B mileage claim is exported and ready for your sign-off.\n\nBest,\nCandy"
+  },
+  {
+    id: "cw-2",
+    sender: "David Vance (Guardian ad Litem / GAL)",
+    subject: "Upcoming Visit Observation & School Check-In",
+    timestamp: "Yesterday at 3:45 PM",
+    body: "Hello,\n\nI will be meeting with the child at school next Tuesday. Could you let me know how they did emotionally following last Friday's family time? Any notes on bedtime routines or behavioral adjustments would be very helpful for my report to the judge.\n\nSincerely,\nDavid Vance, GAL",
+    recommendedReply: "Dear Mr. Vance,\n\nFollowing Friday's visit, the child had a 20-minute emotional de-escalation period but settled well after a snack and evening routine. School attendance has remained at 100% this week. Full notes are logged in our Care Binder.\n\nBest regards,\nCandy"
+  }
+];
+
+async function renderTrainingSimulatorView(container) {
+  // Ensure sandbox theme indicator is activated if in practice mode
+  const isSample = currentSproutMode === 'sample';
+
+  container.innerHTML = `
+    <div class="space-y-6">
+      
+      <!-- Training Header Banner -->
+      <div class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 rounded-3xl p-6 text-white shadow-md relative overflow-hidden border border-blue-700">
+        <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-blue-500/30 text-blue-200 border border-blue-400/40 flex items-center gap-1">
+                <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-blue-300"></i> Caregiver Flight Simulator
+              </span>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                VCWTP Aligned • 100% Synthetic
+              </span>
+            </div>
+            <h2 class="text-2xl font-black tracking-tight text-white flex items-center gap-2">
+              Practice Sandbox & Training Command Center
+            </h2>
+            <p class="text-xs text-blue-200 max-w-2xl mt-1 leading-relaxed">
+              Learn Sprout workflows, master Vermont DCF documentation, practice high-stress emergency intakes, and rehearse court preparation without risking real-family records.
+            </p>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="startInteractiveTutorialTour()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center gap-1.5">
+              <i data-lucide="play-circle" class="w-4 h-4"></i> 5-Min First-Run Tour
+            </button>
+            <button onclick="resetSandboxFactoryData()" class="bg-white/10 hover:bg-white/20 text-white font-semibold text-xs px-3.5 py-2.5 rounded-xl border border-white/20 transition flex items-center gap-1.5">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 text-blue-300"></i> Reset Sandbox
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Module 8.2: Role-Based Training Personas (Instant Persona Switching) -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+              <i data-lucide="users" class="w-4 h-4 text-blue-600"></i>
+              <span>Role-Based Training Personas (Choose Your Caregiver Perspective)</span>
+            </h3>
+            <p class="text-xs text-slate-500">Switch personas instantly to explore specialized documentation for kinship, respite, teens, or emergency care.</p>
+          </div>
+          <span class="text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-lg border border-blue-200">
+            15 Personas Available
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+          <!-- Persona 1: Grandparent Kinship -->
+          <div onclick="activateTrainingPersona('Eleanor Vance', 'HH-113', 'Grandparent Kinship')" class="p-3.5 rounded-xl border border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/40 cursor-pointer transition space-y-1.5 group bg-slate-50/50">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-800 group-hover:text-emerald-900">Grandparents Kinship</span>
+              <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.2 rounded">HH-113</span>
+            </div>
+            <p class="text-[11px] text-slate-500 leading-tight">Eleanor Vance • Navigating custody stipends, relative search, and informal family visitation.</p>
+            <div class="text-[10px] text-emerald-700 font-semibold pt-1 flex items-center gap-1">
+              <i data-lucide="arrow-right" class="w-3 h-3"></i> Load Persona & Child
+            </div>
+          </div>
+
+          <!-- Persona 2: Single Foster Parent -->
+          <div onclick="activateTrainingPersona('Sarah Jenkins', 'HH-101', 'Single Foster Parent')" class="p-3.5 rounded-xl border border-slate-200 hover:border-blue-400 hover:bg-blue-50/40 cursor-pointer transition space-y-1.5 group bg-slate-50/50">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-800 group-hover:text-blue-900">Single Foster Parent</span>
+              <span class="text-[10px] bg-blue-100 text-blue-800 font-bold px-1.5 py-0.2 rounded">HH-101</span>
+            </div>
+            <p class="text-[11px] text-slate-500 leading-tight">Sarah Jenkins • Balancing solo employment with school IEPs and daily MAR medication records.</p>
+            <div class="text-[10px] text-blue-700 font-semibold pt-1 flex items-center gap-1">
+              <i data-lucide="arrow-right" class="w-3 h-3"></i> Load Persona & Child
+            </div>
+          </div>
+
+          <!-- Persona 3: Sibling Group Foster Home -->
+          <div onclick="activateTrainingPersona('Robert Hayes', 'HH-104', 'Sibling Group Foster Home')" class="p-3.5 rounded-xl border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/40 cursor-pointer transition space-y-1.5 group bg-slate-50/50">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-800 group-hover:text-indigo-900">Sibling Group (4 Beds)</span>
+              <span class="text-[10px] bg-indigo-100 text-indigo-800 font-bold px-1.5 py-0.2 rounded">HH-104</span>
+            </div>
+            <p class="text-[11px] text-slate-500 leading-tight">Robert & Laura Hayes • Managing multi-child calendars, staggered visits, and bulk mileage logs.</p>
+            <div class="text-[10px] text-indigo-700 font-semibold pt-1 flex items-center gap-1">
+              <i data-lucide="arrow-right" class="w-3 h-3"></i> Load Persona & Child
+            </div>
+          </div>
+
+          <!-- Persona 4: Respite Provider -->
+          <div onclick="activateTrainingPersona('Julian Scott', 'HH-106', 'Respite Provider')" class="p-3.5 rounded-xl border border-slate-200 hover:border-purple-400 hover:bg-purple-50/40 cursor-pointer transition space-y-1.5 group bg-slate-50/50">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-800 group-hover:text-purple-900">Respite Provider</span>
+              <span class="text-[10px] bg-purple-100 text-purple-800 font-bold px-1.5 py-0.2 rounded">HH-106</span>
+            </div>
+            <p class="text-[11px] text-slate-500 leading-tight">Julian & Anthony • Confidential need-to-know mode, 72-hour handoff cards, and soothing routines.</p>
+            <div class="text-[10px] text-purple-700 font-semibold pt-1 flex items-center gap-1">
+              <i data-lucide="arrow-right" class="w-3 h-3"></i> Load Persona & Child
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Module 8.3 & 8.7: Scenario Training Library & Skill Checks -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Scenarios List (2 Columns) -->
+        <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                <i data-lucide="book-open" class="w-4 h-4 text-emerald-600"></i>
+                <span>Interactive Caregiver Scenarios (Flight Simulation Exercises)</span>
+              </h3>
+              <p class="text-xs text-slate-500">Practice realistic situations, inspect recommended protocols, and log practice notes without risk.</p>
+            </div>
+            <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200">
+              6 Practice Scenarios
+            </span>
+          </div>
+
+          <div class="space-y-3">
+            ${TRAINING_SCENARIOS.map(scen => `
+              <div class="border border-slate-200 rounded-xl p-4 hover:border-blue-300 transition space-y-3 bg-slate-50/30">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 rounded font-bold text-[10px] border ${scen.badgeColor}">
+                      ${scen.category}
+                    </span>
+                    <h4 class="font-bold text-slate-900 text-xs">${scen.title}</h4>
+                  </div>
+                  <span class="text-[11px] font-semibold text-slate-500">Urgency: <strong>${scen.urgency}</strong></span>
+                </div>
+
+                <p class="text-xs text-slate-600 leading-relaxed bg-white p-3 rounded-lg border border-slate-100">
+                  ${scen.situation}
+                </p>
+
+                <div class="space-y-1 text-xs">
+                  <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Recommended Practice Actions:</span>
+                  <ul class="list-disc list-inside text-[11px] text-slate-700 space-y-0.5">
+                    ${scen.recommendedActions.map(act => `<li>${act}</li>`).join('')}
+                  </ul>
+                </div>
+
+                <div class="pt-2 border-t border-slate-200/60 flex items-center justify-between">
+                  <span class="text-[11px] text-emerald-700 font-semibold flex items-center gap-1">
+                    <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Factual, Non-Judgmental Wording Pre-Checked
+                  </span>
+                  <button onclick="practiceLogScenario('${scen.id}')" class="bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs px-3 py-1.5 rounded-lg shadow-2xs transition flex items-center gap-1">
+                    <i data-lucide="pen-tool" class="w-3.5 h-3.5"></i> Practice Logging Note
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Caregiver Skill Checks & Training Progress (1 Column) -->
+        <div class="space-y-6">
+          
+          <!-- Skill Tracker Card -->
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+            <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2 border-b border-slate-100 pb-3">
+              <i data-lucide="award" class="w-4 h-4 text-amber-500"></i>
+              <span>Caregiver Competency Checks</span>
+            </h3>
+
+            <div class="space-y-3 text-xs">
+              <div>
+                <div class="flex justify-between font-semibold mb-1">
+                  <span class="text-slate-700">1. Child Privacy & Identity Shielding</span>
+                  <span class="text-emerald-700 font-bold">100% Mastered</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                  <div class="bg-emerald-600 h-full w-full"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between font-semibold mb-1">
+                  <span class="text-slate-700">2. Objective Behavioral Logging</span>
+                  <span class="text-emerald-700 font-bold">85% Proficient</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                  <div class="bg-emerald-600 h-full w-[85%]"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between font-semibold mb-1">
+                  <span class="text-slate-700">3. Medication Administration (MAR)</span>
+                  <span class="text-blue-700 font-bold">90% Verified</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                  <div class="bg-blue-600 h-full w-[90%]"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between font-semibold mb-1">
+                  <span class="text-slate-700">4. DCF Mileage Reimbursement (FS-334B)</span>
+                  <span class="text-amber-700 font-bold">75% In Progress</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                  <div class="bg-amber-500 h-full w-[75%]"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between font-semibold mb-1">
+                  <span class="text-slate-700">5. Family Court & GAL Preparation</span>
+                  <span class="text-emerald-700 font-bold">95% Ready</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                  <div class="bg-emerald-600 h-full w-[95%]"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-600 text-[11px] leading-relaxed">
+              <strong>VCWTP Credit Equivalent:</strong> 6 Hours of simulated documentation exercises completed.
+            </div>
+          </div>
+
+          <!-- Module 8.5: Mock Caseworker Simulator -->
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                <i data-lucide="message-square" class="w-4 h-4 text-indigo-600"></i>
+                <span>Mock Caseworker Simulator</span>
+              </h3>
+              <span class="text-[10px] bg-indigo-100 text-indigo-800 font-bold px-1.5 py-0.2 rounded">Simulated</span>
+            </div>
+
+            <div class="space-y-3">
+              ${MOCK_CASEWORKER_MESSAGES.map(msg => `
+                <div class="border border-indigo-100 rounded-xl p-3 bg-indigo-50/40 text-xs space-y-2">
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <div class="font-bold text-indigo-950">${msg.sender}</div>
+                      <div class="text-[10px] text-slate-400 font-semibold">${msg.timestamp}</div>
+                    </div>
+                  </div>
+                  <div class="font-semibold text-slate-800 text-[11px]">${msg.subject}</div>
+                  <p class="text-[11px] text-slate-600 whitespace-pre-line leading-relaxed bg-white p-2.5 rounded-lg border border-indigo-50">
+                    ${msg.body}
+                  </p>
+                  <button onclick="practiceReplyCaseworker('${msg.id}')" class="w-full bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-xs py-1.5 rounded-lg shadow-2xs transition flex items-center justify-center gap-1">
+                    <i data-lucide="reply" class="w-3.5 h-3.5"></i> Practice Factual Response
+                  </button>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Module 8.4: Synthetic Document Vault -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+              <i data-lucide="file-check" class="w-4 h-4 text-teal-600"></i>
+              <span>Synthetic Document Vault (Practice Forms & Templates)</span>
+            </h3>
+            <p class="text-xs text-slate-500">Explore court orders, IEPs, and DCF agreements. All documents watermarked: <strong>PRACTICE SANDBOX • NO REAL CHILD DATA</strong>.</p>
+          </div>
+          <span class="text-xs font-bold text-teal-800 bg-teal-50 px-2.5 py-1 rounded-lg border border-teal-200">
+            5 Verified Templates
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+          ${SYNTHETIC_VAULT_DOCS.map(doc => `
+            <div class="border border-slate-200 rounded-xl p-3.5 hover:border-teal-300 transition space-y-2 bg-slate-50/50 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[10px] font-bold text-teal-800 bg-teal-100 px-1.5 py-0.2 rounded">${doc.category}</span>
+                  <span class="text-[9px] font-bold text-amber-700 bg-amber-50 px-1 rounded border border-amber-200">Mock Data</span>
+                </div>
+                <h5 class="font-bold text-slate-900 text-xs break-all">${doc.name}</h5>
+                <p class="text-[11px] text-slate-500 mt-1 leading-snug">${doc.description}</p>
+              </div>
+              <button onclick="previewSyntheticVaultDoc('${doc.name}')" class="mt-2 w-full bg-teal-700 hover:bg-teal-800 text-white font-bold text-[11px] py-1.5 rounded-lg shadow-2xs transition flex items-center justify-center gap-1">
+                <i data-lucide="eye" class="w-3.5 h-3.5"></i> Inspect Sample Document
+              </button>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+    </div>
+  `;
+
+  lucide.createIcons();
+}
+
+function startInteractiveTutorialTour() {
+  alert("🎓 Sprout Interactive Onboarding:\n\n1. Top Bar: Quick-switch between Real Workspace and Practice Sandbox.\n2. Four Cognitive Domains: Health, Visits, Milestones, and Documents.\n3. Daily Briefing Center: Shows immediate doses, upcoming court hearings, and compliance in 10 seconds.\n4. Factual Documentation: Everything logged syncs into court-ready reports automatically!");
+}
+
+function activateTrainingPersona(caregiverName, householdId, roleTitle) {
+  currentSproutMode = 'sample';
+  localStorage.setItem('sproutMode', 'sample');
+  activeCaregiverUser = `Sample Caregiver (${caregiverName})`;
+  localStorage.setItem('caregiverUser', activeCaregiverUser);
+
+  updateWorkspaceToggleUI();
+  updateSproutTheme();
+  loadChildren();
+  
+  alert(`✅ Switched to Training Persona: ${caregiverName} (${roleTitle} • ${householdId})\n\nExplore how Sprout configures specialized workflows for this family!`);
+  switchMainSection('dashboard');
+}
+
+function practiceLogScenario(scenId) {
+  const scen = TRAINING_SCENARIOS.find(s => s.id === scenId);
+  if (!scen) return;
+
+  // Open note modal pre-filled with factual practice observation
+  openRecordModal();
+  setTimeout(() => {
+    const titleInput = document.getElementById('recTitle');
+    const summaryInput = document.getElementById('recSummary');
+    const catInput = document.getElementById('recCategory');
+    if (titleInput) titleInput.value = `[PRACTICE] ${scen.sampleLogTitle}`;
+    if (summaryInput) summaryInput.value = scen.sampleLogSummary;
+    if (catInput) {
+      if (scen.category.includes('Health')) catInput.value = 'medical';
+      else if (scen.category.includes('Visits')) catInput.value = 'visits';
+      else if (scen.category.includes('Court')) catInput.value = 'legal';
+      else if (scen.category.includes('School') || scen.category.includes('Celebration')) catInput.value = 'education';
+      else catInput.value = 'daily';
+    }
+  }, 150);
+}
+
+function practiceReplyCaseworker(msgId) {
+  const msg = MOCK_CASEWORKER_MESSAGES.find(m => m.id === msgId);
+  if (!msg) return;
+
+  alert(`📨 Simulated DCF Email Draft Generated:\n\nTo: ${msg.sender}\nSubject: Re: ${msg.subject}\n\n${msg.recommendedReply}\n\n(This draft was created in Practice Sandbox without sending live emails.)`);
+}
+
+function previewSyntheticVaultDoc(docName) {
+  alert(`📄 Previewing Synthetic Document:\n\n[ WATERMARK: PRACTICE SANDBOX • NO REAL CHILD DATA ]\n\nFilename: ${docName}\nStatus: Verified Synthetic Template for Caregiver Training.`);
+}
+
+function resetSandboxFactoryData() {
+  if (confirm("Reset Practice Sandbox back to default baseline settings?")) {
+    currentSproutMode = 'sample';
+    localStorage.setItem('sproutMode', 'sample');
+    activeCaregiverUser = 'Sample Caregiver (Sarah Jenkins)';
+    localStorage.setItem('caregiverUser', activeCaregiverUser);
+    localStorage.removeItem('currentChildId');
+    updateWorkspaceToggleUI();
+    updateSproutTheme();
+    loadChildren();
+    alert("Practice Sandbox reset to factory baseline.");
+    switchMainSection('training');
   }
 }
+
 
 
 
