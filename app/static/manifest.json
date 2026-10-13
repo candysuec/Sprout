@@ -1,0 +1,21 @@
+{
+  "name": "Sprout KinCare OS",
+  "short_name": "Sprout",
+  "description": "Vermont Foster, Kinship & Respite Caregiver Operating System",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#064e3b",
+  "theme_color": "#064e3b",
+  "icons": [
+    {
+      "src": "/static/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

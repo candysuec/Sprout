@@ -51,6 +51,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   const today = new Date().toISOString().split('T')[0];
   const dateInput = document.getElementById('recDate');
   if (dateInput) dateInput.value = today;
+
+  // Register Service Worker for Offline Field & Mobile Support (PWA)
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/static/sw.js').catch(() => {});
+    });
+  }
 });
 
 function updateSproutTheme() {
