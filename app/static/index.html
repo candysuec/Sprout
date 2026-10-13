@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Caregiver Command Center — Vermont Foster & Kinship Care</title>
+  <!-- Tailwind CSS & Lucide Icons via CDN for smooth local rendering -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .badge-medical { background: #dbeafe; color: #1e40af; }
+    .badge-legal { background: #fef3c7; color: #92400e; }
+    .badge-dcf { background: #e0e7ff; color: #3730a3; }
+    .badge-family { background: #dcfce7; color: #166534; }
+    .badge-incident { background: #fee2e2; color: #991b1b; }
+    .badge-education { background: #f3e8ff; color: #6b21a8; }
+    .custom-scroll::-webkit-scrollbar { width: 6px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <!-- Top App Navigation Bar (Clean, uncluttered, caregiver-first) -->
+  <header id="topHeader" class="bg-emerald-950 text-white shadow-sm sticky top-0 z-40 border-b border-emerald-900 transition-colors duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+      
+      <!-- Brand & Title: Named "Sprout" -->
+      <div class="flex items-center space-x-3">
+        <div class="bg-emerald-800/80 p-2 rounded-xl text-emerald-300 border border-emerald-700/60 shadow-sm">
+          <i data-lucide="sprout" class="w-5 h-5 text-emerald-300"></i>
+        </div>
+        <div>
+          <h1 class="text-base font-bold tracking-tight text-white flex items-center gap-1.5">
+            Sprout
+          </h1>
+          <p class="text-[11px] text-emerald-400 font-medium">Kinship & Placement Command Center</p>
+        </div>
+      </div>
+
+      <!-- Right Header Actions: Sprout Sphere & Caregiver User Only -->
+      <div class="flex items-center space-x-3">
+        
+        <!-- 1. Sprout Environment Mode Selector -->
+        <div class="flex items-center bg-emerald-950/80 rounded-xl px-2.5 py-1.5 border border-emerald-800 shadow-sm" title="Caregiver Sprout Environment">
+          <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400 mr-1.5 shrink-0"></i>
+          <div class="text-left leading-tight mr-1">
+            <span class="text-[9px] text-emerald-400 font-semibold block uppercase tracking-wider">Sprout Sphere</span>
+            <select id="sproutModeSelect" onchange="onSproutModeChange()" class="bg-transparent text-white font-bold text-xs focus:outline-none cursor-pointer">
+              <option value="sample" selected class="bg-slate-800 text-white">Sample Caregiver Sprout (Dev Sandbox)</option>
+              <option value="local" class="bg-slate-800 text-white">Local Caregiver Sprout (Local Live Data)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 2. Caregiver User Profile Selector (Populated dynamically based on Sprout Sphere) -->
+        <div class="flex items-center bg-emerald-900/80 rounded-xl px-2.5 py-1.5 border border-emerald-800 shadow-sm" title="Active Caregiver Profile">
+          <div id="caregiverAvatar" class="w-6 h-6 rounded-full bg-emerald-700 text-white font-bold flex items-center justify-center text-xs mr-2 shrink-0">
+            CC
+          </div>
+          <div class="text-left leading-tight mr-1">
+            <span class="text-[9px] text-emerald-400 font-semibold block uppercase tracking-wider">Caregiver User</span>
+            <select id="caregiverSelect" onchange="onCaregiverUserChange()" class="bg-transparent text-white font-bold text-xs focus:outline-none cursor-pointer">
+              <!-- Dynamically populated based on Sprout mode -->
+            </select>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 w-full flex-1 flex flex-col gap-5">
+
+    <!-- Primary Top-Level Navigation & Quick Actions Bar (White Bar Above Main Content) -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-3.5 space-y-3">
+      
+      <!-- Top Row: Structured Section Clusters with Distinct Larger Buttons -->
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-2">
+          
+          <!-- Cluster 1: Core Command Center -->
+          <div class="flex items-center bg-slate-100/80 p-1 rounded-xl border border-slate-200/80 space-x-1">
+            <button onclick="switchMainSection('dashboard')" id="navBtn-dashboard" class="main-nav-btn active px-3.5 py-2 rounded-lg transition text-slate-700 hover:bg-white flex items-center gap-1.5 font-bold text-xs bg-white text-emerald-800 shadow-sm">
+              <i data-lucide="layout-dashboard" class="w-4 h-4 text-emerald-600"></i> Dashboard
+            </button>
+            <button onclick="switchMainSection('households')" id="navBtn-households" class="main-nav-btn px-3 py-2 rounded-lg transition text-slate-700 hover:bg-white flex items-center gap-1.5 font-semibold text-xs">
+              <i data-lucide="home" class="w-4 h-4 text-emerald-600"></i> Households
+            </button>
+            <button onclick="switchMainSection('children')" id="navBtn-children" class="main-nav-btn px-3 py-2 rounded-lg transition text-slate-700 hover:bg-white flex items-center gap-1.5 font-semibold text-xs">
+              <i data-lucide="users" class="w-4 h-4 text-emerald-600"></i> Children In Care
+            </button>
+          </div>
+
+          <!-- Cluster 2: Daily Documentation -->
+          <div class="flex items-center bg-slate-100/80 p-1 rounded-xl border border-slate-200/80 space-x-1">
+            <button onclick="switchMainSection('journal')" id="navBtn-journal" class="main-nav-btn px-3 py-2 rounded-lg transition text-slate-700 hover:bg-white flex items-center gap-1.5 font-semibold text-xs">
+              <i data-lucide="book-open" class="w-4 h-4 text-teal-600"></i> Journal
+            </button>
+            <button onclick="switchMainSection('binder')" id="navBtn-binder" class="main-nav-btn px-3 py-2 rounded-lg transition text-slate-700 hover:bg-white flex items-center gap-1.5 font-semibold text-xs">
+              <i data-lucide="folder-kanban" class="w-4 h-4 text-teal-600"></i> Binder
+            </button>
+            <button onclick="switchMainSection('timeline')" id="navBtn-timeline" class="main-nav-btn px-3 py-2 rounded-lg transition text-slate-700 hover:bg-white flex items-center gap-1.5 font-semibold text-xs">
+              <i data-lucide="clock" class="w-4 h-4 text-purple-600"></i> Timeline
+            </button>
+            <button onclick="switchMainSection('appointments')" id="navBtn-appointments" class="main-nav-btn px-3 py-2 rounded-lg transition text-slate-700 hover:bg-white flex items-center gap-1.5 font-semibold text-xs">
+              <i data-lucide="calendar-clock" class="w-4 h-4 text-amber-600"></i> Appointments
+            </button>
+          </div>
+
+          <!-- Cluster 3: DCF & External Records -->
+          <div class="flex items-center bg-slate-100/80 p-1 rounded-xl border border-slate-200/80 space-x-1">
+            <button onclick="switchMainSection('documents')" id="navBtn-documents" class="main-nav-btn px-3 py-2 rounded-lg transition text-slate-700 hover:bg-white flex items-center gap-1.5 font-semibold text-xs">
+              <i data-lucide="files" class="w-4 h-4 text-blue-600"></i> Documents
+            </button>
+            <button onclick="switchMainSection('contacts')" id="navBtn-contacts" class="main-nav-btn px-3 py-2 rounded-lg transition text-slate-700 hover:bg-white flex items-center gap-1.5 font-semibold text-xs">
+              <i data-lucide="contact" class="w-4 h-4 text-indigo-600"></i> Contacts
+            </button>
+            <button onclick="switchMainSection('communications')" id="navBtn-communications" class="main-nav-btn px-3 py-2 rounded-lg transition text-slate-700 hover:bg-white flex items-center gap-1.5 font-semibold text-xs">
+              <i data-lucide="send" class="w-4 h-4 text-indigo-600"></i> Comms
+            </button>
+            <button onclick="switchMainSection('reports')" id="navBtn-reports" class="main-nav-btn px-3 py-2 rounded-lg transition text-slate-700 hover:bg-white flex items-center gap-1.5 font-semibold text-xs">
+              <i data-lucide="file-text" class="w-4 h-4 text-cyan-600"></i> Reports
+            </button>
+          </div>
+
+          <!-- Cluster 4: System / Development Sandbox -->
+          <div class="flex items-center bg-slate-100/80 p-1 rounded-xl border border-slate-200/80 space-x-1">
+            <button onclick="switchMainSection('sample_data')" id="navBtn-sample_data" class="main-nav-btn px-3 py-2 rounded-lg transition text-slate-700 hover:bg-white flex items-center gap-1.5 font-semibold text-xs">
+              <i data-lucide="database" class="w-4 h-4 text-sky-600"></i> Sample Dataset
+            </button>
+            <button onclick="switchMainSection('settings')" id="navBtn-settings" class="main-nav-btn px-3 py-2 rounded-lg transition text-slate-700 hover:bg-white flex items-center gap-1.5 font-semibold text-xs">
+              <i data-lucide="settings" class="w-4 h-4 text-slate-500"></i> Settings & Audit
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Integrated Fast-Action Toolbar -->
+        <div class="flex items-center gap-2.5 shrink-0 pt-2 lg:pt-0 border-t lg:border-t-0 border-slate-100">
+          <!-- Search Bar -->
+          <div class="relative">
+            <input type="text" id="globalSearchInput" oninput="handleGlobalSearch(event)" placeholder="Search binder..." class="bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 text-xs rounded-xl pl-8 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 w-48 transition-all" />
+            <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-3 pointer-events-none"></i>
+          </div>
+
+          <!-- Child Initials Selector -->
+          <div class="flex items-center bg-slate-50 rounded-xl px-3 py-1.5 border border-slate-200 shadow-sm" title="Active Child in Care">
+            <i data-lucide="baby" class="w-4 h-4 text-emerald-600 mr-1.5 shrink-0"></i>
+            <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mr-1">Child:</span>
+            <select id="childSelect" onchange="onChildChange()" class="bg-transparent text-slate-900 font-extrabold text-xs focus:outline-none cursor-pointer">
+              <!-- Populated with Initials Only -->
+            </select>
+          </div>
+
+          <!-- Quick Log Action Button -->
+          <button onclick="openRecordModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5 shrink-0">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>Log Note</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Quick Guidance & Help Toolbar (Directly Above Main Content / Dashboard) -->
+      <div class="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div class="flex items-center gap-2">
+          <span class="text-[10px] uppercase font-extrabold text-slate-400 tracking-wider flex items-center gap-1">
+            <i data-lucide="help-circle" class="w-3.5 h-3.5 text-blue-500"></i> Reference & Help:
+          </span>
+          <!-- Button 1: Caregiver Profiles Guide -->
+          <button onclick="openCaregiverProfilesModal()" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold rounded-lg border border-blue-200 shadow-2xs transition flex items-center gap-1.5">
+            <i data-lucide="users" class="w-3.5 h-3.5 text-blue-600"></i>
+            <span>1. Profiles of Caregivers</span>
+            <span class="text-[10px] px-1.5 py-0.2 bg-blue-200 text-blue-900 rounded-full font-extrabold">15 Homes</span>
+          </button>
+          <!-- Button 2: System Help -->
+          <button onclick="openSystemHelpModal()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-lg border border-slate-300 shadow-2xs transition flex items-center gap-1.5">
+            <i data-lucide="book-marked" class="w-3.5 h-3.5 text-slate-600"></i>
+            <span>2. System Help & Instructions</span>
+          </button>
+        </div>
+        <div class="text-[11px] text-slate-400 italic">
+          Sprout Sphere: <span id="currentSphereIndicator" class="font-bold text-blue-700">Dev Sandbox Active</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Child Workspace Sub-Navigation (Visible when in Child Workspace or child view) -->
+    <div id="childWorkspaceSubNav" class="bg-emerald-50/60 rounded-xl border border-emerald-100 p-1.5 flex flex-wrap gap-1 items-center overflow-x-auto text-xs font-semibold">
+      <span class="text-emerald-800 px-2 py-1 font-bold uppercase tracking-wider text-[10px] flex items-center gap-1">
+        <i data-lucide="layers" class="w-3.5 h-3.5"></i> Child Workspace:
+      </span>
+      <button onclick="switchChildTab('overview')" class="child-subtab-btn active px-2.5 py-1.5 rounded-lg transition text-emerald-900 bg-white shadow-sm border border-emerald-200" data-childtab="overview">
+        Overview
+      </button>
+      <button onclick="switchChildTab('journal')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="journal">
+        Journal
+      </button>
+      <button onclick="switchChildTab('binder')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="binder">
+        Binder
+      </button>
+      <button onclick="switchChildTab('medical')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="medical">
+        Medical
+      </button>
+      <button onclick="switchChildTab('education')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="education">
+        Education
+      </button>
+      <button onclick="switchChildTab('visits')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="visits">
+        Visits
+      </button>
+      <button onclick="switchChildTab('expenses')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="expenses">
+        Expenses
+      </button>
+      <button onclick="switchChildTab('documents')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="documents">
+        Documents
+      </button>
+      <button onclick="switchChildTab('appointments')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="appointments">
+        Appointments
+      </button>
+      <button onclick="switchChildTab('contacts')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="contacts">
+        Contacts
+      </button>
+      <button onclick="switchChildTab('communications')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="communications">
+        Communications
+      </button>
+      <button onclick="switchChildTab('kinship')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="kinship">
+        Kinship Pathways
+      </button>
+      <button onclick="switchChildTab('posc')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="posc">
+        Plan of Safe Care (POSC)
+      </button>
+      <button onclick="switchChildTab('benefits')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="benefits">
+        Benefits & Assistance
+      </button>
+      <button onclick="switchChildTab('chins')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="chins">
+        CHINS Court Flowchart
+      </button>
+      <button onclick="switchChildTab('timeline')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="timeline">
+        Timeline
+      </button>
+    </div>
+
+    <!-- Child Snapshot Header (Visible when in Child Workspace or reviewing child records) -->
+    <div id="snapshotCard" class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm relative overflow-hidden hidden">
+      <!-- Injected dynamically by app.js -->
+    </div>
+
+    <!-- Active Content Area -->
+    <div id="tabContent" class="flex-1">
+      <!-- Dynamic View Injected Here -->
+    </div>
+
+  </div>
+
+  <!-- Quick Record Modal -->
+  <div id="recordModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl overflow-y-auto max-h-[90vh]">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+        <div class="flex items-center gap-2">
+          <div class="p-2 bg-emerald-100 text-emerald-800 rounded-lg">
+            <i data-lucide="edit-3" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-900 text-lg">Single-Entry Event Logger</h3>
+            <p class="text-xs text-slate-500">Enter once — automatically updates timeline, reports & alerts.</p>
+          </div>
+        </div>
+        <button onclick="closeRecordModal()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="recordForm" onsubmit="handleRecordSubmit(event)" class="mt-4 space-y-4">
+        <input type="hidden" id="recEditId" value="" />
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Category / Binder Tab *</label>
+            <select id="recCategory" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-emerald-500">
+              <option value="medical">Medical / Health (Tab 3)</option>
+              <option value="family_time">Family Time Visit (Tab 9)</option>
+              <option value="communication">DCF Contact / Communication (Tab 8)</option>
+              <option value="legal">Legal & Court Hearing (Tab 1)</option>
+              <option value="education">Education / IEP (Tab 5)</option>
+              <option value="behavioral">Behavioral Health / Therapy (Tab 4)</option>
+              <option value="incident">Incident / Safety (Tab 10)</option>
+              <option value="financial">Financial / Mileage (Tab 11)</option>
+              <option value="daily">Daily Life & Milestones (Tab 6/7/13)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Severity / Smart Action *</label>
+            <select id="recSeverity" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-emerald-500 font-semibold text-slate-800">
+              <option value="Routine" class="text-slate-700">🟢 Routine (Daily activity, purchase)</option>
+              <option value="Important" class="text-blue-700">🔵 Important (IEP, med adjustment, checkup)</option>
+              <option value="Court Relevant" class="text-amber-700">🟠 Court Relevant (Behavior, visit issue)</option>
+              <option value="Emergency" class="text-red-700">🔴 Emergency (Hospital, police, disclosure)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Event Title *</label>
+            <input type="text" id="recTitle" required placeholder="e.g. Well-Child Exam, Easterseals Visit, Caseworker Call" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Date *</label>
+            <input type="date" id="recDate" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Location</label>
+            <input type="text" id="recLocation" placeholder="Clinic, Home, DCF Office" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Participants Involved</label>
+            <input type="text" id="recParticipants" placeholder="Names of doctors, workers, parents" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">What Happened? (Summary & Notes) *</label>
+          <textarea id="recSummary" required rows="3" placeholder="Clear, factual details: what was discussed, findings, child response, recommendations..." class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500"></textarea>
+        </div>
+
+        <!-- Optional Mileage & Reimbursement Strip (For Visits, Doctor trips, and DCF Runs) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-emerald-50/60 border border-emerald-100 rounded-xl p-3 text-xs">
+          <div>
+            <label class="block font-semibold text-emerald-900 mb-1 flex items-center gap-1">
+              <i data-lucide="navigation" class="w-3.5 h-3.5 text-emerald-600"></i> Round-Trip Mileage (DCF Reimbursable)
+            </label>
+            <input type="number" step="0.5" id="recMileage" placeholder="Miles driven (e.g. 14.5)" class="w-full text-xs border border-emerald-200 rounded-lg p-2 bg-white" />
+            <p class="text-[10px] text-emerald-700 mt-1">Calculated at current DCF state travel reimbursement rate ($0.67/mi).</p>
+          </div>
+          <div>
+            <label class="block font-semibold text-emerald-900 mb-1 flex items-center gap-1">
+              <i data-lucide="shield" class="w-3.5 h-3.5 text-emerald-600"></i> RPPS Decision Log (Caregiver Prudent Parent)
+            </label>
+            <select id="recRppsCategory" class="w-full text-xs border border-emerald-200 rounded-lg p-2 bg-white">
+              <option value="">Not an RPPS Decision</option>
+              <option value="Extracurricular / Sports">Extracurricular Activity / Sports / Lessons</option>
+              <option value="Social / Sleepover">Social Activity / Peer Sleepover / Playdate</option>
+              <option value="Travel / Trip">In-State Field Trip / Family Vacation Day</option>
+              <option value="Personal Care / Haircut">Personal Grooming / Haircut / Clothing Choice</option>
+              <option value="Job / Driver Ed">Part-Time Work / Driver's Education</option>
+            </select>
+            <p class="text-[10px] text-emerald-700 mt-1">Protects caregiver decision authority under Vermont RPPS foster care rules.</p>
+          </div>
+        </div>
+
+        <!-- Follow-up action alert -->
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 space-y-2">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="recFollowUpNeeded" onchange="toggleFollowUpFields()" class="rounded text-amber-600 focus:ring-amber-500 w-4 h-4">
+            <span class="text-xs font-bold text-amber-900">Requires Follow-Up or Action Item</span>
+          </label>
+          <div id="followUpGroup" class="hidden grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+            <div>
+              <label class="block text-xs text-amber-800 font-medium mb-1">Follow-Up Action Required</label>
+              <input type="text" id="recFollowUpNotes" placeholder="e.g. Schedule 6-month check, send report to GAL" class="w-full text-xs border border-amber-300 rounded-lg p-2 bg-white" />
+            </div>
+            <div>
+              <label class="block text-xs text-amber-800 font-medium mb-1">Due Date</label>
+              <input type="date" id="recFollowUpDue" class="w-full text-xs border border-amber-300 rounded-lg p-2 bg-white" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Attachment upload -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Attach Document / Photo (Receipt, Visit notes, Orders)</label>
+          <input type="file" id="recFile" class="text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 cursor-pointer" />
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
+          <button type="button" onclick="closeRecordModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button>
+          <button type="submit" class="px-5 py-2 text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 rounded-lg shadow">Save to Binder</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- New Child Profile Modal -->
+  <div id="newChildModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl">
+      <div class="flex items-center justify-between pb-3 border-b mb-3">
+        <h3 class="font-bold text-slate-900 text-lg flex items-center gap-2">
+          <i data-lucide="shield-alert" class="text-emerald-700 w-5 h-5"></i> Add Confidential Child Profile
+        </h3>
+        <button onclick="closeNewChildModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <!-- Confidentiality reminder -->
+      <div class="bg-amber-50 border border-amber-200 rounded-lg p-2.5 text-xs text-amber-900 mb-3 flex items-start gap-2">
+        <i data-lucide="lock" class="w-4 h-4 text-amber-700 mt-0.5 shrink-0"></i>
+        <span><strong>Confidentiality Policy:</strong> In compliance with child privacy guidelines, use <strong>Initials Only</strong> (e.g., <em>"CD"</em> or <em>"AD"</em>). Legal full names are never stored in this profile.</span>
+      </div>
+
+      <!-- 30-Second Fast Intake Quick Presets -->
+      <div class="flex items-center gap-1.5 p-2 bg-slate-100 rounded-xl mb-3 text-xs overflow-x-auto">
+        <span class="font-bold text-slate-500 text-[10px] uppercase shrink-0">Quick Presets:</span>
+        <button type="button" onclick="applyIntakePreset('emergency')" class="px-2.5 py-1 bg-rose-100 hover:bg-rose-200 text-rose-900 rounded-lg font-bold shrink-0 flex items-center gap-1">
+          <i data-lucide="alert-triangle" class="w-3 h-3"></i> Emergency Placement
+        </button>
+        <button type="button" onclick="applyIntakePreset('respite')" class="px-2.5 py-1 bg-purple-100 hover:bg-purple-200 text-purple-900 rounded-lg font-bold shrink-0 flex items-center gap-1">
+          <i data-lucide="sparkles" class="w-3 h-3"></i> Weekend Respite
+        </button>
+        <button type="button" onclick="applyIntakePreset('primary')" class="px-2.5 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-900 rounded-lg font-bold shrink-0 flex items-center gap-1">
+          <i data-lucide="home" class="w-3 h-3"></i> Primary Kinship
+        </button>
+      </div>
+
+      <form onsubmit="handleNewChildSubmit(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold mb-1">Child Initials / Alias *</label>
+          <input type="text" id="newChildAlias" required maxlength="4" placeholder="e.g. CD" class="w-full text-sm border rounded-lg p-2 uppercase font-bold tracking-wider" />
+          <p class="text-[11px] text-slate-500 mt-1">1 to 4 capital letters (e.g. initials CD, AD, LS).</p>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold mb-1">Date of Birth</label>
+            <input type="date" id="newChildDob" class="w-full text-sm border rounded-lg p-2" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Placement Date</label>
+            <input type="date" id="newChildPlacement" class="w-full text-sm border rounded-lg p-2" />
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold mb-1">Care Relationship *</label>
+            <select id="newChildRelationship" class="w-full text-sm border rounded-lg p-2 bg-emerald-50/50 font-semibold text-slate-800">
+              <option value="Primary Placement">Primary Placement</option>
+              <option value="Kinship Placement">Kinship Placement</option>
+              <option value="Temporary Respite">Temporary Respite</option>
+              <option value="Emergency Respite">Emergency Respite</option>
+              <option value="Former Placement">Former Placement</option>
+              <option value="Inactive Relationship">Inactive Relationship</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Episode Status</label>
+            <select id="newChildEpisodeStatus" class="w-full text-sm border rounded-lg p-2 bg-slate-50 font-medium">
+              <option value="Active">Active Episode</option>
+              <option value="Temporary">Temporary Stay</option>
+              <option value="Former">Former / Transitioned</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold mb-1">Episode Start Date</label>
+            <input type="date" id="newChildEpisodeStart" class="w-full text-sm border rounded-lg p-2" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Episode End Date</label>
+            <input type="date" id="newChildEpisodeEnd" class="w-full text-sm border rounded-lg p-2" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1">Permanency Goal</label>
+          <select id="newChildGoal" class="w-full text-sm border rounded-lg p-2 bg-slate-50">
+            <option value="Reunification">Reunification</option>
+            <option value="Guardianship">Guardianship</option>
+            <option value="Adoption">Adoption</option>
+            <option value="Independent Living">Independent Living</option>
+            <option value="Other">Other Planned Permanent Living</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1">Known Allergies / Medical Alerts</label>
+          <input type="text" id="newChildAllergies" placeholder="Peanuts, Penicillin, Asthma..." class="w-full text-sm border rounded-lg p-2" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold mb-1">Food Preferences / Diet</label>
+            <input type="text" id="newChildFood" placeholder="Favorites, dislikes, texture needs" class="w-full text-sm border rounded-lg p-2" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Comfort Items</label>
+            <input type="text" id="newChildComfort" placeholder="Stuffed animal, special blanket, sound machine" class="w-full text-sm border rounded-lg p-2" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1">Behavioral Supports & Soothing Routines</label>
+          <input type="text" id="newChildBehavior" placeholder="Bedtime routine, quiet space when overwhelmed, sensory tools" class="w-full text-sm border rounded-lg p-2" />
+        </div>
+        <div class="flex justify-end gap-2 pt-3 border-t">
+          <button type="button" onclick="closeNewChildModal()" class="px-4 py-2 text-xs font-medium text-slate-600">Cancel</button>
+          <button type="submit" class="px-4 py-2 text-xs font-bold text-white bg-emerald-700 rounded-lg">Create Profile</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- New Contact Modal -->
+  <div id="newContactModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl">
+      <div class="flex items-center justify-between pb-3 border-b mb-3">
+        <h3 class="font-bold text-slate-900 text-lg flex items-center gap-2">
+          <i data-lucide="user-plus" class="text-indigo-600 w-5 h-5"></i> Add Case Contact / Recipient
+        </h3>
+        <button onclick="closeNewContactModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <form onsubmit="handleNewContactSubmit(event)" class="space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold mb-1">Role / Type *</label>
+            <select id="contactRoleType" class="w-full text-sm border rounded-lg p-2 bg-slate-50">
+              <option value="DCF Worker">DCF Worker</option>
+              <option value="DCF Supervisor">DCF Supervisor</option>
+              <option value="GAL">Guardian ad Litem (GAL)</option>
+              <option value="Attorney">Attorney</option>
+              <option value="Doctor">Doctor / Pediatrician</option>
+              <option value="Therapist">Therapist / Counselor</option>
+              <option value="Teacher">Teacher / School Contact</option>
+              <option value="Respite Provider">Respite Provider</option>
+              <option value="Family Contact">Family / Kin Contact</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Full Name *</label>
+            <input type="text" id="contactFullName" required placeholder="Jane Doe" class="w-full text-sm border rounded-lg p-2" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold mb-1">Organization</label>
+            <input type="text" id="contactOrg" placeholder="VT DCF, Middlebury Pediatrics..." class="w-full text-sm border rounded-lg p-2" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Preferred Method</label>
+            <select id="contactPreferredMethod" class="w-full text-sm border rounded-lg p-2 bg-slate-50">
+              <option value="Email">Email</option>
+              <option value="Phone">Phone</option>
+              <option value="Text">Text</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold mb-1">Email</label>
+            <input type="email" id="contactEmail" placeholder="contact@example.com" class="w-full text-sm border rounded-lg p-2" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Phone</label>
+            <input type="tel" id="contactPhone" placeholder="(802) 555-0123" class="w-full text-sm border rounded-lg p-2" />
+          </div>
+        </div>
+
+        <div>
+          <label class="flex items-center gap-2 cursor-pointer pt-1">
+            <input type="checkbox" id="contactIsEmergency" class="rounded text-rose-600 focus:ring-rose-500 w-4 h-4">
+            <span class="text-xs font-bold text-rose-800">Emergency Contact</span>
+          </label>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold mb-1">Notes / Instructions</label>
+          <textarea id="contactNotes" rows="2" placeholder="Hours, office location, specific case notes..." class="w-full text-sm border rounded-lg p-2"></textarea>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t">
+          <button type="button" onclick="closeNewContactModal()" class="px-4 py-2 text-xs font-medium text-slate-600">Cancel</button>
+          <button type="submit" class="px-4 py-2 text-xs font-bold text-white bg-indigo-700 hover:bg-indigo-800 rounded-lg">Save Contact</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- New Licensing & Safety Modal -->
+  <div id="newLicensingModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl">
+      <div class="flex items-center justify-between pb-3 border-b mb-3">
+        <h3 class="font-bold text-slate-900 text-lg flex items-center gap-2">
+          <i data-lucide="award" class="text-teal-700 w-5 h-5"></i> Log Training / Safety Drill
+        </h3>
+        <button onclick="closeNewLicensingModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <form onsubmit="handleNewLicensingSubmit(event)" class="space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold mb-1">Record Type *</label>
+            <select id="licRecordType" class="w-full text-sm border rounded-lg p-2 bg-slate-50">
+              <option value="Training">Training (VCWTP)</option>
+              <option value="Fire Drill">Monthly Fire Drill</option>
+              <option value="Smoke Alarm">Smoke / CO Alarm Test</option>
+              <option value="Water Test">Annual Water / Well Test</option>
+              <option value="Home Safety">Home Safety Inspection</option>
+              <option value="Other">Other Compliance Event</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Title / Topic *</label>
+            <input type="text" id="licTitle" required placeholder="e.g. Trauma-Informed Care" class="w-full text-sm border rounded-lg p-2" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold mb-1">Date Completed *</label>
+            <input type="date" id="licRecordDate" required class="w-full text-sm border rounded-lg p-2" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Hours / Credits</label>
+            <input type="number" step="0.5" id="licHours" value="1.0" class="w-full text-sm border rounded-lg p-2" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold mb-1">Provider / Sponsor</label>
+            <input type="text" id="licProvider" placeholder="VCWTP, DCF, Red Cross" class="w-full text-sm border rounded-lg p-2" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Expiration / Renewal Due</label>
+            <input type="date" id="licExpiryDate" class="w-full text-sm border rounded-lg p-2" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold mb-1">Notes & Drill Details</label>
+          <textarea id="licNotes" rows="2" placeholder="Evacuation route used, duration, certificates earned..." class="w-full text-sm border rounded-lg p-2"></textarea>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t">
+          <button type="button" onclick="closeNewLicensingModal()" class="px-4 py-2 text-xs font-medium text-slate-600">Cancel</button>
+          <button type="submit" class="px-4 py-2 text-xs font-bold text-white bg-teal-700 hover:bg-teal-800 rounded-lg">Save Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add / Manage Household Modal -->
+  <div id="newHouseholdModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl">
+      <div class="flex items-center justify-between pb-3 border-b mb-3">
+        <h3 class="font-bold text-slate-900 text-lg flex items-center gap-2">
+          <i data-lucide="home" class="text-emerald-700 w-5 h-5"></i> Add / Update Household Profile
+        </h3>
+        <button onclick="closeHouseholdModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <form onsubmit="handleNewHouseholdSubmit(event)" class="space-y-3">
+        <input type="hidden" id="hhId" value="" />
+        <div>
+          <label class="block text-xs font-semibold mb-1">Household Name / Label *</label>
+          <input type="text" id="hhName" required placeholder="e.g. 41 Elmwood Drive Household" class="w-full text-sm border rounded-lg p-2" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold mb-1">Physical / E911 Address *</label>
+          <input type="text" id="hhAddress" required placeholder="e.g. 41 Elmwood Dr, West Berlin, VT 05663" class="w-full text-sm border rounded-lg p-2" />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold mb-1">E911 Emergency Address</label>
+            <input type="text" id="hhE911Address" placeholder="e.g. 41 Elmwood Dr, West Berlin, VT 05663" class="w-full text-sm border rounded-lg p-2" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Mailing Address (e.g. PO Box)</label>
+            <input type="text" id="hhMailingAddress" placeholder="e.g. PO Box 153, Northfield Falls, VT 05664" class="w-full text-sm border rounded-lg p-2" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold mb-1">Residence Status</label>
+            <select id="hhStatus" class="w-full text-sm border rounded-lg p-2 bg-slate-50">
+              <option value="Active Care Residence">Active Care Residence</option>
+              <option value="Secondary Home">Secondary Home</option>
+              <option value="Prior Licensed Home">Prior Licensed Home</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Licensing Status</label>
+            <select id="hhLicenseStatus" class="w-full text-sm border rounded-lg p-2 bg-slate-50 font-semibold">
+              <option value="New Application Submitted">New Application Submitted</option>
+              <option value="Licensed Active">Licensed Active</option>
+              <option value="License Expired">License Expired</option>
+              <option value="Relicensing In Progress">Relicensing In Progress</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold mb-1">Primary Caregiver</label>
+            <input type="text" id="hhPrimaryCaregiver" value="Candy Chevalier" class="w-full text-sm border rounded-lg p-2 bg-slate-100 font-semibold" readonly />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Secondary Applicant</label>
+            <input type="text" id="hhSecondaryCaregiver" placeholder="e.g. Mallory Wheeler" class="w-full text-sm border rounded-lg p-2" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold mb-1">Home Owner & Care Resource</label>
+          <input type="text" id="hhHomeOwner" placeholder="e.g. Robin Davis" class="w-full text-sm border rounded-lg p-2" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold mb-1">Notes / Placement Details</label>
+          <textarea id="hhNotes" rows="2" placeholder="Care arrangement notes, room setup, licensing application timeline..." class="w-full text-sm border rounded-lg p-2"></textarea>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t">
+          <button type="button" onclick="closeHouseholdModal()" class="px-4 py-2 text-xs font-medium text-slate-600">Cancel</button>
+          <button type="submit" class="px-4 py-2 text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 rounded-lg">Save Household</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 1. CAREGIVER PROFILES & JOURNEY MODAL -->
+  <div id="caregiverProfilesModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl max-w-4xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-start justify-between pb-3 border-b border-slate-100">
+        <div>
+          <h3 class="font-extrabold text-slate-900 text-lg flex items-center gap-2">
+            <i data-lucide="users" class="w-5 h-5 text-blue-600"></i> Profiles of Sample Caregivers (Caregiver Journey Model)
+          </h3>
+          <p class="text-xs text-slate-500 mt-0.5">Explore how the 15 synthetic households illustrate the complete lifecycle from initial inquiry to retired mentor.</p>
+        </div>
+        <button onclick="closeCaregiverProfilesModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Quick Selector / Overview Table -->
+      <div id="caregiverProfilesList" class="space-y-3">
+        <!-- Dynamically populated or rendered -->
+      </div>
+
+      <div class="flex justify-end pt-3 border-t">
+        <button onclick="closeCaregiverProfilesModal()" class="px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow-xs">
+          Close Guide
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. SYSTEM HELP & INSTRUCTIONS MODAL -->
+  <div id="systemHelpModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl max-w-3xl w-full p-6 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-start justify-between pb-3 border-b border-slate-100">
+        <div>
+          <h3 class="font-extrabold text-slate-900 text-lg flex items-center gap-2">
+            <i data-lucide="help-circle" class="w-5 h-5 text-emerald-600"></i> Sprout System Help & User Guide
+          </h3>
+          <p class="text-xs text-slate-500 mt-0.5">How to navigate environments, log documentation, and maintain zero data contamination.</p>
+        </div>
+        <button onclick="closeSystemHelpModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4 text-xs text-slate-700 leading-relaxed">
+        
+        <!-- Section 1: Sprout Spheres -->
+        <div class="bg-blue-50/70 border border-blue-200 rounded-xl p-4 space-y-2">
+          <h4 class="font-bold text-blue-950 text-sm flex items-center gap-1.5">
+            <i data-lucide="sparkles" class="w-4 h-4 text-blue-600"></i> 1. Understanding Sprout Spheres (Environments)
+          </h4>
+          <p class="text-blue-900">
+            <strong>Sample Caregiver Sprout (Dev Sandbox - Blue Header):</strong>
+            Safe testing ground pre-loaded with 15 synthetic caregiver households, 20 children in care, sample FS-221A milestones, and training logs.
+            <em class="font-bold">Zero live data</em> is queried or exposed.
+          </p>
+          <p class="text-blue-900">
+            <strong>Local Caregiver Sprout (Local Live Data - Emerald Header):</strong>
+            Operational environment for <strong>Candy Chevalier</strong>, <strong>Mallory Wheeler</strong>, and <strong>Robin Davis</strong>. Restricts homes strictly to 41 Elmwood Dr and 22 East Parkside, with CD as Potential Placement.
+          </p>
+        </div>
+
+        <!-- Section 2: Caregiver User Selection -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
+          <h4 class="font-bold text-slate-900 text-sm flex items-center gap-1.5">
+            <i data-lucide="user-check" class="w-4 h-4 text-teal-600"></i> 2. Selecting a Caregiver User
+          </h4>
+          <p>
+            The top-right <strong>Caregiver User</strong> dropdown changes your active identity.
+            When launching in sandbox, it defaults to <code>-- Select Sample Caregiver --</code>. Choosing a caregiver instantly scopes:
+          </p>
+          <ul class="list-disc list-inside space-y-1 pl-2 text-slate-600">
+            <li><strong>Households:</strong> Scoped strictly to that caregiver's home and licensing stage.</li>
+            <li><strong>Children In Care:</strong> Scoped strictly to youth placed in that home.</li>
+            <li><strong>Timeline & Binders:</strong> Displays realistic synthetic logs (pediatrics, IEPs, visits).</li>
+            <li><strong>Compliance (FS-221A):</strong> Displays the checklist tailored to that home's approval stage.</li>
+          </ul>
+        </div>
+
+        <!-- Section 3: Daily Logging & 15-Second Action Bar -->
+        <div class="bg-emerald-50/60 border border-emerald-200 rounded-xl p-4 space-y-2">
+          <h4 class="font-bold text-emerald-950 text-sm flex items-center gap-1.5">
+            <i data-lucide="clock" class="w-4 h-4 text-emerald-700"></i> 3. Fast 15-Second Documentation & DCF Drafts
+          </h4>
+          <p class="text-emerald-900">
+            Click <strong>Log Note</strong> (or the fast action buttons on the Dashboard) to record pediatric visits, school IEP notes, family time interactions, and behavioral observations.
+            The system automatically drafts formal notification emails for your DCF Family Services Worker and GAL based on Vermont policy requirements.
+          </p>
+        </div>
+
+        <!-- Section 4: Document Vault & Privacy Shield -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
+          <h4 class="font-bold text-slate-900 text-sm flex items-center gap-1.5">
+            <i data-lucide="shield-check" class="w-4 h-4 text-purple-600"></i> 4. Local & Offline Privacy Guarantee
+          </h4>
+          <p>
+            All files and SQLite databases run 100% locally on your computer with zero external cloud transmission.
+            In Sample Sandbox mode, private OneDrive files are completely shielded so personal information (SSNs, court orders) is never exposed.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="flex justify-end pt-3 border-t">
+        <button onclick="closeSystemHelpModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow-xs">
+          Got It, Return to Sprout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="text-center py-4 text-xs text-slate-400 border-t border-slate-200 mt-auto">
+    Vermont Foster & Kinship Care Digital Operating System • 100% Local & Offline
+  </footer>
+
+  <!-- App Core JavaScript Logic -->
+  <script src="/static/app.js"></script>
+</body>
+</html>

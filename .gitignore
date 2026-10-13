@@ -1,0 +1,49 @@
+# ==============================================================================
+# SPROUT ZERO-LEAKAGE PRIVACY & SECURITY GUARDRAILS
+# ==============================================================================
+
+# Databases & Local State (Strictly Local)
+*.db
+*.sqlite
+*.sqlite3
+foster_binder.db
+foster_care.db
+
+# Live Private User Documents, Uploads & Attachments
+uploads/
+exports/
+*.pdf
+*.docx
+*.doc
+*.xlsx
+*.xls
+*.csv
+*.jpg
+*.jpeg
+*.png
+*.heic
+*.gif
+*.txt
+!requirements.txt
+
+# Python execution caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+
+# Environment configs & logs
+.env
+*.log
+
+# Editor & OS Artifacts
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
