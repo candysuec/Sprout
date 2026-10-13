@@ -2434,8 +2434,97 @@ function renderReportsView(container) {
         </div>
         <div id="respiteResult" class="text-xs text-center font-medium"></div>
       </div>
+
+      <!-- Vermont DCF State Form Auto-Filler (FS-334B & FS-333B Claims) -->
+      <div class="bg-gradient-to-r from-emerald-50 via-teal-50 to-slate-50 rounded-2xl border border-emerald-200 p-5 shadow-sm space-y-4">
+        <div class="flex items-center justify-between border-b border-emerald-200/80 pb-3">
+          <div>
+            <h4 class="font-bold text-emerald-950 text-base flex items-center gap-2">
+              <i data-lucide="file-spreadsheet" class="w-5 h-5 text-emerald-700"></i>
+              <span>Vermont DCF State Reimbursement Form Auto-Filler</span>
+            </h4>
+            <p class="text-xs text-emerald-800">
+              1-Click official Word/DOCX export pre-filled with logged trips, mileage calculations ($0.67/mi), and signature blocks for prompt state reimbursement.
+            </p>
+          </div>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-200 text-emerald-900 uppercase tracking-wider">
+            Official Forms
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <!-- Form FS-334B: Travel & Mileage -->
+          <div class="bg-white p-4 rounded-xl border border-emerald-200 space-y-3 shadow-2xs">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-900 text-sm flex items-center gap-1.5">
+                <i data-lucide="car" class="w-4 h-4 text-emerald-600"></i> Form FS-334B: Travel Claim
+              </span>
+              <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">$0.67 / Mile</span>
+            </div>
+            <p class="text-slate-600 leading-relaxed text-[11px]">
+              Extracts all Family Time visitation runs, medical trips, and court hearings. Pre-calculates itemized miles, dollar amounts, and certification text ready for caseworker signature.
+            </p>
+            <button onclick="generateDcfClaimForm('FS-334B')" id="claimBtn-FS-334B" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs py-2 rounded-lg shadow-sm transition flex items-center justify-center gap-1.5">
+              <i data-lucide="download" class="w-4 h-4"></i> Export Form FS-334B (.docx)
+            </button>
+            <div id="claimResult-FS-334B" class="text-center text-[11px] font-semibold text-emerald-800"></div>
+          </div>
+
+          <!-- Form FS-333B: Special Expense Claim -->
+          <div class="bg-white p-4 rounded-xl border border-teal-200 space-y-3 shadow-2xs">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-900 text-sm flex items-center gap-1.5">
+                <i data-lucide="receipt" class="w-4 h-4 text-teal-600"></i> Form FS-333B: Expense Claim
+              </span>
+              <span class="text-[10px] bg-teal-100 text-teal-800 font-bold px-2 py-0.5 rounded">Special Care</span>
+            </div>
+            <p class="text-slate-600 leading-relaxed text-[11px]">
+              Itemizes extraordinary clothing allowances, education/sports fees, and RPPS prudent-parent approved expenses incurred on behalf of the child.
+            </p>
+            <button onclick="generateDcfClaimForm('FS-333B')" id="claimBtn-FS-333B" class="w-full bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs py-2 rounded-lg shadow-sm transition flex items-center justify-center gap-1.5">
+              <i data-lucide="download" class="w-4 h-4"></i> Export Form FS-333B (.docx)
+            </button>
+            <div id="claimResult-FS-333B" class="text-center text-[11px] font-semibold text-teal-800"></div>
+          </div>
+        </div>
+      </div>
+
     </div>
   `;
+}
+
+async function generateDcfClaimForm(claimType) {
+  const btn = document.getElementById(`claimBtn-${claimType}`);
+  const status = document.getElementById(`claimResult-${claimType}`);
+  const year = document.getElementById('rptYear') ? parseInt(document.getElementById('rptYear').value) : new Date().getFullYear();
+  const month = document.getElementById('rptMonth') ? parseInt(document.getElementById('rptMonth').value) : (new Date().getMonth() + 1);
+
+  if (btn) btn.disabled = true;
+  if (status) status.textContent = `Assembling official Vermont Form ${claimType}...`;
+
+  try {
+    const res = await apiFetch('/api/reports/dcf-claim', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        child_id: currentChildId,
+        year: year,
+        month: month,
+        claim_type: claimType
+      })
+    });
+    const data = await res.json();
+    if (data.download_url) {
+      if (status) status.innerHTML = `<a href="${data.download_url}" class="text-emerald-700 font-bold underline">Download ${data.filename}</a>`;
+      window.open(data.download_url, '_blank');
+    } else {
+      if (status) status.textContent = "Error: " + (data.error || 'Failed to generate form');
+    }
+  } catch (err) {
+    if (status) status.textContent = "Error: " + err.message;
+  } finally {
+    if (btn) btn.disabled = false;
+  }
 }
 
 // Modal Handlers

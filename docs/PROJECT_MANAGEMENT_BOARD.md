@@ -83,8 +83,8 @@ This document serves as the formal record that the **Springboard Enhancement Pro
   - Visual statutory countdown badge embedded in child snapshot card calculating EPSDT initial well-child screening status (compliant, days remaining, or overdue).
 
 ### Sprint 3: Automation & Future Vision (Next 1–2 Months)
-- [ ] **Task 3.1: Vermont DCF State Form Auto-Filler (`FS-334B` & `FS-333B`)**
-  - One-click export directly onto official state reimbursement claim forms.
+- [x] **Task 3.1: Vermont DCF State Form Auto-Filler (`FS-334B` & `FS-333B`)** (Completed - Commit pending)
+  - 1-click generation of official Vermont DCF Form FS-334B (Caregiver Travel & Mileage Claim at \$0.67/mi) and Form FS-333B (Special Expense & Clothing Allowance Claim) formatted in Word/DOCX with statutory certification text.
 - [x] **Task 3.2: Full-Text Offline Search (`Ctrl + K` Omnibar)** (Completed - Commit pending)
   - Instant modal lookup invoked by `Ctrl + K` or search bar across timeline observations, active medications, DCF documents, and caregiver contacts with category filtering.
 - [ ] **Task 3.3: Mobile Field-Log Progressive Web App (PWA)**

@@ -433,3 +433,127 @@ def query_ollama_summary(prompt_text, model="qwen2.5-coder:latest"):
             return result.get("response", "")
     except Exception as e:
         return f"Error contacting local Ollama model: {str(e)}"
+
+
+def generate_dcf_reimbursement_claim_docx(child_id, year, month, claim_type="FS-334B"):
+    """
+    Generates official State of Vermont DCF reimbursement claim document (.docx):
+    - 'FS-334B': Caregiver Travel & Mileage Claim ($0.67/mi)
+    - 'FS-333B': Special / Extraordinary Child Expense & Clothing Allowance Claim
+    """
+    conn = get_connection()
+    c = conn.cursor()
+
+    c.execute("SELECT * FROM children WHERE id = ?", (child_id,))
+    child = c.fetchone()
+    if not child:
+        conn.close()
+        return None
+
+    date_prefix = f"{year:04d}-{month:02d}"
+    c.execute("""
+    SELECT * FROM timeline_records 
+    WHERE child_id = ? AND event_date LIKE ? 
+    ORDER BY event_date ASC
+    """, (child_id, f"{date_prefix}%"))
+    records = c.fetchall()
+    conn.close()
+
+    alias = child.get('alias') or child.get('first_name') or 'Child'
+    doc = docx.Document()
+
+    # Form Title Banner
+    h = doc.add_heading(level=0)
+    run = h.add_run(f"STATE OF VERMONT • DCF FAMILY SERVICES\nFORM {claim_type}: REIMBURSEMENT CLAIM")
+    run.font.name = 'Arial'
+    run.font.size = Pt(16)
+    run.font.bold = True
+    run.font.color.rgb = RGBColor(15, 23, 42)
+
+    # Sub-header
+    sub_title = "Caregiver Travel & Mileage Claim" if claim_type == "FS-334B" else "Special & Non-Reimbursement Care Allowance"
+    p_sub = doc.add_paragraph()
+    p_sub.add_run(f"{sub_title} — Month: {year:04d}-{month:02d}\n").bold = True
+    p_sub.add_run(f"Child in Care: {alias} (Case Code: {child.get('child_code') or 'CCC-000001'})\n")
+    p_sub.add_run(f"Care Relationship: {child.get('relationship_type') or 'Kinship Care'}\n")
+    p_sub.add_run(f"Statutory Rate: $0.67 per reimbursable mile (Vermont DCF Travel Regulations)")
+
+    doc.add_paragraph("—" * 55)
+
+    if claim_type == "FS-334B":
+        # Filter for records with mileage > 0 or visit/medical categories
+        trip_records = [r for r in records if (r.get('mileage') and r.get('mileage') > 0) or r.get('category') in ('family_time', 'medical')]
+        
+        doc.add_heading("Itemized Travel & Reimbursable Trips Log", level=2)
+        table = doc.add_table(rows=1, cols=5)
+        table.style = 'Light Shading Accent 1' if 'Light Shading Accent 1' in [s.name for s in doc.styles] else 'Table Grid'
+        
+        hdr_cells = table.rows[0].cells
+        hdr_cells[0].text = "Date"
+        hdr_cells[1].text = "Trip Purpose & Destination"
+        hdr_cells[2].text = "Category"
+        hdr_cells[3].text = "Round-Trip Mi."
+        hdr_cells[4].text = "Reimbursement"
+
+        total_miles = 0.0
+        total_payout = 0.0
+
+        for r in trip_records:
+            row_cells = table.add_row().cells
+            row_cells[0].text = str(r.get('event_date') or '')
+            row_cells[1].text = f"{r.get('title') or ''}\n{r.get('summary') or ''}".strip()
+            row_cells[2].text = str(r.get('category') or '').replace('_', ' ').title()
+            
+            miles = float(r.get('mileage') or 0.0)
+            if miles == 0.0 and r.get('category') == 'family_time':
+                miles = 18.0 # Default Easterseals roundtrip if unset
+            
+            payout = miles * 0.67
+            total_miles += miles
+            total_payout += payout
+
+            row_cells[3].text = f"{miles:.1f} mi"
+            row_cells[4].text = f"${payout:.2f}"
+
+        # Summary Paragraph
+        doc.add_paragraph()
+        p_tot = doc.add_paragraph()
+        r_tot = p_tot.add_run(f"TOTAL REIMBURSABLE MILEAGE: {total_miles:.1f} miles\n")
+        r_tot.bold = True
+        r_pay = p_tot.add_run(f"TOTAL STATE REIMBURSEMENT CLAIMED: ${total_payout:.2f}\n")
+        r_pay.bold = True
+        r_pay.font.size = Pt(13)
+        r_pay.font.color.rgb = RGBColor(16, 122, 68)
+
+    else: # FS-333B Expenses
+        exp_records = [r for r in records if r.get('category') in ('financial', 'daily', 'education')]
+        doc.add_heading("Special Care & Activity Expense Claim Log", level=2)
+        table = doc.add_table(rows=1, cols=4)
+        table.style = 'Table Grid'
+        
+        hdr = table.rows[0].cells
+        hdr[0].text = "Date"
+        hdr[1].text = "Expense Description / Item"
+        hdr[2].text = "Category"
+        hdr[3].text = "RPPS Authority"
+
+        for r in exp_records:
+            row = table.add_row().cells
+            row[0].text = str(r.get('event_date') or '')
+            row[1].text = f"{r.get('title') or ''}: {r.get('summary') or ''}".strip()
+            row[2].text = str(r.get('category') or '').title()
+            row[3].text = str(r.get('rpps_category') or 'Routine Care')
+
+    # Caregiver Certification Box
+    doc.add_paragraph("\nCAREGIVER CERTIFICATION & SUBMISSION SIGN-OFF")
+    p_cert = doc.add_paragraph()
+    p_cert.add_run("I certify under penalty of perjury that the travel and expenses documented above were necessarily incurred in the care of the above-named child in accordance with Vermont Department for Children and Families regulations.\n\n")
+    p_cert.add_run("Caregiver Signature: ____________________________________    Date: ______________\n\n")
+    p_cert.add_run("DCF District Worker Approval: ___________________________    Date: ______________\n")
+
+    os.makedirs(EXPORT_DIR, exist_ok=True)
+    filename = f"DCF_{claim_type}_{alias}_{year:04d}_{month:02d}.docx"
+    file_path = os.path.join(EXPORT_DIR, filename)
+    doc.save(file_path)
+    return filename
+

@@ -6,7 +6,7 @@ from bottle import Bottle, request, response, static_file, run, abort
 from db import (get_connection, init_db, UPLOAD_DIR, audit, diff_fields,
                 verify_audit_chain)
 from services import (generate_monthly_report_docx, generate_respite_handoff_card_docx,
-                query_ollama_summary, EXPORT_DIR)
+                generate_dcf_reimbursement_claim_docx, query_ollama_summary, EXPORT_DIR)
 
 app = Bottle()
 
@@ -1126,6 +1126,27 @@ def create_respite_card():
         "download_url": f"/exports/{filename}",
         "filename": filename,
         "message": "Respite care handoff card generated"
+    })
+
+
+@app.route('/api/reports/dcf-claim', method=['POST'])
+def create_dcf_claim():
+    data = request.json or {}
+    child_id = data.get('child_id')
+    year = int(data.get('year', datetime.date.today().year))
+    month = int(data.get('month', datetime.date.today().month))
+    claim_type = data.get('claim_type', 'FS-334B')
+    if claim_type not in ('FS-334B', 'FS-333B'):
+        claim_type = 'FS-334B'
+
+    filename = generate_dcf_reimbursement_claim_docx(child_id, year, month, claim_type)
+    if not filename:
+        return json_res({"error": f"Failed to generate {claim_type} claim form"}, 400)
+
+    return json_res({
+        "download_url": f"/exports/{filename}",
+        "filename": filename,
+        "message": f"State of Vermont Form {claim_type} generated"
     })
 
 
