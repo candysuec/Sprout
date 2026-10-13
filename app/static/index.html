@@ -136,10 +136,11 @@
 
         <!-- Integrated Fast-Action Toolbar -->
         <div class="flex items-center gap-2.5 shrink-0 pt-2 lg:pt-0 border-t lg:border-t-0 border-slate-100">
-          <!-- Search Bar -->
-          <div class="relative">
-            <input type="text" id="globalSearchInput" oninput="handleGlobalSearch(event)" placeholder="Search binder..." class="bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 text-xs rounded-xl pl-8 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 w-48 transition-all" />
+          <!-- Search Bar with Ctrl+K shortcut -->
+          <div class="relative cursor-pointer" onclick="openOmnibarModal()">
+            <input type="text" id="globalSearchInput" readonly placeholder="Quick find... (Ctrl+K)" class="bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 text-xs rounded-xl pl-8 pr-12 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 w-48 transition-all cursor-pointer hover:bg-slate-100" />
             <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-3 pointer-events-none"></i>
+            <span class="absolute right-2 top-2 px-1.5 py-0.5 rounded text-[10px] bg-slate-200/80 text-slate-600 font-bold border border-slate-300 pointer-events-none">Ctrl K</span>
           </div>
 
           <!-- Child Initials Selector -->
@@ -887,6 +888,48 @@
             <i data-lucide="printer" class="w-4 h-4"></i> Print / Save PDF
           </button>
         </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Full-Text Offline Omnibar Search Modal (Ctrl + K) -->
+  <div id="omnibarModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-start justify-center z-50 p-4 pt-16 sm:pt-24 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden space-y-0">
+      
+      <!-- Omnibar Search Input Header -->
+      <div class="p-4 border-b border-slate-100 flex items-center gap-3 bg-slate-50/50">
+        <i data-lucide="search" class="w-5 h-5 text-emerald-600 shrink-0"></i>
+        <input type="text" id="omnibarSearchInput" oninput="handleOmnibarInput(event)" placeholder="Search records, visits, medications, contacts, or documents..." class="w-full text-sm font-medium bg-transparent focus:outline-none placeholder-slate-400 text-slate-900" autofocus />
+        <button onclick="closeOmnibarModal()" class="px-2 py-1 text-slate-400 hover:text-slate-600 rounded-lg text-xs font-bold border border-slate-200 bg-white">
+          ESC
+        </button>
+      </div>
+
+      <!-- Quick Category Filter Chips -->
+      <div class="px-4 py-2 border-b border-slate-100 bg-white flex items-center gap-1.5 overflow-x-auto text-[11px]">
+        <span class="font-bold text-slate-400 uppercase tracking-wider text-[10px] shrink-0">Filter:</span>
+        <button onclick="setOmnibarFilter('all')" class="omnibar-chip px-2.5 py-1 rounded-full bg-emerald-700 text-white font-bold" data-omnifilter="all">All</button>
+        <button onclick="setOmnibarFilter('medical')" class="omnibar-chip px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 font-medium hover:bg-slate-200" data-omnifilter="medical">Medical & Meds</button>
+        <button onclick="setOmnibarFilter('family_time')" class="omnibar-chip px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 font-medium hover:bg-slate-200" data-omnifilter="family_time">Family Time</button>
+        <button onclick="setOmnibarFilter('communication')" class="omnibar-chip px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 font-medium hover:bg-slate-200" data-omnifilter="communication">DCF Calls</button>
+        <button onclick="setOmnibarFilter('contacts')" class="omnibar-chip px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 font-medium hover:bg-slate-200" data-omnifilter="contacts">Contacts</button>
+        <button onclick="setOmnibarFilter('documents')" class="omnibar-chip px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 font-medium hover:bg-slate-200" data-omnifilter="documents">Documents</button>
+      </div>
+
+      <!-- Results Container -->
+      <div id="omnibarResultsContainer" class="max-h-96 overflow-y-auto divide-y divide-slate-100 p-2 text-xs">
+        <div class="p-8 text-center text-slate-400">
+          <i data-lucide="sparkles" class="w-6 h-6 text-emerald-500 mx-auto mb-2 opacity-80"></i>
+          <p class="font-semibold text-slate-600">Type anything to search across child records, meds, and contacts.</p>
+          <p class="text-[11px] text-slate-400 mt-1">Instant local search • Press <kbd class="px-1.5 py-0.5 bg-slate-100 border rounded text-[10px]">ESC</kbd> to exit</p>
+        </div>
+      </div>
+
+      <!-- Omnibar Footer -->
+      <div class="p-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+        <span>Vermont Foster & Kinship Care • 100% Offline Fast Retrieval</span>
+        <span>Tip: Press <kbd class="px-1 py-0.5 bg-white border rounded text-[10px]">Ctrl</kbd> + <kbd class="px-1 py-0.5 bg-white border rounded text-[10px]">K</kbd> anywhere</span>
       </div>
 
     </div>

@@ -85,8 +85,8 @@ This document serves as the formal record that the **Springboard Enhancement Pro
 ### Sprint 3: Automation & Future Vision (Next 1–2 Months)
 - [ ] **Task 3.1: Vermont DCF State Form Auto-Filler (`FS-334B` & `FS-333B`)**
   - One-click export directly onto official state reimbursement claim forms.
-- [ ] **Task 3.2: Full-Text Offline Search (`Ctrl + K` Omnibar)**
-  - SQLite FTS5 search across all notes, observations, and PDF metadata.
+- [x] **Task 3.2: Full-Text Offline Search (`Ctrl + K` Omnibar)** (Completed - Commit pending)
+  - Instant modal lookup invoked by `Ctrl + K` or search bar across timeline observations, active medications, DCF documents, and caregiver contacts with category filtering.
 - [ ] **Task 3.3: Mobile Field-Log Progressive Web App (PWA)**
   - Rapid field logging optimized for visitation exchanges in parking lots and court waiting areas.
 

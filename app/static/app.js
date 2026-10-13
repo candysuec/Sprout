@@ -2489,31 +2489,197 @@ async function toggleTaskComplete(id) {
   loadTabContent();
 }
 
-// Global Instant Search
+// Global Omnibar Full-Text Search Controller (Ctrl + K)
+let omnibarDebounce = null;
+let currentOmnibarFilter = 'all';
+
+function openOmnibarModal() {
+  const modal = document.getElementById('omnibarModal');
+  const input = document.getElementById('omnibarSearchInput');
+  if (!modal || !input) return;
+  modal.classList.remove('hidden');
+  input.value = '';
+  input.focus();
+  setOmnibarFilter('all');
+  renderOmnibarPlaceholder();
+  lucide.createIcons();
+}
+
+function closeOmnibarModal() {
+  const modal = document.getElementById('omnibarModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function renderOmnibarPlaceholder() {
+  const container = document.getElementById('omnibarResultsContainer');
+  if (!container) return;
+  container.innerHTML = `
+    <div class="p-8 text-center text-slate-400">
+      <i data-lucide="sparkles" class="w-6 h-6 text-emerald-500 mx-auto mb-2 opacity-80"></i>
+      <p class="font-semibold text-slate-600">Type anything to search across child records, meds, and contacts.</p>
+      <p class="text-[11px] text-slate-400 mt-1">Instant local search • Press <kbd class="px-1.5 py-0.5 bg-slate-100 border rounded text-[10px]">ESC</kbd> to exit</p>
+    </div>
+  `;
+}
+
+function setOmnibarFilter(filter) {
+  currentOmnibarFilter = filter;
+  document.querySelectorAll('.omnibar-chip').forEach(btn => {
+    if (btn.getAttribute('data-omnifilter') === filter) {
+      btn.className = "omnibar-chip px-2.5 py-1 rounded-full bg-emerald-700 text-white font-bold";
+    } else {
+      btn.className = "omnibar-chip px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 font-medium hover:bg-slate-200";
+    }
+  });
+  const input = document.getElementById('omnibarSearchInput');
+  if (input && input.value.trim().length > 0) {
+    executeOmnibarSearch(input.value.trim());
+  }
+}
+
+function handleOmnibarInput(e) {
+  clearTimeout(omnibarDebounce);
+  const query = e.target.value.trim();
+  if (!query) {
+    renderOmnibarPlaceholder();
+    lucide.createIcons();
+    return;
+  }
+  omnibarDebounce = setTimeout(() => {
+    executeOmnibarSearch(query);
+  }, 200);
+}
+
+async function executeOmnibarSearch(query) {
+  const container = document.getElementById('omnibarResultsContainer');
+  if (!container) return;
+
+  container.innerHTML = `
+    <div class="p-6 text-center text-slate-400">
+      <i data-lucide="loader" class="w-5 h-5 animate-spin mx-auto text-emerald-600 mb-1"></i>
+      <span class="text-xs">Searching local offline records...</span>
+    </div>
+  `;
+  lucide.createIcons();
+
+  try {
+    const [recRes, contactRes, docRes] = await Promise.all([
+      apiFetch(`/api/children/${currentChildId}/records?category=all&search=${encodeURIComponent(query)}`),
+      apiFetch(`/api/contacts`),
+      apiFetch(`/api/shared-docs`)
+    ]);
+
+    const records = await recRes.json();
+    const contacts = await contactRes.json();
+    const docs = await docRes.json();
+
+    const lowerQ = query.toLowerCase();
+    const matchedContacts = contacts.filter(c => 
+      (c.name || '').toLowerCase().includes(lowerQ) || 
+      (c.role || '').toLowerCase().includes(lowerQ) || 
+      (c.organization || '').toLowerCase().includes(lowerQ)
+    );
+    const matchedDocs = docs.filter(d => 
+      (d.filename || '').toLowerCase().includes(lowerQ) || 
+      (d.category || '').toLowerCase().includes(lowerQ)
+    );
+
+    let filteredRecords = records;
+    if (currentOmnibarFilter !== 'all' && currentOmnibarFilter !== 'contacts' && currentOmnibarFilter !== 'documents') {
+      filteredRecords = records.filter(r => r.category === currentOmnibarFilter);
+    }
+
+    const showContacts = currentOmnibarFilter === 'all' || currentOmnibarFilter === 'contacts';
+    const showDocs = currentOmnibarFilter === 'all' || currentOmnibarFilter === 'documents';
+
+    const totalMatches = (currentOmnibarFilter === 'contacts' ? 0 : filteredRecords.length) + 
+                         (showContacts ? matchedContacts.length : 0) + 
+                         (showDocs ? matchedDocs.length : 0);
+
+    if (totalMatches === 0) {
+      container.innerHTML = `
+        <div class="p-8 text-center text-slate-400">
+          <i data-lucide="search-x" class="w-6 h-6 mx-auto mb-1 text-slate-300"></i>
+          <p class="font-bold text-slate-700">No records found for "${query}"</p>
+          <p class="text-[11px] text-slate-400 mt-1">Try another keyword or switch category filters.</p>
+        </div>
+      `;
+      lucide.createIcons();
+      return;
+    }
+
+    let html = '';
+
+    // Render Contact Matches
+    if (showContacts && matchedContacts.length > 0) {
+      html += `<div class="p-2 bg-indigo-50/60 font-bold text-indigo-900 text-[10px] uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="contact" class="w-3.5 h-3.5"></i> Contacts (${matchedContacts.length})</div>`;
+      matchedContacts.forEach(c => {
+        html += `
+          <div onclick="closeOmnibarModal(); switchMainSection('contacts');" class="p-3 hover:bg-slate-50 cursor-pointer flex items-center justify-between transition">
+            <div>
+              <div class="font-bold text-slate-900">${c.name} <span class="text-xs text-indigo-700 font-semibold">(${c.role})</span></div>
+              <div class="text-[11px] text-slate-500">${c.organization || ''} • ${c.phone || c.email || 'No direct phone'}</div>
+            </div>
+            <span class="text-[10px] bg-indigo-100 text-indigo-800 font-bold px-2 py-0.5 rounded">View Contact</span>
+          </div>
+        `;
+      });
+    }
+
+    // Render Document Matches
+    if (showDocs && matchedDocs.length > 0) {
+      html += `<div class="p-2 bg-blue-50/60 font-bold text-blue-900 text-[10px] uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="files" class="w-3.5 h-3.5"></i> Documents & Forms (${matchedDocs.length})</div>`;
+      matchedDocs.forEach(d => {
+        html += `
+          <div onclick="closeOmnibarModal(); switchMainSection('documents');" class="p-3 hover:bg-slate-50 cursor-pointer flex items-center justify-between transition">
+            <div>
+              <div class="font-bold text-slate-900">${d.filename}</div>
+              <div class="text-[11px] text-slate-500">Category: <strong>${d.category || 'General'}</strong></div>
+            </div>
+            <span class="text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded">Open Vault</span>
+          </div>
+        `;
+      });
+    }
+
+    // Render Event / Binder Matches
+    if (currentOmnibarFilter !== 'contacts' && currentOmnibarFilter !== 'documents' && filteredRecords.length > 0) {
+      html += `<div class="p-2 bg-emerald-50/60 font-bold text-emerald-900 text-[10px] uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="book-open" class="w-3.5 h-3.5"></i> Binder & Timeline Records (${filteredRecords.length})</div>`;
+      filteredRecords.forEach(r => {
+        html += `
+          <div onclick="closeOmnibarModal(); openEditRecordModal(${r.id});" class="p-3 hover:bg-slate-50 cursor-pointer flex items-start justify-between transition gap-3">
+            <div>
+              <div class="font-bold text-slate-900">${r.title} <span class="text-[11px] text-slate-400 font-normal">(${r.event_date})</span></div>
+              <div class="text-xs text-slate-600 mt-0.5 line-clamp-1">${r.summary || 'Logged observation.'}</div>
+            </div>
+            <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded uppercase shrink-0">${r.category}</span>
+          </div>
+        `;
+      });
+    }
+
+    container.innerHTML = html;
+    lucide.createIcons();
+  } catch (err) {
+    container.innerHTML = `<div class="p-4 text-xs text-rose-700 bg-rose-50 font-bold">Error executing search: ${err.message}</div>`;
+  }
+}
+
+// Global Keyboard Listener for Ctrl + K and ESC
+window.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+    e.preventDefault();
+    openOmnibarModal();
+  } else if (e.key === 'Escape') {
+    closeOmnibarModal();
+    closeEmergencyHandoffModal();
+  }
+});
+
+// Global Instant Search (Legacy fallback)
 let searchDebounce = null;
 function handleGlobalSearch(e) {
-  clearTimeout(searchDebounce);
-  const query = e.target.value.trim();
-  searchDebounce = setTimeout(async () => {
-    if (query.length > 0) {
-      if (currentTab !== 'timeline') {
-        currentTab = 'timeline';
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-          if (btn.getAttribute('data-tab') === 'timeline') {
-            btn.classList.add('bg-slate-100', 'font-bold', 'text-emerald-800');
-          } else {
-            btn.classList.remove('bg-slate-100', 'font-bold', 'text-emerald-800');
-          }
-        });
-      }
-      const container = document.getElementById('tabContent');
-      const res = await fetch(`/api/children/${currentChildId}/records?category=all&search=${encodeURIComponent(query)}`);
-      const records = await res.json();
-      await renderRecordsCustomList(container, records, `Search Results for "${query}"`);
-    } else {
-      loadTabContent();
-    }
-  }, 250);
+  openOmnibarModal();
 }
 
 // Single-entry Submission (Supports both CREATE and UPDATE)
