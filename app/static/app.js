@@ -3905,6 +3905,38 @@ function closeSystemHelpModal() {
   if (modal) modal.classList.add('hidden');
 }
 
+// Global Modal Backdrop and Escape Key Handler
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeRecordModal();
+    closeNewChildModal();
+    closeNewContactModal();
+    closeNewLicensingModal();
+    closeHouseholdModal();
+    closeCaregiverProfilesModal();
+    closeSystemHelpModal();
+  }
+});
+
+// Attach background backdrop click listeners
+document.addEventListener('DOMContentLoaded', () => {
+  const modalIds = [
+    'recordModal', 'newChildModal', 'newContactModal',
+    'newLicensingModal', 'newHouseholdModal',
+    'caregiverProfilesModal', 'systemHelpModal'
+  ];
+  modalIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('click', (e) => {
+        if (e.target === el) {
+          el.classList.add('hidden');
+        }
+      });
+    }
+  });
+});
+
 // Master Welcome & State Resource Hub (Shown when no sphere or caregiver is selected)
 function renderWelcomeLandingView(container) {
   container.innerHTML = `
