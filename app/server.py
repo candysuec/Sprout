@@ -177,13 +177,18 @@ def open_local_doc():
 
 @app.route('/api/households', method=['GET'])
 def get_households():
-    conn = get_connection()
-    caregiver = (request.headers.get('X-Caregiver') or 'Candy Chevalier').strip()
-    sprout_mode = (request.headers.get('X-Sprout-Mode') or 'local').strip().lower()
+    caregiver = (request.headers.get('X-Caregiver') or '').strip()
+    sprout_mode = (request.headers.get('X-Sprout-Mode') or '').strip().lower()
+    
+    # UNSELECTED GUARD: When opening Sprout fresh or when no caregiver is selected, return zero records
+    if not sprout_mode or not caregiver:
+        return json_res([])
+
     is_sample = ('Sample' in caregiver) or (sprout_mode == 'sample')
     
     if not is_sample:
         # Real Working Sphere: Candy, Robin, and Mallory only operate out of 41 Elmwood Dr & 22 East Parkside
+        conn = get_connection()
         db_rows = conn.execute("SELECT * FROM households WHERE address LIKE '%Elmwood%' OR address LIKE '%Parkside%' ORDER BY id ASC").fetchall()
         rows = []
         for r in db_rows:
@@ -193,7 +198,6 @@ def get_households():
         conn.close()
         return json_res(rows)
 
-    conn.close()
     # Sample Caregiver Sandbox:
     # Return the specific synthetic household assigned to the selected sample caregiver
     import sample_dataset as sd
@@ -203,7 +207,7 @@ def get_households():
             selected_hh_id = adm['HouseholdID']
             break
     if not selected_hh_id:
-        selected_hh_id = "HH-101"
+        return json_res([])
 
     sample_hh_list = []
     for h in sd.HOUSEHOLDS:
@@ -490,14 +494,19 @@ def _derive_alias(data):
 
 @app.route('/api/children', method=['GET'])
 def get_children():
-    conn = get_connection()
-    caregiver = (request.headers.get('X-Caregiver') or 'Candy Chevalier').strip()
-    sprout_mode = (request.headers.get('X-Sprout-Mode') or 'local').strip().lower()
+    caregiver = (request.headers.get('X-Caregiver') or '').strip()
+    sprout_mode = (request.headers.get('X-Sprout-Mode') or '').strip().lower()
+
+    # UNSELECTED GUARD: When opening Sprout fresh or when no caregiver is selected, return zero records
+    if not sprout_mode or not caregiver:
+        return json_res([])
+
     is_sample = ('Sample' in caregiver) or (sprout_mode == 'sample')
     
     if not is_sample:
         # Real Working Sphere (Candy Chevalier, Robin Davis, Mallory Wheeler):
         # NO children currently in care; CD is strictly a Potential Kinship Placement at 41 Elmwood
+        conn = get_connection()
         all_rows = [dict(r) for r in conn.execute("SELECT * FROM children WHERE alias = 'CD' ORDER BY alias ASC")]
         conn.close()
         clean_rows = []
@@ -509,22 +518,18 @@ def get_children():
             clean_rows.append(r)
         return json_res(clean_rows)
 
-    conn.close()
     # Sample Caregiver Sandbox:
     # Tie fictional children STRICTLY to the selected sample caregiver's household
     import sample_dataset as sd
 
-    # Determine which HouseholdID corresponds to the selected sample caregiver
-    # If a specific caregiver was chosen, find their HouseholdID
     selected_hh_id = None
     for adm in sd.ADULT_MEMBERS:
         if adm['Name'] in caregiver:
             selected_hh_id = adm['HouseholdID']
             break
     
-    # If no specific match, default to HH-101 (Sarah Jenkins)
     if not selected_hh_id:
-        selected_hh_id = "HH-101"
+        return json_res([])
 
     # Find placements in this household
     hh_placements = [p for p in sd.PLACEMENTS if p['HouseholdID'] == selected_hh_id]

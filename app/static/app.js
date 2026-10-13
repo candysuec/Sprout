@@ -2,8 +2,8 @@ let currentChildId = null;
 let currentTab = 'dashboard';
 let childrenList = [];
 
-// Sprout Environment State ('sample' = Dev Sandbox [Default], 'local' = Local Live Data)
-let currentSproutMode = localStorage.getItem('sproutMode') || 'sample';
+// Sprout Environment State ('' = Unselected [Default Welcome Portal], 'sample' = Dev Sandbox, 'local' = Local Live Data)
+let currentSproutMode = localStorage.getItem('sproutMode') || '';
 
 const LOCAL_CAREGIVERS = [
   { id: 'Candy Chevalier', name: 'Candy Chevalier (Primary Caregiver)', initials: 'CC', color: 'bg-emerald-700' },
@@ -81,12 +81,15 @@ function updateSproutTheme() {
   // Update current sphere text indicator
   const sphereInd = document.getElementById('currentSphereIndicator');
   if (sphereInd) {
-    if (isSample) {
+    if (currentSproutMode === 'sample') {
       sphereInd.textContent = 'Dev Sandbox Active';
       sphereInd.className = 'font-bold text-blue-700';
-    } else {
+    } else if (currentSproutMode === 'local') {
       sphereInd.textContent = 'Local Live Data Active';
       sphereInd.className = 'font-bold text-emerald-700';
+    } else {
+      sphereInd.textContent = 'Welcome Portal (No Sphere Selected)';
+      sphereInd.className = 'font-bold text-slate-500';
     }
   }
 }
@@ -95,7 +98,11 @@ function onSproutModeChange() {
   const sproutSelect = document.getElementById('sproutModeSelect');
   if (sproutSelect) {
     currentSproutMode = sproutSelect.value;
-    localStorage.setItem('sproutMode', currentSproutMode);
+    if (currentSproutMode) {
+      localStorage.setItem('sproutMode', currentSproutMode);
+    } else {
+      localStorage.removeItem('sproutMode');
+    }
   }
   
   // Reset caregiver selection to unselected prompt upon mode switch
@@ -105,9 +112,52 @@ function onSproutModeChange() {
   populateCaregiverDropdown();
   updateSproutTheme();
   loadChildren();
-  if (currentMainSection === 'households' || currentMainSection === 'children' || currentMainSection === 'dashboard' || currentMainSection === 'sample_data') {
-    switchMainSection(currentMainSection);
+  loadTabContent();
+}
+
+function resetToHomeLanding() {
+  currentSproutMode = '';
+  activeCaregiverUser = '';
+  localStorage.removeItem('sproutMode');
+  localStorage.removeItem('caregiverUser');
+
+  const sproutSelect = document.getElementById('sproutModeSelect');
+  if (sproutSelect) sproutSelect.value = '';
+
+  const caregiverSelect = document.getElementById('caregiverSelect');
+  if (caregiverSelect) caregiverSelect.value = '';
+
+  populateCaregiverDropdown();
+  updateSproutTheme();
+  loadChildren();
+  loadTabContent();
+}
+
+function activateSampleCaregiverProfile(primaryName) {
+  currentSproutMode = 'sample';
+  localStorage.setItem('sproutMode', 'sample');
+  const sproutSelect = document.getElementById('sproutModeSelect');
+  if (sproutSelect) sproutSelect.value = 'sample';
+
+  populateCaregiverDropdown();
+  updateSproutTheme();
+
+  // Find caregiver option that matches primaryName
+  const caregiverSelect = document.getElementById('caregiverSelect');
+  if (caregiverSelect) {
+    for (let opt of caregiverSelect.options) {
+      if (opt.textContent.includes(primaryName)) {
+        caregiverSelect.value = opt.value;
+        activeCaregiverUser = opt.value;
+        localStorage.setItem('caregiverUser', activeCaregiverUser);
+        break;
+      }
+    }
   }
+
+  updateCaregiverAvatarDisplay(activeCaregiverUser);
+  loadChildren();
+  switchMainSection('dashboard');
 }
 
 function populateCaregiverDropdown() {
@@ -115,6 +165,18 @@ function populateCaregiverDropdown() {
   if (!select) return;
 
   select.innerHTML = '';
+  
+  if (!currentSproutMode) {
+    const defaultOpt = document.createElement('option');
+    defaultOpt.value = '';
+    defaultOpt.textContent = '-- Select Caregiver User --';
+    defaultOpt.className = 'bg-slate-800 text-slate-400 italic';
+    select.appendChild(defaultOpt);
+    select.value = '';
+    updateCaregiverAvatarDisplay('');
+    return;
+  }
+
   const list = currentSproutMode === 'local' ? LOCAL_CAREGIVERS : SAMPLE_CAREGIVERS;
 
   // Placeholder Prompt Option: "-- Select Caregiver User --"
@@ -406,6 +468,21 @@ function switchTab(tabKey) {
 async function loadTabContent() {
   const container = document.getElementById('tabContent');
   if (!container) return;
+
+  // WELCOME / ENTRY PORTAL: When no sphere mode or caregiver is selected, render the master welcome portal & state resource center
+  if (!currentSproutMode || !activeCaregiverUser) {
+    const card = document.getElementById('snapshotCard');
+    if (card) {
+      card.classList.add('hidden');
+      card.innerHTML = '';
+    }
+    const subNav = document.getElementById('childWorkspaceSubNav');
+    if (subNav) subNav.classList.add('hidden');
+
+    renderWelcomeLandingView(container);
+    lucide.createIcons();
+    return;
+  }
 
   if (currentMainSection === 'dashboard') {
     await renderDashboardView(container);
@@ -3820,6 +3897,477 @@ function closeSystemHelpModal() {
   const modal = document.getElementById('systemHelpModal');
   if (modal) modal.classList.add('hidden');
 }
+
+// Master Welcome & State Resource Hub (Shown when no sphere or caregiver is selected)
+function renderWelcomeLandingView(container) {
+  container.innerHTML = `
+    <div class="space-y-8 animate-fadeIn">
+      
+      <!-- Welcome Hero Banner -->
+      <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 rounded-2xl p-6 sm:p-8 text-white shadow-lg border border-slate-700 relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative z-10 max-w-4xl space-y-3">
+          <div class="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full text-xs font-bold uppercase tracking-wider">
+            <i data-lucide="sprout" class="w-4 h-4 text-emerald-400"></i> Sprout Caregiver Command Center & OS
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+            Vermont Caregiver Support & Development Portal
+          </h1>
+          <p class="text-slate-300 text-sm leading-relaxed max-w-3xl">
+            Welcome to the centralized, private command center for Vermont foster, kinship, respite, and adoptive families. 
+            Select an environment mode and caregiver user from the top navigation bar to access an active household dashboard, 
+            or explore the interactive sandbox profiles and state resource directory below.
+          </p>
+          <div class="pt-2 flex flex-wrap items-center gap-3">
+            <button onclick="activateSampleCaregiverProfile('Sarah Jenkins')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center gap-2">
+              <i data-lucide="play" class="w-4 h-4"></i>
+              <span>Launch Sample Sandbox (Sarah Jenkins • Established)</span>
+            </button>
+            <button onclick="openCaregiverProfilesModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center gap-2">
+              <i data-lucide="users" class="w-4 h-4"></i>
+              <span>Browse 15 Caregiver Lifecycle Profiles</span>
+            </button>
+            <button onclick="openSystemHelpModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl text-xs border border-slate-600 transition flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4"></i>
+              <span>System Help & Architecture</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Action: Caregiver Journey Sandbox Grid (15 Distinct Models) -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <i data-lucide="compass" class="w-5 h-5 text-blue-600"></i>
+              Explore Caregiver Journey Sandbox Households
+            </h3>
+            <p class="text-xs text-slate-500">
+              Select any profile below to immediately launch the Dev Sandbox configured for that specific household structure and approval stage.
+            </p>
+          </div>
+          <span class="text-xs font-semibold px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg border border-blue-200">
+            15 Realistic Vermont Model Households
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+          <!-- Card 1: Sarah Jenkins -->
+          <div class="border border-slate-200 hover:border-blue-400 bg-slate-50/70 hover:bg-white rounded-xl p-3.5 transition space-y-2.5 flex flex-col justify-between shadow-2xs">
+            <div>
+              <div class="flex items-start justify-between gap-2">
+                <span class="font-bold text-slate-900 text-xs">Sarah Jenkins</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-900 border border-blue-200">Established (1-3 Yrs)</span>
+              </div>
+              <p class="text-[11px] text-slate-500">Single Adult • Maple Ridge Home (HH-101)</p>
+              <div class="text-[11px] text-slate-600 mt-1">Approvals: <span class="font-semibold text-slate-800">Foster, Respite</span></div>
+              <div class="text-[11px] text-slate-500">Tenure: 2.5 yrs • Placements: 1 Active / 3 Completed</div>
+            </div>
+            <button onclick="activateSampleCaregiverProfile('Sarah Jenkins')" class="w-full mt-2 py-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg text-xs transition flex items-center justify-center gap-1.5">
+              <span>Activate Profile</span> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+
+          <!-- Card 2: Marcus Vance -->
+          <div class="border border-slate-200 hover:border-blue-400 bg-slate-50/70 hover:bg-white rounded-xl p-3.5 transition space-y-2.5 flex flex-col justify-between shadow-2xs">
+            <div>
+              <div class="flex items-start justify-between gap-2">
+                <span class="font-bold text-slate-900 text-xs">Marcus Vance</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-900 border border-purple-200">Specialized Provider</span>
+              </div>
+              <p class="text-[11px] text-slate-500">Single Adult • Birchwood Haven (HH-102)</p>
+              <div class="text-[11px] text-slate-600 mt-1">Approvals: <span class="font-semibold text-slate-800">Foster, Therapeutic, Independent Living</span></div>
+              <div class="text-[11px] text-slate-500">Tenure: 5.0 yrs • Placements: 2 Active / 8 Completed</div>
+            </div>
+            <button onclick="activateSampleCaregiverProfile('Marcus Vance')" class="w-full mt-2 py-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg text-xs transition flex items-center justify-center gap-1.5">
+              <span>Activate Profile</span> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+
+          <!-- Card 3: David & Emily Miller -->
+          <div class="border border-slate-200 hover:border-blue-400 bg-slate-50/70 hover:bg-white rounded-xl p-3.5 transition space-y-2.5 flex flex-col justify-between shadow-2xs">
+            <div>
+              <div class="flex items-start justify-between gap-2">
+                <span class="font-bold text-slate-900 text-xs">David & Emily Miller</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-900 border border-emerald-200">Permanency Provider</span>
+              </div>
+              <p class="text-[11px] text-slate-500">Married Couple • Oak Hill Cottage (HH-103)</p>
+              <div class="text-[11px] text-slate-600 mt-1">Approvals: <span class="font-semibold text-slate-800">Foster, Foster-to-Adopt</span></div>
+              <div class="text-[11px] text-slate-500">Tenure: 4.0 yrs • Adoptions Finalized: 2</div>
+            </div>
+            <button onclick="activateSampleCaregiverProfile('David & Emily Miller')" class="w-full mt-2 py-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg text-xs transition flex items-center justify-center gap-1.5">
+              <span>Activate Profile</span> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+
+          <!-- Card 4: Elena Ramos & Chloe Bennett -->
+          <div class="border border-slate-200 hover:border-blue-400 bg-slate-50/70 hover:bg-white rounded-xl p-3.5 transition space-y-2.5 flex flex-col justify-between shadow-2xs">
+            <div>
+              <div class="flex items-start justify-between gap-2">
+                <span class="font-bold text-slate-900 text-xs">Elena Ramos & Chloe Bennett</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 text-teal-900 border border-teal-200">Specialized Provider</span>
+              </div>
+              <p class="text-[11px] text-slate-500">Domestic Partners • Cedar Grove Retreat (HH-105)</p>
+              <div class="text-[11px] text-slate-600 mt-1">Approvals: <span class="font-semibold text-slate-800">Foster, Medical Foster Care</span></div>
+              <div class="text-[11px] text-slate-500">Tenure: 3.5 yrs • Placements: 1 Active / 4 Completed</div>
+            </div>
+            <button onclick="activateSampleCaregiverProfile('Elena Ramos & Chloe Bennett')" class="w-full mt-2 py-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg text-xs transition flex items-center justify-center gap-1.5">
+              <span>Activate Profile</span> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+
+          <!-- Card 5: Hannah & Beatrice Abbott -->
+          <div class="border border-slate-200 hover:border-blue-400 bg-slate-50/70 hover:bg-white rounded-xl p-3.5 transition space-y-2.5 flex flex-col justify-between shadow-2xs">
+            <div>
+              <div class="flex items-start justify-between gap-2">
+                <span class="font-bold text-slate-900 text-xs">Hannah & Beatrice Abbott</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-200">Established Kinship</span>
+              </div>
+              <p class="text-[11px] text-slate-500">Siblings • Mountain View Homestead (HH-109)</p>
+              <div class="text-[11px] text-slate-600 mt-1">Approvals: <span class="font-semibold text-slate-800">Kinship, Respite</span></div>
+              <div class="text-[11px] text-slate-500">Tenure: 1.5 yrs • Placements: 2 Active Kinship</div>
+            </div>
+            <button onclick="activateSampleCaregiverProfile('Hannah & Beatrice Abbott')" class="w-full mt-2 py-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg text-xs transition flex items-center justify-center gap-1.5">
+              <span>Activate Profile</span> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+
+          <!-- Card 6: Eleanor & Arthur Vance -->
+          <div class="border border-slate-200 hover:border-blue-400 bg-slate-50/70 hover:bg-white rounded-xl p-3.5 transition space-y-2.5 flex flex-col justify-between shadow-2xs">
+            <div>
+              <div class="flex items-start justify-between gap-2">
+                <span class="font-bold text-slate-900 text-xs">Eleanor & Arthur Vance</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-900 border border-indigo-200">Grandparents Kinship</span>
+              </div>
+              <p class="text-[11px] text-slate-500">Grandparents (55+) • Willow Creek Farm (HH-113)</p>
+              <div class="text-[11px] text-slate-600 mt-1">Approvals: <span class="font-semibold text-slate-800">Kinship, Foster-to-Adopt</span></div>
+              <div class="text-[11px] text-slate-500">Tenure: 5.5 yrs • Permanent Guardianship Finalized</div>
+            </div>
+            <button onclick="activateSampleCaregiverProfile('Eleanor & Arthur Vance')" class="w-full mt-2 py-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg text-xs transition flex items-center justify-center gap-1.5">
+              <span>Activate Profile</span> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MASTER VERMONT CAREGIVER RESOURCE COMMAND CENTER -->
+      <div class="space-y-6">
+        <div class="border-b border-slate-200 pb-3 flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
+              <i data-lucide="shield" class="w-6 h-6 text-emerald-700"></i>
+              Vermont Caregiver Official Resource Directory & Toolkit
+            </h2>
+            <p class="text-xs text-slate-500">
+              State-contracted guidelines, daily reimbursement rates, mandatory training portals, advocacy networks, and legal resources.
+            </p>
+          </div>
+          <span class="text-[11px] font-mono bg-slate-100 text-slate-600 px-3 py-1 rounded-full border border-slate-200">
+            Updated Oct 2026 • Policy 75 & VT DCF Compliant
+          </span>
+        </div>
+
+        <!-- 1. Financial Support, Rate Schedules & Benefit Calculators -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-5">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+              <i data-lucide="dollar-sign" class="w-5 h-5 text-emerald-600"></i>
+              1. Financial Support, DCF Rate Schedules & Benefit Calculators
+            </h3>
+            <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">Official VT DCF Rates</span>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <!-- Rate Schedules Table Card -->
+            <div class="lg:col-span-2 border border-slate-200 rounded-xl p-4 bg-slate-50/60 space-y-3">
+              <h4 class="font-bold text-slate-800 text-xs flex items-center gap-1.5">
+                <i data-lucide="table" class="w-4 h-4 text-emerald-600"></i> Standard Daily Reimbursement Schedules (Board, Clothing & Incidentals)
+              </h4>
+              <div class="overflow-x-auto text-xs">
+                <table class="w-full text-left border-collapse bg-white rounded-lg overflow-hidden border border-slate-200">
+                  <thead class="bg-slate-100 text-slate-700 text-[11px] font-bold uppercase">
+                    <tr>
+                      <th class="py-2 px-3 border-b">Age Category</th>
+                      <th class="py-2 px-3 border-b">Daily Board</th>
+                      <th class="py-2 px-3 border-b">Daily Clothing</th>
+                      <th class="py-2 px-3 border-b">Daily Incidentals</th>
+                      <th class="py-2 px-3 border-b text-emerald-800 font-extrabold">Total Daily Rate</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100 text-[11px]">
+                    <tr class="hover:bg-slate-50">
+                      <td class="py-2 px-3 font-semibold text-slate-800">Preschool (0 – 5)</td>
+                      <td class="py-2 px-3 text-slate-600">$17.50</td>
+                      <td class="py-2 px-3 text-slate-600">$3.10</td>
+                      <td class="py-2 px-3 text-slate-600">$1.65</td>
+                      <td class="py-2 px-3 font-bold text-emerald-700">$22.25 / day</td>
+                    </tr>
+                    <tr class="hover:bg-slate-50">
+                      <td class="py-2 px-3 font-semibold text-slate-800">Child (6 – 12)</td>
+                      <td class="py-2 px-3 text-slate-600">$19.80</td>
+                      <td class="py-2 px-3 text-slate-600">$3.95</td>
+                      <td class="py-2 px-3 text-slate-600">$2.10</td>
+                      <td class="py-2 px-3 font-bold text-emerald-700">$25.85 / day</td>
+                    </tr>
+                    <tr class="hover:bg-slate-50">
+                      <td class="py-2 px-3 font-semibold text-slate-800">Teen (13 – 18)</td>
+                      <td class="py-2 px-3 text-slate-600">$23.40</td>
+                      <td class="py-2 px-3 text-slate-600">$5.10</td>
+                      <td class="py-2 px-3 text-slate-600">$2.95</td>
+                      <td class="py-2 px-3 font-bold text-emerald-700">$31.45 / day</td>
+                    </tr>
+                    <tr class="bg-amber-50/70 font-semibold text-amber-900">
+                      <td class="py-2 px-3" colspan="4">Emergency Placement Flat Rate (Up to 30 days)</td>
+                      <td class="py-2 px-3 font-bold text-amber-800">$30.00 / day</td>
+                    </tr>
+                    <tr class="bg-purple-50/70 font-semibold text-purple-900">
+                      <td class="py-2 px-3" colspan="4">Specialized / Enhanced 24-Hour Medical or Behavioral Care</td>
+                      <td class="py-2 px-3 font-bold text-purple-800">Up to $200.00 / day</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="text-[10px] text-slate-500 italic">
+                * Note: Rates are direct state tax-free stipends issued bi-weekly to licensed kin and foster caregivers.
+              </p>
+            </div>
+
+            <!-- State Forms & Reimbursements Card -->
+            <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/60 space-y-3 flex flex-col justify-between">
+              <div>
+                <h4 class="font-bold text-slate-800 text-xs flex items-center gap-1.5">
+                  <i data-lucide="file-check" class="w-4 h-4 text-emerald-600"></i> Special Reimbursement Portals
+                </h4>
+                <div class="space-y-2 mt-2 text-xs">
+                  <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+                    <div class="font-bold text-slate-900 flex justify-between">
+                      <span>Family Support Fund</span>
+                      <span class="text-emerald-700">$350 / child / yr</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 mt-0.5">Normalcy items, school trips, extracurriculars, lessons. Email: <a href="mailto:Carrie.deem@vermont.gov" class="text-blue-600 font-bold hover:underline">Carrie.deem@vermont.gov</a></p>
+                  </div>
+
+                  <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+                    <div class="font-bold text-slate-900 flex justify-between">
+                      <span>Initial Clothing Voucher</span>
+                      <span class="text-emerald-700">$100.00 Voucher</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 mt-0.5">Issued upon child entry into care when clothing is insufficient.</p>
+                  </div>
+
+                  <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+                    <div class="font-bold text-slate-900 flex justify-between">
+                      <span>Child-Only Reach Up Cash Grant</span>
+                      <span class="text-blue-700 font-bold">1-800-479-6151</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 mt-0.5">Monthly cash assistance for non-licensed relative kin (Conditional Custody, Minor Guardianship, or Informal Kinship).</p>
+                  </div>
+                </div>
+              </div>
+              <div class="text-[11px] text-slate-500 font-medium pt-2 border-t border-slate-200">
+                Official Forms: <span class="font-mono text-slate-700">FS-333B</span> (Expenses), <span class="font-mono text-slate-700">FS-334B</span> (Respite Mileage), <span class="font-mono text-slate-700">FS-270</span> (Damage Claims)
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Training, Education & Incentive Portal -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+              <i data-lucide="graduation-cap" class="w-5 h-5 text-indigo-600"></i>
+              2. Training, Education & Mandatory Licensing Portals
+            </h3>
+            <span class="text-xs font-bold text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-full border border-indigo-200">VT-CWTP Accredited</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+            <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/60 space-y-2">
+              <div class="font-bold text-slate-900 flex items-center gap-1.5">
+                <i data-lucide="external-link" class="w-4 h-4 text-indigo-600"></i> VT-CWTP E-Learning Portal
+              </div>
+              <p class="text-slate-600 text-[11px]">
+                Access the official Vermont Child Welfare Training Partnership LMS for mandatory courses and interactive modules.
+              </p>
+              <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-2 font-bold text-indigo-900 text-[11px]">
+                🎁 $100 Completion Incentive: Claimable upon finishing the 15-hour Foundations Series!
+              </div>
+              <a href="https://vtadoption.org/child-welfare-training-partnership.html" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-blue-700 font-bold hover:underline pt-1">
+                Open CWTP Portal →
+              </a>
+            </div>
+
+            <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/60 space-y-2">
+              <div class="font-bold text-slate-900 flex items-center gap-1.5">
+                <i data-lucide="award" class="w-4 h-4 text-indigo-600"></i> Core Curriculum & Foundations
+              </div>
+              <ul class="space-y-1 text-slate-600 text-[11px] list-disc list-inside">
+                <li><strong>Foundations Online</strong> (15 Hours Self-Paced)</li>
+                <li><strong>Foundations Learning Networks</strong> (9-Hour 3-Week District Cohorts)</li>
+                <li><strong>Fostering to Forever</strong> (Adoption & Permanent Guardianship)</li>
+                <li><strong>RPC+ Trauma Parenting</strong> (Resource Parent Curriculum)</li>
+              </ul>
+            </div>
+
+            <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/60 space-y-2">
+              <div class="font-bold text-slate-900 flex items-center gap-1.5">
+                <i data-lucide="book-open" class="w-4 h-4 text-indigo-600"></i> Early Childhood & Specialized
+              </div>
+              <div class="space-y-1.5 text-[11px]">
+                <div>
+                  <a href="https://northernlightsccv.org/training/training-calendar/" target="_blank" rel="noopener noreferrer" class="font-bold text-blue-700 hover:underline">
+                    Northern Lights at CCV →
+                  </a>
+                  <p class="text-slate-500">Child development & infant care continuing education.</p>
+                </div>
+                <div>
+                  <a href="https://www.cdc.gov/act-early/site.html#gen" target="_blank" rel="noopener noreferrer" class="font-bold text-blue-700 hover:underline">
+                    CDC Act Early Milestones →
+                  </a>
+                  <p class="text-slate-500">Under 5 child development milestones and developmental tracking.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Kinship, Foster & Respite Advocacy Networks -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+              <i data-lucide="heart-handshake" class="w-5 h-5 text-rose-600"></i>
+              3. Kinship, Foster & Respite Advocacy Networks
+            </h3>
+            <span class="text-xs font-bold text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">Community Alliances</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+            <div class="border border-slate-200 rounded-xl p-3.5 bg-slate-50/60 space-y-1.5">
+              <div class="font-bold text-slate-900 flex items-center gap-1.5">
+                <i data-lucide="phone" class="w-3.5 h-3.5 text-rose-600"></i> Vermont Kin as Parents (VKAP)
+              </div>
+              <p class="text-slate-600 text-[11px]">24/7 Warmline, Kinship Navigators, PASTA peer groups, and VKAP Respite Grants.</p>
+              <div class="text-rose-800 font-extrabold text-xs">📞 (802) 871-5104</div>
+              <a href="https://www.vkap.org/home" target="_blank" rel="noopener noreferrer" class="text-blue-700 font-bold hover:underline block pt-1">Visit VKAP Website →</a>
+            </div>
+
+            <div class="border border-slate-200 rounded-xl p-3.5 bg-slate-50/60 space-y-1.5">
+              <div class="font-bold text-slate-900 flex items-center gap-1.5">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-rose-600"></i> VFAFA Alliance
+              </div>
+              <p class="text-slate-600 text-[11px]">VT Foster & Adoptive Family Association: District reps, advocacy, and Children's Activity Fund grants.</p>
+              <a href="https://vfafa.org/" target="_blank" rel="noopener noreferrer" class="text-blue-700 font-bold hover:underline block pt-1">Visit VFAFA Website →</a>
+            </div>
+
+            <div class="border border-slate-200 rounded-xl p-3.5 bg-slate-50/60 space-y-1.5">
+              <div class="font-bold text-slate-900 flex items-center gap-1.5">
+                <i data-lucide="home" class="w-3.5 h-3.5 text-rose-600"></i> VT Adoption & Guardianship
+              </div>
+              <p class="text-slate-600 text-[11px]">VT Consortium for post-permanency support, lending library, and educational counseling.</p>
+              <div class="text-slate-800 font-bold text-xs">📞 (802) 241-0901</div>
+              <a href="https://vtadoption.org" target="_blank" rel="noopener noreferrer" class="text-blue-700 font-bold hover:underline block pt-1">vtadoption.org →</a>
+            </div>
+
+            <div class="border border-slate-200 rounded-xl p-3.5 bg-slate-50/60 space-y-1.5">
+              <div class="font-bold text-slate-900 flex items-center gap-1.5">
+                <i data-lucide="user-plus" class="w-3.5 h-3.5 text-rose-600"></i> Area Agencies on Aging (55+)
+              </div>
+              <p class="text-slate-600 text-[11px]">Family Caregiver Support Program for grandparents and older kin 55+ raising children.</p>
+              <div class="text-emerald-800 font-extrabold text-xs">📞 1-800-642-5119</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Healthcare, Early Intervention & Infant Care -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+              <i data-lucide="heart-pulse" class="w-5 h-5 text-teal-600"></i>
+              4. Healthcare, Early Intervention & Infant Development
+            </h3>
+            <span class="text-xs font-bold text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200">Health & Wellness</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+            <div class="border border-slate-200 rounded-xl p-3.5 bg-slate-50/60 space-y-1">
+              <div class="font-bold text-slate-900">Dr. Dynasaur (Medicaid)</div>
+              <p class="text-slate-600 text-[11px]">100% comprehensive medical, dental, and prescription coverage for all children in foster/kin care.</p>
+              <div class="font-bold text-slate-800 text-xs">📞 1-855-899-9600</div>
+            </div>
+
+            <div class="border border-slate-200 rounded-xl p-3.5 bg-slate-50/60 space-y-1">
+              <div class="font-bold text-slate-900">WIC Nutrition Program</div>
+              <p class="text-slate-600 text-[11px]">Nutritional food vouchers, infant formula, and feeding support for all children under age 5.</p>
+              <div class="font-bold text-teal-800 text-xs">Text "VTWIC" to 855-11</div>
+            </div>
+
+            <div class="border border-slate-200 rounded-xl p-3.5 bg-slate-50/60 space-y-1">
+              <div class="font-bold text-slate-900">CIS & Help Me Grow VT</div>
+              <p class="text-slate-600 text-[11px]">Children’s Integrated Services: Early intervention, home visiting, PT/OT/speech therapy.</p>
+              <div class="font-bold text-slate-800 text-xs">Dial 2-1-1, Ext. 6</div>
+            </div>
+
+            <div class="border border-slate-200 rounded-xl p-3.5 bg-slate-50/60 space-y-1">
+              <div class="font-bold text-slate-900">Plan of Safe Care (POSC)</div>
+              <p class="text-slate-600 text-[11px]">CAPTA notification and supportive planning for substance-exposed infants & safe sleep.</p>
+              <div class="font-bold text-blue-700 text-[11px] truncate">AHS.DCFFSDCAPTA@vermont.gov</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. State Park Passes, Legal & 12 District Offices -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+              <i data-lucide="map-pin" class="w-5 h-5 text-blue-600"></i>
+              5. State Park Passes, Legal Services & 12 DCF District Offices
+            </h3>
+            <span class="text-xs font-bold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">Statewide Access</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+            <div class="border border-slate-200 rounded-xl p-3.5 bg-slate-50/60 space-y-2">
+              <div class="font-bold text-slate-900 flex items-center gap-1.5">
+                <i data-lucide="trees" class="w-4 h-4 text-emerald-600"></i> Free VT State Park Day Passes
+              </div>
+              <p class="text-slate-600 text-[11px]">
+                Foster and licensed kinship families receive free day-use entry to all 55 Vermont State Parks across the state.
+              </p>
+              <div class="text-[11px] text-slate-500 font-medium">Request pass via your DCF Resource Coordinator or local district office.</div>
+            </div>
+
+            <div class="border border-slate-200 rounded-xl p-3.5 bg-slate-50/60 space-y-2">
+              <div class="font-bold text-slate-900 flex items-center gap-1.5">
+                <i data-lucide="scale" class="w-4 h-4 text-indigo-600"></i> Legal & Advocacy Resources
+              </div>
+              <ul class="space-y-1 text-slate-600 text-[11px]">
+                <li><strong>Legal Services Vermont:</strong> 1-800-889-2047</li>
+                <li><strong>South Royalton Legal Clinic:</strong> (802) 831-1500 (Kinship guardianships)</li>
+                <li><strong>Youth Development Program (YDP):</strong> (802) 229-9151 (Ages 14-23)</li>
+              </ul>
+            </div>
+
+            <div class="border border-slate-200 rounded-xl p-3.5 bg-slate-50/60 space-y-2">
+              <div class="font-bold text-slate-900 flex items-center gap-1.5">
+                <i data-lucide="building" class="w-4 h-4 text-blue-600"></i> 12 DCF District Offices Directory
+              </div>
+              <p class="text-slate-600 text-[11px]">
+                Barre, Bennington, Brattleboro, Burlington, Hartford, Middlebury, Morrisville, Newport, Rutland, Springfield, St. Albans, St. Johnsbury.
+              </p>
+              <div class="bg-rose-50 border border-rose-200 rounded-lg p-2 font-bold text-rose-900 text-[11px]">
+                🚨 24/7 DCF Crisis & Emergency: 1-800-649-5285
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  `;
+}
+
 
 
 

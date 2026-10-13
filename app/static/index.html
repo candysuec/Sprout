@@ -26,29 +26,36 @@
   <header id="topHeader" class="bg-emerald-950 text-white shadow-sm sticky top-0 z-40 border-b border-emerald-900 transition-colors duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
       
-      <!-- Brand & Title: Named "Sprout" -->
-      <div class="flex items-center space-x-3">
-        <div class="bg-emerald-800/80 p-2 rounded-xl text-emerald-300 border border-emerald-700/60 shadow-sm">
+      <!-- Brand & Title: Clickable to Reset to Main Landing Page -->
+      <div onclick="resetToHomeLanding()" class="flex items-center space-x-3 cursor-pointer group" title="Return to Sprout Welcome & Resource Center">
+        <div class="bg-emerald-800/80 group-hover:bg-emerald-700 p-2 rounded-xl text-emerald-300 border border-emerald-700/60 shadow-sm transition">
           <i data-lucide="sprout" class="w-5 h-5 text-emerald-300"></i>
         </div>
         <div>
-          <h1 class="text-base font-bold tracking-tight text-white flex items-center gap-1.5">
+          <h1 class="text-base font-bold tracking-tight text-white flex items-center gap-1.5 group-hover:text-emerald-200 transition">
             Sprout
           </h1>
           <p class="text-[11px] text-emerald-400 font-medium">Kinship & Placement Command Center</p>
         </div>
       </div>
 
-      <!-- Right Header Actions: Sprout Sphere & Caregiver User Only -->
-      <div class="flex items-center space-x-3">
+      <!-- Right Header Actions: Emergency Hotline + Sprout Sphere & Caregiver User -->
+      <div class="flex items-center space-x-2.5">
         
+        <!-- DCF 24/7 Crisis Hotline Direct Call Widget -->
+        <a href="tel:18006495285" class="hidden sm:flex items-center bg-rose-950/80 hover:bg-rose-900 border border-rose-800/70 text-rose-200 px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-xs gap-1.5" title="Vermont DCF After-Hours Emergency Hotline (Evenings, Weekends, Holidays)">
+          <i data-lucide="phone-call" class="w-3.5 h-3.5 text-rose-400 animate-pulse"></i>
+          <span>24/7 DCF: 1-800-649-5285</span>
+        </a>
+
         <!-- 1. Sprout Environment Mode Selector -->
         <div class="flex items-center bg-emerald-950/80 rounded-xl px-2.5 py-1.5 border border-emerald-800 shadow-sm" title="Caregiver Sprout Environment">
           <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400 mr-1.5 shrink-0"></i>
           <div class="text-left leading-tight mr-1">
             <span class="text-[9px] text-emerald-400 font-semibold block uppercase tracking-wider">Sprout Sphere</span>
             <select id="sproutModeSelect" onchange="onSproutModeChange()" class="bg-transparent text-white font-bold text-xs focus:outline-none cursor-pointer">
-              <option value="sample" selected class="bg-slate-800 text-white">Sample Caregiver Sprout (Dev Sandbox)</option>
+              <option value="" selected class="bg-slate-800 text-slate-400 italic">-- Select Sprout Sphere --</option>
+              <option value="sample" class="bg-slate-800 text-white">Sample Caregiver Sprout (Dev Sandbox)</option>
               <option value="local" class="bg-slate-800 text-white">Local Caregiver Sprout (Local Live Data)</option>
             </select>
           </div>
@@ -56,8 +63,8 @@
 
         <!-- 2. Caregiver User Profile Selector (Populated dynamically based on Sprout Sphere) -->
         <div class="flex items-center bg-emerald-900/80 rounded-xl px-2.5 py-1.5 border border-emerald-800 shadow-sm" title="Active Caregiver Profile">
-          <div id="caregiverAvatar" class="w-6 h-6 rounded-full bg-emerald-700 text-white font-bold flex items-center justify-center text-xs mr-2 shrink-0">
-            CC
+          <div id="caregiverAvatar" class="w-6 h-6 rounded-full bg-slate-700 text-slate-300 font-bold flex items-center justify-center text-xs mr-2 shrink-0 border border-slate-600">
+            ?
           </div>
           <div class="text-left leading-tight mr-1">
             <span class="text-[9px] text-emerald-400 font-semibold block uppercase tracking-wider">Caregiver User</span>
