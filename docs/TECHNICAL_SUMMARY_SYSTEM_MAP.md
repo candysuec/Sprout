@@ -543,4 +543,110 @@ All endpoints require loopback binding (`Host: 127.0.0.1:5858`), CORS prevention
      ```
    - In **Sample Mode**, `/api/open-doc` unconditionally responds with `403 Forbidden` to preserve strict privacy boundaries.
 
+---
+
+## 12. Audit Logging Architecture
+
+### A. Architectural Purpose & Court Readiness
+In foster care and juvenile court proceedings, documentation credibility is paramount. Caseworkers, attorneys, and Judges must be able to trust that medical administration entries, behavioral incidents, and parental visitation logs have not been retroactively altered or fabricated.
+
+Sprout implements an immutable, append-only **Cryptographic Audit Ledger** directly within SQLite (`audit_log`), guaranteeing court-admissible audit readiness.
+
+### B. Immutable Audit Ledger Schema & Hash-Chaining
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                        CRYPTOGRAPHIC AUDIT CHAIN                       │
+│                                                                        │
+│   Row N-1                                                              │
+│   ├── ts: 2026-10-12T14:10:00Z                                         │
+│   ├── actor: Candy Chevalier                                           │
+│   ├── action: create                                                   │
+│   ├── entity: timeline_records (Medication Administered)               │
+│   ├── prev_hash: 7a8f...                                               │
+│   └── row_hash:  e3b0... ─────────────────────────────┐                │
+│                                                       │                │
+│   Row N                                               ▼                │
+│   ├── ts: 2026-10-12T14:35:12Z                        │                │
+│   ├── actor: Candy Chevalier                          │                │
+│   ├── action: update                                  │                │
+│   ├── entity: timeline_records (Dosage Notes)         │                │
+│   ├── prev_hash: e3b0... ◄────────────────────────────┘                │
+│   ├── changes: {"details": ["old", "new"]}                             │
+│   └── row_hash:  9f12...                                               │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+1. **Tracked Actions**:
+   - `create`: New child intake, journal entry, medical administration, expense log.
+   - `update`: Changes to records, capturing granular JSON field-level diffs (`diff_fields()`).
+   - `delete`: Logical deletion or record archiving, storing original state.
+   - `access`: High-security exports (e.g., generating court report bundles).
+2. **Hash-Chain Verification Algorithm (`verify_audit_chain()`)**:
+   - Every row computes: `row_hash = SHA256(prev_hash + JSON(row_fields))`.
+   - If an unauthorized direct edit or deletion occurs in the SQLite file, `verify_audit_chain()` immediately flags the first compromised row ID and invalidates the chain.
+
+---
+
+## 13. Backup & Recovery Architecture
+
+### A. Core Disaster Scenarios & Mitigation Strategies
+
+| Disaster Scenario | Threat / Failure Vector | Impact | Automated Mitigation & Recovery Runbook |
+| :--- | :--- | :--- | :--- |
+| **1. Database Corruption** | Sudden power loss, OS crash during SQLite write | App fails to launch or returns `disk I/O error` | 1. Automated daily snapshots stored in `backups/`<br/>2. Execute `VACUUM INTO` backup restore script<br/>3. Verify cryptographic hash chain with `verify_audit_chain()` |
+| **2. Physical Drive Failure** | Workstation SSD/HDD hardware death | Total loss of local workstation files | 1. OneDrive cloud sync preserves all PDFs, court orders & photos<br/>2. Re-pull code from Git repository (`github.com/candysuec/Sprout`)<br/>3. Re-seed local SQLite index from OneDrive document registry |
+| **3. PC Migration / Swap** | Upgrading caregiver PC or emergency replacement | Zero-downtime caregiver migration required | 1. Install Python 3.10+ on new machine<br/>2. Sync OneDrive `Davis & VTDCF Shared Folder`<br/>3. Copy `%LOCALAPPDATA%\CaregiverCommandCenter` folder<br/>4. Launch server loopback (`python server.py`) in under 5 minutes |
+| **4. Accidental File Deletion** | Caregiver accidentally deletes a critical PDF in Explorer | Missing attachment error in Sprout Binder | 1. Native OneDrive 30-day Version History & Recycle Bin recovery<br/>2. SQLite metadata persists independently, alerting user to restore file |
+
+### B. Standard Backup Schedule & Runbook
+1. **Automated SQLite Hot Backups**:
+   - Every startup and schema migration automatically invokes a timestamped copy:
+     `%LOCALAPPDATA%\CaregiverCommandCenter\backups\foster_binder_YYYYMMDD_HHMMSS.db`.
+   - Maintains a rolling 14-day local retention window.
+2. **OneDrive File Versioning**:
+   - Native enterprise version history enabled across all 6 core document folders, preserving all file revisions without manual intervention.
+
+---
+
+## 16. Document Compliance Engine
+
+### A. Architectural Purpose
+Child welfare licensing in Vermont involves strict statutory timelines governed by **VT DCF Family Services Policy 75, Kinship Licensing Standards (FS-221A), and Federal ASFA Rules**. 
+
+The Sprout Document Compliance Engine transforms static PDFs into **dynamic, predictive operational monitors**, ensuring caregivers never miss a court deadline, annual medical exam, or home safety drill.
+
+### B. Core Statutory Compliance Modules
+
+```mermaid
+flowchart LR
+    subgraph Rule_Engine["Deterministic Compliance Monitor"]
+        direction TB
+        R1["Placement Agreement (FS-221A)<br/>Target: Day 1"]
+        R2["Initial Health Screening<br/>Target: 30 Days from Placement"]
+        R3["Annual Pediatric Physical<br/>Target: 365 Days (12 Months)"]
+        R4["Bi-Annual Dental Exam<br/>Target: 180 Days (6 Months)"]
+        R5["Smoke & CO Detector Drill<br/>Target: Annual Inspection"]
+        R6["Fingerprint Background<br/>Target: 90 Days from Application"]
+    end
+
+    subgraph State_Machine["Document Status Engine"]
+        Current["CURRENT<br/>(Valid & Compliant)"]
+        Expiring["EXPIRING SOON<br/>(Within 30 Days)"]
+        Expired["EXPIRED<br/>(Overdue Action Required)"]
+        Missing["MISSING<br/>(Mandatory Document Not Found)"]
+    end
+
+    R1 & R2 & R3 & R4 & R5 & R6 --> State_Machine
+```
+
+### C. Compliance State Progression
+1. **Status Definitions**:
+   - `Current`: Valid document on file, expiration date > 30 days away.
+   - `Expiring Soon`: Active document approaching deadline (within 30 days of expiration). Emits yellow alert pill on dashboard.
+   - `Expired`: Deadline passed. Emits high-priority red alert pill with automated DCF email draft.
+   - `Missing`: Required statutory document not present in registry for active placement.
+2. **Zero-Disk Scan Query Performance**:
+   - Compliance status is calculated directly via SQL indexed date queries (`target_date`, `expiry_date` in `compliance_items` and `licensing_records`).
+   - Dashboard renders instantly without traversing local OneDrive folders.
 
