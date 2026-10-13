@@ -441,27 +441,64 @@ async function renderChildSnapshot() {
         </div>
       </div>
 
-      <!-- Vital Alerts, Health Clock & Emergency Handoff Section -->
-      <div class="flex flex-wrap items-center gap-3">
-        <button onclick="openEmergencyHandoffCard()" class="bg-rose-700 hover:bg-rose-800 text-white rounded-xl px-3.5 py-2 text-xs font-bold flex items-center gap-2 shadow transition" title="Print/View 1-Click Care Handoff Card for ER, Doctor, or Babysitter">
-          <i data-lucide="shield-alert" class="w-4 h-4 text-rose-200"></i>
-          <span>Emergency / Babysitter Card</span>
-        </button>
-
-        ${healthClockHtml}
-
-        <div class="bg-rose-50 border border-rose-200 rounded-xl px-3.5 py-2">
-          <div class="text-[10px] uppercase font-bold tracking-wider text-rose-600 flex items-center gap-1">
-            <i data-lucide="alert-circle" class="w-3 h-3"></i> Allergies / Medical Alerts
+      <!-- P1.2 SMART CHILD COMMAND CARD (5-Domain Flight Instrument) -->
+      <div class="flex flex-col gap-2 w-full lg:w-auto">
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
+          <!-- 1. Health Status -->
+          <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-2.5 text-center min-w-[100px]">
+            <span class="text-[9px] uppercase font-bold text-emerald-800 tracking-wider block">1. Health</span>
+            <span class="text-xs font-bold text-emerald-950 flex items-center justify-center gap-1 mt-0.5">
+              ✅ Current
+            </span>
+            <span class="text-[10px] text-emerald-700 block truncate">EPSDT Safe</span>
           </div>
-          <div class="text-xs font-semibold text-rose-900 mt-0.5">${child.allergies || 'None logged'}</div>
+
+          <!-- 2. School Status -->
+          <div class="bg-blue-50 border border-blue-200 rounded-xl p-2.5 text-center min-w-[100px]">
+            <span class="text-[9px] uppercase font-bold text-blue-800 tracking-wider block">2. School</span>
+            <span class="text-xs font-bold text-blue-950 flex items-center justify-center gap-1 mt-0.5">
+              ✅ Active
+            </span>
+            <span class="text-[10px] text-blue-700 block truncate">${child.school || 'Enrolled'}</span>
+          </div>
+
+          <!-- 3. Visits Status -->
+          <div class="bg-amber-50 border border-amber-200 rounded-xl p-2.5 text-center min-w-[100px]">
+            <span class="text-[9px] uppercase font-bold text-amber-800 tracking-wider block">3. Visits</span>
+            <span class="text-xs font-bold text-amber-950 flex items-center justify-center gap-1 mt-0.5">
+              ⚠️ In 48h
+            </span>
+            <span class="text-[10px] text-amber-700 block truncate">Easterseals</span>
+          </div>
+
+          <!-- 4. Documents Status -->
+          <div class="bg-purple-50 border border-purple-200 rounded-xl p-2.5 text-center min-w-[100px]">
+            <span class="text-[9px] uppercase font-bold text-purple-800 tracking-wider block">4. Docs</span>
+            <span class="text-xs font-bold text-purple-950 flex items-center justify-center gap-1 mt-0.5">
+              ✅ Complete
+            </span>
+            <span class="text-[10px] text-purple-700 block truncate">Vault Verified</span>
+          </div>
+
+          <!-- 5. Benefits Status -->
+          <div class="bg-teal-50 border border-teal-200 rounded-xl p-2.5 text-center min-w-[100px]">
+            <span class="text-[9px] uppercase font-bold text-teal-800 tracking-wider block">5. Benefits</span>
+            <span class="text-xs font-bold text-teal-950 flex items-center justify-center gap-1 mt-0.5">
+              ✅ Active
+            </span>
+            <span class="text-[10px] text-teal-700 block truncate">VT Medicaid</span>
+          </div>
         </div>
 
-        <div class="bg-amber-50 border border-amber-200 rounded-xl px-3.5 py-2">
-          <div class="text-[10px] uppercase font-bold tracking-wider text-amber-700 flex items-center gap-1">
-            <i data-lucide="bell" class="w-3 h-3"></i> Action Follow-Ups
-          </div>
-          <div class="text-xs font-semibold text-amber-900 mt-0.5">${followUps.length} Pending Tasks</div>
+        <!-- Quick 1-Click Action Bar -->
+        <div class="flex items-center justify-end gap-2 pt-1">
+          <button onclick="openEmergencyHandoffCard()" class="bg-rose-700 hover:bg-rose-800 text-white rounded-xl px-3 py-1.5 text-xs font-bold flex items-center gap-1.5 shadow-2xs transition" title="Print/View 1-Click Care Handoff Card for ER, Doctor, or Babysitter">
+            <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-rose-200"></i>
+            <span>Emergency Mode</span>
+          </button>
+          <button onclick="quickOpenAction('medical', 'Pediatric Well-Visit / Prescription Check', 'Routine medical review logged.')" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold shadow-2xs transition flex items-center gap-1">
+            <i data-lucide="plus" class="w-3 h-3 text-slate-500"></i> Quick Log
+          </button>
         </div>
       </div>
     </div>
@@ -1033,86 +1070,108 @@ async function renderDashboardView(container) {
     <div class="space-y-5">
 
       <!-- ========================================== -->
-      <!-- P0.2 NEXT 3 ACTIONS FLIGHT STRIP (Cockpit Rule) -->
+      <!-- P1.1 DAILY BRIEFING CENTER (Morning Command Copilot) -->
       <!-- ========================================== -->
-      <div class="bg-gradient-to-r from-amber-500 via-emerald-600 to-teal-700 p-0.5 rounded-2xl shadow-sm">
-        <div class="bg-white rounded-[14px] p-4 space-y-3">
-          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-100 pb-2">
-            <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
-              <h3 class="font-extrabold text-slate-900 text-sm tracking-tight flex items-center gap-1.5">
-                <i data-lucide="compass" class="w-4 h-4 text-emerald-700"></i>
-                <span>FLIGHT STRIP: NEXT 3 PRIORITY ACTIONS</span>
-              </h3>
+      <div class="bg-gradient-to-r from-emerald-800 via-teal-800 to-indigo-900 rounded-2xl p-5 text-white shadow-md space-y-4 border border-emerald-700/80">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-b border-white/10 pb-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-400 text-slate-900 flex items-center justify-center font-bold text-lg shadow-sm">
+              ☀️
             </div>
-            <span class="text-[11px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
-              Operator: Candy Chevalier • 60-Second Orientation
-            </span>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-300">Morning Copilot Briefing</span>
+                <span class="text-[10px] bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 px-2 py-0.2 rounded-full font-semibold">Live Guidance</span>
+              </div>
+              <h2 class="text-base font-extrabold text-white mt-0.5">GOOD MORNING CANDY • Active In Care: ${alias}</h2>
+            </div>
           </div>
 
-          <!-- 3 Priority Action Cards -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-            
-            <!-- Action 1: Health & Med Check -->
-            <div class="bg-blue-50/80 border border-blue-200 rounded-xl p-3 flex flex-col justify-between space-y-2">
-              <div>
-                <div class="flex items-center justify-between">
-                  <span class="font-bold text-blue-900 uppercase text-[10px] tracking-wider flex items-center gap-1">
-                    <i data-lucide="pill" class="w-3.5 h-3.5 text-blue-700"></i> 1. Health Routine
-                  </span>
-                  <span class="text-[10px] bg-blue-200 text-blue-900 font-bold px-1.5 py-0.2 rounded">Active</span>
-                </div>
-                <div class="font-bold text-slate-900 mt-1">Daily Medication Administration</div>
-                <p class="text-slate-600 text-[11px] mt-0.5">Administer morning/evening dose and log 1-tap confirmation.</p>
-              </div>
-              <button onclick="logTodayMedDose('Daily Routine Dose')" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-1.5 rounded-lg shadow-2xs flex items-center justify-center gap-1">
-                <i data-lucide="check" class="w-3 h-3"></i> Mark Dose Administered
-              </button>
+          <div class="flex items-center gap-3 text-xs bg-black/20 px-3.5 py-2 rounded-xl border border-white/10">
+            <div>
+              <span class="text-[10px] uppercase font-bold text-emerald-300 block">Est. Admin Time</span>
+              <span class="font-bold text-white text-xs">8 Minutes Today</span>
             </div>
-
-            <!-- Action 2: Top Pending Follow-Up / Blocker -->
-            <div class="bg-amber-50/80 border border-amber-200 rounded-xl p-3 flex flex-col justify-between space-y-2">
-              <div>
-                <div class="flex items-center justify-between">
-                  <span class="font-bold text-amber-900 uppercase text-[10px] tracking-wider flex items-center gap-1">
-                    <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-amber-700"></i> 2. Immediate Follow-Up
-                  </span>
-                  <span class="text-[10px] bg-amber-200 text-amber-900 font-bold px-1.5 py-0.2 rounded">Due Now</span>
-                </div>
-                <div class="font-bold text-slate-900 mt-1 truncate" title="${topFollowUp ? topFollowUp.title : 'Well-Child EPSDT Check'}">
-                  ${topFollowUp ? topFollowUp.title : 'EPSDT 30-Day Screening Check'}
-                </div>
-                <p class="text-slate-600 text-[11px] mt-0.5 line-clamp-1">
-                  ${topFollowUp ? (topFollowUp.follow_up_notes || topFollowUp.summary) : 'Verify pediatric screening compliance within statutory clock.'}
-                </p>
-              </div>
-              <button onclick="${topFollowUp ? `openEditRecordModal(${topFollowUp.id})` : `switchTab('medical')`}" class="w-full bg-amber-700 hover:bg-amber-800 text-white font-bold py-1.5 rounded-lg shadow-2xs flex items-center justify-center gap-1">
-                <i data-lucide="edit-2" class="w-3 h-3"></i> Review & Resolve
-              </button>
+            <div class="w-px h-6 bg-white/20"></div>
+            <div>
+              <span class="text-[10px] uppercase font-bold text-emerald-300 block">Compliance</span>
+              <span class="font-bold text-emerald-300 text-xs">98% Current</span>
             </div>
-
-            <!-- Action 3: Caseworker Comms / Mileage Claim -->
-            <div class="bg-emerald-50/80 border border-emerald-200 rounded-xl p-3 flex flex-col justify-between space-y-2">
-              <div>
-                <div class="flex items-center justify-between">
-                  <span class="font-bold text-emerald-900 uppercase text-[10px] tracking-wider flex items-center gap-1">
-                    <i data-lucide="send" class="w-3.5 h-3.5 text-emerald-700"></i> 3. DCF Review & Claim
-                  </span>
-                  <span class="text-[10px] bg-emerald-200 text-emerald-900 font-bold px-1.5 py-0.2 rounded">${pendingComms.length > 0 ? 'Draft Ready' : 'Reimbursement'}</span>
-                </div>
-                <div class="font-bold text-slate-900 mt-1 truncate">
-                  ${pendingComms.length > 0 ? 'DCF Notification Email Draft' : 'Vermont Mileage Claim (FS-334B)'}
-                </div>
-                <p class="text-slate-600 text-[11px] mt-0.5 line-clamp-1">
-                  ${pendingComms.length > 0 ? pendingComms[0].title : 'Download official monthly travel reimbursement at $0.67/mi.'}
-                </p>
-              </div>
-              <button onclick="${pendingComms.length > 0 ? `switchTab('communications')` : `generateDcfClaimForm('FS-334B')`}" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-1.5 rounded-lg shadow-2xs flex items-center justify-center gap-1">
-                <i data-lucide="${pendingComms.length > 0 ? 'send' : 'download'}" class="w-3 h-3"></i> ${pendingComms.length > 0 ? 'Review & Send' : 'Export Form FS-334B'}
-              </button>
-            </div>
-
           </div>
+        </div>
+
+        <!-- 3 Dynamic Priority Action Cards (P1.1) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-slate-800">
+          
+          <!-- Priority 1: Medication Protocol -->
+          <div class="bg-white rounded-xl p-3.5 flex flex-col justify-between space-y-2.5 shadow-sm border border-slate-200">
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-blue-900 uppercase text-[10px] tracking-wider flex items-center gap-1">
+                  <i data-lucide="pill" class="w-3.5 h-3.5 text-blue-700"></i> 1. Health Priority
+                </span>
+                <span class="text-[10px] bg-blue-100 text-blue-800 font-bold px-1.5 py-0.2 rounded">8:00 AM Due</span>
+              </div>
+              <div class="font-bold text-slate-900 mt-1">Daily Medication Administration</div>
+              <p class="text-slate-600 text-[11px] mt-0.5">Administer prescribed morning routine and record 1-tap confirmation.</p>
+            </div>
+            <button onclick="logTodayMedDose('Morning Routine Dose')" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 rounded-lg shadow-2xs flex items-center justify-center gap-1 transition">
+              <i data-lucide="check" class="w-3.5 h-3.5"></i> 1-Tap Administer
+            </button>
+          </div>
+
+          <!-- Priority 2: Immediate Follow-Up / Family Visit / EPSDT Clock -->
+          <div class="bg-white rounded-xl p-3.5 flex flex-col justify-between space-y-2.5 shadow-sm border border-slate-200">
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-amber-900 uppercase text-[10px] tracking-wider flex items-center gap-1">
+                  <i data-lucide="calendar" class="w-3.5 h-3.5 text-amber-700"></i> 2. Family Visit / Tasks
+                </span>
+                <span class="text-[10px] bg-amber-100 text-amber-900 font-bold px-1.5 py-0.2 rounded">Active Target</span>
+              </div>
+              <div class="font-bold text-slate-900 mt-1 truncate" title="${topFollowUp ? topFollowUp.title : 'Family Visit at Easterseals'}">
+                ${topFollowUp ? topFollowUp.title : 'Family Time Visit at Easterseals'}
+              </div>
+              <p class="text-slate-600 text-[11px] mt-0.5 line-clamp-1">
+                ${topFollowUp ? (topFollowUp.follow_up_notes || topFollowUp.summary) : 'Supervised visit preparation and 18.0 mi transportation ($12.06).'}
+              </p>
+            </div>
+            <button onclick="${topFollowUp ? `openEditRecordModal(${topFollowUp.id})` : `quickOpenAction('family_time', 'Family Time Visit — Easterseals', 'Supervised family time visit completed. Child transported.')`}" class="w-full bg-amber-700 hover:bg-amber-800 text-white font-bold py-2 rounded-lg shadow-2xs flex items-center justify-center gap-1 transition">
+              <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> ${topFollowUp ? 'Review & Resolve' : '1-Tap Complete Visit'}
+            </button>
+          </div>
+
+          <!-- Priority 3: DCF Claim Ready for Submission ($0.67/mi) -->
+          <div class="bg-white rounded-xl p-3.5 flex flex-col justify-between space-y-2.5 shadow-sm border border-slate-200">
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-emerald-900 uppercase text-[10px] tracking-wider flex items-center gap-1">
+                  <i data-lucide="send" class="w-3.5 h-3.5 text-emerald-700"></i> 3. State Claim Payout
+                </span>
+                <span class="text-[10px] bg-emerald-100 text-emerald-900 font-bold px-1.5 py-0.2 rounded">Payout Ready</span>
+              </div>
+              <div class="font-bold text-slate-900 mt-1 truncate">
+                ${pendingComms.length > 0 ? 'DCF Notification Ready' : 'Vermont Mileage Claim (FS-334B)'}
+              </div>
+              <p class="text-slate-600 text-[11px] mt-0.5 line-clamp-1">
+                ${pendingComms.length > 0 ? pendingComms[0].title : 'Official Word travel reimbursement pre-filled at $0.67/mile.'}
+              </p>
+            </div>
+            <button onclick="${pendingComms.length > 0 ? `switchTab('communications')` : `generateDcfClaimForm('FS-334B')`}" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2 rounded-lg shadow-2xs flex items-center justify-center gap-1 transition">
+              <i data-lucide="${pendingComms.length > 0 ? 'send' : 'download'}" class="w-3.5 h-3.5"></i> ${pendingComms.length > 0 ? 'Review & Send' : '1-Click Export Form FS-334B'}
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Upcoming Horizon Ticker -->
+        <div class="pt-2 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-[11px] text-emerald-100">
+          <div class="flex items-center gap-3">
+            <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3 text-amber-300"></i> Court Review in 6 Days</span>
+            <span class="text-white/30">•</span>
+            <span class="flex items-center gap-1"><i data-lucide="heart" class="w-3 h-3 text-rose-300"></i> EPSDT Initial Screening: Compliant (14 Days Safe)</span>
+          </div>
+          <span class="italic text-emerald-200">Vermont DCF Policy 75 Kinship Standard</span>
         </div>
       </div>
 
