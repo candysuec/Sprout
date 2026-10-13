@@ -426,9 +426,9 @@ async function renderChildSnapshot() {
         healthClockHtml = `
           <div class="bg-emerald-50 border border-emerald-200 rounded-xl px-3.5 py-2">
             <div class="text-[10px] uppercase font-bold tracking-wider text-emerald-700 flex items-center gap-1">
-              <i data-lucide="check-circle" class="w-3 h-3 text-emerald-600"></i> 30-Day Health Clock
+              <i data-lucide="check-circle" class="w-3 h-3 text-emerald-600"></i> 30-Day Well-Child Health Exam (EPSDT)
             </div>
-            <div class="text-xs font-bold text-emerald-900 mt-0.5">Compliant (Exam on File)</div>
+            <div class="text-xs font-bold text-emerald-900 mt-0.5">Compliant (Exam on File with DCF)</div>
           </div>
         `;
       } else if (daysRemaining >= 0) {
@@ -437,18 +437,18 @@ async function renderChildSnapshot() {
         healthClockHtml = `
           <div class="${urgencyColor} border rounded-xl px-3.5 py-2">
             <div class="text-[10px] uppercase font-bold tracking-wider flex items-center gap-1">
-              <i data-lucide="clock" class="w-3 h-3 ${iconColor}"></i> 30-Day Health Clock
+              <i data-lucide="clock" class="w-3 h-3 ${iconColor}"></i> 30-Day Well-Child Health Exam (EPSDT)
             </div>
-            <div class="text-xs font-bold mt-0.5">${daysRemaining} Days Left (Due Day 30)</div>
+            <div class="text-xs font-bold mt-0.5">${daysRemaining} Days Left (State Deadline)</div>
           </div>
         `;
       } else {
         healthClockHtml = `
           <div class="bg-rose-100 border border-rose-300 text-rose-950 rounded-xl px-3.5 py-2">
             <div class="text-[10px] uppercase font-bold tracking-wider text-rose-700 flex items-center gap-1">
-              <i data-lucide="alert-octagon" class="w-3 h-3 text-rose-600"></i> 30-Day Health Clock
+              <i data-lucide="alert-octagon" class="w-3 h-3 text-rose-600"></i> 30-Day Well-Child Health Exam (EPSDT)
             </div>
-            <div class="text-xs font-bold mt-0.5">${Math.abs(daysRemaining)} Days Overdue</div>
+            <div class="text-xs font-bold mt-0.5">${Math.abs(daysRemaining)} Days Overdue (Call Caseworker)</div>
           </div>
         `;
       }
