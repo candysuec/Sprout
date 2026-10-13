@@ -1012,39 +1012,56 @@ async function renderDashboardView(container) {
       
       <!-- 2. 1-TAP FAST ACTIONS BAR (Instant 15-second logging) -->
       <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
-        <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2.5 flex items-center gap-1.5">
-          <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-500"></i> Fast Caregiver Actions:
+        <div class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2.5 flex items-center justify-between">
+          <span class="flex items-center gap-1.5"><i data-lucide="zap" class="w-4 h-4 text-amber-500"></i> Fast Caregiver Actions (1-Tap 15-Second Logging):</span>
+          <span class="text-[11px] font-semibold text-slate-400 lowercase">click any button to open pre-filled logger</span>
         </div>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <button onclick="quickOpenAction('daily', 'Infant Feeding / Care', '🍼 Formula feeding logged by caregiver.')" class="flex items-center gap-2.5 p-3 rounded-xl bg-emerald-50/80 hover:bg-emerald-100/80 border border-emerald-200 text-emerald-950 font-bold text-xs transition text-left">
-            <span class="text-lg">🍼</span>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+          <button onclick="quickOpenAction('medical', 'Medication Given / Refilled', 'Daily prescription administered on schedule.')" class="flex items-center gap-2.5 p-3 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-950 font-bold text-xs transition text-left shadow-xs">
+            <span class="text-xl">💊</span>
             <div>
-              <div>Log Feeding</div>
-              <div class="text-[10px] text-emerald-700 font-normal">Formula / Meal</div>
+              <div>Log Meds</div>
+              <div class="text-[11px] text-blue-700 font-normal">Dose / Refill</div>
             </div>
           </button>
 
-          <button onclick="quickOpenAction('communication', 'DCF Caseworker Contact', 'Call with Family Services Worker regarding case transition.')" class="flex items-center gap-2.5 p-3 rounded-xl bg-blue-50/80 hover:bg-blue-100/80 border border-blue-200 text-blue-950 font-bold text-xs transition text-left">
-            <span class="text-lg">📞</span>
+          <button onclick="quickOpenAction('daily', 'Infant Feeding / Meal Routine', '🍼 Formula feeding or meal logged by caregiver.')" class="flex items-center gap-2.5 p-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-950 font-bold text-xs transition text-left shadow-xs">
+            <span class="text-xl">🍼</span>
             <div>
-              <div>Log DCF Call</div>
-              <div class="text-[10px] text-blue-700 font-normal">Worker update</div>
+              <div>Feeding</div>
+              <div class="text-[11px] text-emerald-700 font-normal">Formula / Meal</div>
             </div>
           </button>
 
-          <button onclick="quickOpenAction('family_time', 'Family Time Visit & Mileage', 'Supervised family visit attended. Transported child.')" class="flex items-center gap-2.5 p-3 rounded-xl bg-rose-50/80 hover:bg-rose-100/80 border border-rose-200 text-rose-950 font-bold text-xs transition text-left">
-            <span class="text-lg">🚗</span>
+          <button onclick="quickOpenAction('communication', 'DCF Caseworker Contact', 'Call / email with Family Services Worker regarding child.')" class="flex items-center gap-2.5 p-3 rounded-xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-950 font-bold text-xs transition text-left shadow-xs">
+            <span class="text-xl">📞</span>
+            <div>
+              <div>DCF Call</div>
+              <div class="text-[11px] text-indigo-700 font-normal">Worker update</div>
+            </div>
+          </button>
+
+          <button onclick="quickOpenAction('family_time', 'Family Time Visit & Mileage', 'Supervised family visit attended. Transported child.')" class="flex items-center gap-2.5 p-3 rounded-xl bg-teal-50 hover:bg-teal-100 border border-teal-200 text-teal-950 font-bold text-xs transition text-left shadow-xs">
+            <span class="text-xl">🚗</span>
             <div>
               <div>Family Visit</div>
-              <div class="text-[10px] text-rose-700 font-normal">Notes & Mileage</div>
+              <div class="text-[11px] text-teal-700 font-normal">Visit & Mileage</div>
             </div>
           </button>
 
-          <button onclick="quickOpenAction('medical', 'Pediatric Appointment / Checkup', 'Well-child visit attended.')" class="flex items-center gap-2.5 p-3 rounded-xl bg-amber-50/80 hover:bg-amber-100/80 border border-amber-200 text-amber-950 font-bold text-xs transition text-left">
-            <span class="text-lg">🩺</span>
+          <button onclick="quickOpenAction('medical', 'Pediatric Appointment / Checkup', 'Well-child visit attended.')" class="flex items-center gap-2.5 p-3 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-950 font-bold text-xs transition text-left shadow-xs">
+            <span class="text-xl">🩺</span>
             <div>
               <div>Doctor Visit</div>
-              <div class="text-[10px] text-amber-700 font-normal">Vitals / Vaccines</div>
+              <div class="text-[11px] text-amber-700 font-normal">Vitals / Checkup</div>
+            </div>
+          </button>
+
+          <button onclick="quickOpenAction('incident', 'Incident / Behavioral Note', 'Unusual event or behavioral challenge observed.')" class="flex items-center gap-2.5 p-3 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-950 font-bold text-xs transition text-left shadow-xs">
+            <span class="text-xl">⚠️</span>
+            <div>
+              <div>Incident</div>
+              <div class="text-[11px] text-rose-700 font-normal">Behavior / Safety</div>
             </div>
           </button>
         </div>
@@ -1302,6 +1319,8 @@ async function renderDashboardView(container) {
 
 function quickOpenAction(category, defaultTitle, defaultSummary) {
   openRecordModal();
+  document.getElementById('recEditId').value = '';
+  document.getElementById('recDate').value = new Date().toISOString().split('T')[0];
   document.getElementById('recCategory').value = category;
   document.getElementById('recTitle').value = defaultTitle;
   document.getElementById('recSummary').value = defaultSummary;

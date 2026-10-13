@@ -60,13 +60,17 @@ This document serves as the formal record that the **Springboard Enhancement Pro
 ## 4. Prioritized Execution Backlog (Post-Approval)
 
 ### Sprint 1: Quick Wins (Immediate Implementation)
-- [ ] **Task 1.1: Visual Hierarchy & Font Size Upgrade**
-  - Increase base font to `text-sm` (14px).
-  - Remove all remaining `text-[10px]` uppercase micro-labels to reduce caregiver eye strain.
-- [ ] **Task 1.2: 1-Click Emergency / Babysitter Care Handoff Card**
-  - Add print/mobile-ready summary containing: initials, Medicaid ID, emergency contacts, soothing routines, and doctor info.
-- [ ] **Task 1.3: Human-Centric Workspace Switcher**
-  - Replace "Sprout Sphere" with *"Real Family Workspace"* vs *"Practice Demo Sandbox"*.
+- [x] **Task 1.1: Visual Hierarchy & Font Size Upgrade** (Completed - Commit `b01b9e1`)
+  - Increased base forms & compliance lists to `text-sm` (14px) and `text-xs` (12px).
+  - Eliminated eye-strain micro-labels on critical action fields.
+- [x] **Task 1.2: 1-Click Emergency / Babysitter Care Handoff Card** (Completed - Commit `a0064ea`)
+  - Added print/mobile-ready summary modal containing: initials, Medicaid ID, emergency contacts, soothing routines, active medications, and doctor info.
+- [x] **Task 1.3: Human-Centric Workspace Switcher** (Completed - Commit `a0064ea`)
+  - Replaced "Sprout Sphere" with *"Real Family Workspace (Private Home Data)"* vs *"Practice Demo Sandbox (Safe Training)"*.
+- [x] **Task 1.4: Contextual DCF Regulatory Policy Guidance Tooltips** (Completed - Commit `b01b9e1`)
+  - Embedded "Why DCF Requires This" explainers on FS-221A licensure checklist items (fingerprints, well testing, smoke alarms, emergency exits, VCWTP hours).
+- [x] **Task 1.5: Expanded 15-Second Fast Action Logging Grid** (Completed - Commit pending)
+  - 6 instant logging buttons added to Dashboard: Meds, Feeding, DCF Call, Family Visit, Doctor Visit, and Incident/Safety.
 
 ### Sprint 2: Core Workflow Enhancements (Next 2 Weeks)
 - [ ] **Task 2.1: Navigation Consolidation**
