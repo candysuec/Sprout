@@ -53,29 +53,21 @@
           <span>24/7 DCF: 1-800-649-5285</span>
         </a>
 
-        <!-- 1. Sprout Environment Mode Selector -->
-        <div class="flex items-center bg-emerald-950/80 rounded-xl px-2.5 py-1.5 border border-emerald-800 shadow-sm" title="Caregiver Workspace Mode">
-          <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400 mr-1.5 shrink-0"></i>
-          <div class="text-left leading-tight mr-1">
-            <span class="text-[9px] text-emerald-400 font-semibold block uppercase tracking-wider">Workspace Mode</span>
-            <select id="sproutModeSelect" onchange="onSproutModeChange()" class="bg-transparent text-white font-bold text-xs focus:outline-none cursor-pointer">
-              <option value="" selected class="bg-slate-800 text-slate-400 italic">-- Select Workspace --</option>
-              <option value="sample" class="bg-slate-800 text-white">Practice Demo Sandbox (Safe Training)</option>
-              <option value="local" class="bg-slate-800 text-white">Real Family Workspace (Private Home Data)</option>
-            </select>
-          </div>
-        </div>
+        <!-- 1-Click Workspace Toggle (P0.1 Identity Context) -->
+        <button id="btnToggleWorkspaceMode" onclick="toggleSproutWorkspaceMode()" class="flex items-center bg-emerald-900/90 hover:bg-emerald-800 border border-emerald-700/80 rounded-xl px-3 py-1.5 text-xs font-bold transition shadow-xs gap-1.5" title="Click to toggle between Real Family Workspace and Practice Sandbox">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-300"></i>
+          <span id="workspaceToggleLabel" class="text-white">Real Family Workspace</span>
+          <span class="text-[10px] bg-emerald-700/80 text-emerald-200 px-1.5 py-0.2 rounded font-semibold uppercase">Switch</span>
+        </button>
 
-        <!-- 2. Caregiver User Profile Selector (Populated dynamically based on Sprout Sphere) -->
-        <div class="flex items-center bg-emerald-900/80 rounded-xl px-2.5 py-1.5 border border-emerald-800 shadow-sm" title="Active Caregiver Profile">
-          <div id="caregiverAvatar" class="w-6 h-6 rounded-full bg-slate-700 text-slate-300 font-bold flex items-center justify-center text-xs mr-2 shrink-0 border border-slate-600">
-            ?
+        <!-- Active Caregiver Identity Badge (Candy Chevalier auto-selected) -->
+        <div id="caregiverBadgeContainer" class="flex items-center bg-emerald-950/90 rounded-xl px-3 py-1.5 border border-emerald-800 shadow-sm gap-2" title="Active Caregiver Identity">
+          <div id="caregiverAvatar" class="w-6 h-6 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-xs shrink-0 border border-emerald-400">
+            CC
           </div>
-          <div class="text-left leading-tight mr-1">
-            <span class="text-[9px] text-emerald-400 font-semibold block uppercase tracking-wider">Caregiver User</span>
-            <select id="caregiverSelect" onchange="onCaregiverUserChange()" class="bg-transparent text-white font-bold text-xs focus:outline-none cursor-pointer">
-              <!-- Dynamically populated based on Sprout mode -->
-            </select>
+          <div class="text-left leading-tight">
+            <span class="text-[9px] text-emerald-400 font-semibold block uppercase tracking-wider">Active Caregiver</span>
+            <span id="activeCaregiverDisplay" class="text-xs font-bold text-white block">Candy Chevalier</span>
           </div>
         </div>
 
@@ -197,59 +189,37 @@
 
     </div>
 
-    <!-- Child Workspace Sub-Navigation (Visible when in Child Workspace or child view) -->
-    <div id="childWorkspaceSubNav" class="bg-emerald-50/60 rounded-xl border border-emerald-100 p-1.5 flex flex-wrap gap-1 items-center overflow-x-auto text-xs font-semibold">
-      <span class="text-emerald-800 px-2 py-1 font-bold uppercase tracking-wider text-[10px] flex items-center gap-1">
-        <i data-lucide="layers" class="w-3.5 h-3.5"></i> Child Workspace:
-      </span>
-      <button onclick="switchChildTab('overview')" class="child-subtab-btn active px-2.5 py-1.5 rounded-lg transition text-emerald-900 bg-white shadow-sm border border-emerald-200" data-childtab="overview">
-        Overview
-      </button>
-      <button onclick="switchChildTab('journal')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="journal">
-        Journal
-      </button>
-      <button onclick="switchChildTab('binder')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="binder">
-        Binder
-      </button>
-      <button onclick="switchChildTab('medical')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="medical">
-        Medical
-      </button>
-      <button onclick="switchChildTab('education')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="education">
-        Education
-      </button>
-      <button onclick="switchChildTab('visits')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="visits">
-        Visits
-      </button>
-      <button onclick="switchChildTab('expenses')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="expenses">
-        Expenses
-      </button>
-      <button onclick="switchChildTab('documents')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="documents">
-        Documents
-      </button>
-      <button onclick="switchChildTab('appointments')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="appointments">
-        Appointments
-      </button>
-      <button onclick="switchChildTab('contacts')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="contacts">
-        Contacts
-      </button>
-      <button onclick="switchChildTab('communications')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="communications">
-        Communications
-      </button>
-      <button onclick="switchChildTab('kinship')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="kinship">
-        Kinship Pathways
-      </button>
-      <button onclick="switchChildTab('posc')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="posc">
-        Plan of Safe Care (POSC)
-      </button>
-      <button onclick="switchChildTab('benefits')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="benefits">
-        Benefits & Assistance
-      </button>
-      <button onclick="switchChildTab('chins')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="chins">
-        CHINS Court Flowchart
-      </button>
-      <button onclick="switchChildTab('timeline')" class="child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80" data-childtab="timeline">
-        Timeline
-      </button>
+    <!-- Child Workspace 4 Cognitive Domains Sub-Navigation (P0.3 Consolidation) -->
+    <div id="childWorkspaceSubNav" class="bg-emerald-50/80 rounded-xl border border-emerald-200 p-2 flex flex-wrap gap-2 items-center justify-between text-xs font-semibold">
+      <div class="flex items-center gap-2">
+        <span class="text-emerald-950 font-extrabold uppercase tracking-wider text-[11px] flex items-center gap-1.5 px-1">
+          <i data-lucide="layers" class="w-4 h-4 text-emerald-700"></i> Child Care Domains:
+        </span>
+        <button onclick="switchChildDomain('health')" id="domainBtn-health" class="child-domain-btn active px-3 py-1.5 rounded-lg transition text-emerald-950 bg-white shadow-xs border border-emerald-300 font-bold flex items-center gap-1.5" data-childdomain="health">
+          <i data-lucide="heart-pulse" class="w-3.5 h-3.5 text-rose-600"></i>
+          <span>1. Health & Care Routines</span>
+        </button>
+        <button onclick="switchChildDomain('visits')" id="domainBtn-visits" class="child-domain-btn px-3 py-1.5 rounded-lg transition text-slate-700 hover:bg-white/80 font-medium flex items-center gap-1.5" data-childdomain="visits">
+          <i data-lucide="calendar" class="w-3.5 h-3.5 text-blue-600"></i>
+          <span>2. Visits, Appointments & Court</span>
+        </button>
+        <button onclick="switchChildDomain('milestones')" id="domainBtn-milestones" class="child-domain-btn px-3 py-1.5 rounded-lg transition text-slate-700 hover:bg-white/80 font-medium flex items-center gap-1.5" data-childdomain="milestones">
+          <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-purple-600"></i>
+          <span>3. School, Milestones & Daily Life</span>
+        </button>
+        <button onclick="switchChildDomain('documents')" id="domainBtn-documents" class="child-domain-btn px-3 py-1.5 rounded-lg transition text-slate-700 hover:bg-white/80 font-medium flex items-center gap-1.5" data-childdomain="documents">
+          <i data-lucide="folder-check" class="w-3.5 h-3.5 text-teal-600"></i>
+          <span>4. Documents, Claims & Binder</span>
+        </button>
+      </div>
+
+      <!-- Quick Timeline Filter Switch -->
+      <div class="flex items-center gap-1 text-[11px] bg-white/80 px-2 py-1 rounded-lg border border-emerald-100">
+        <span class="text-slate-500 font-medium">Quick Jump:</span>
+        <button onclick="switchChildTab('overview')" class="text-emerald-800 hover:underline font-bold px-1">Overview</button> •
+        <button onclick="switchChildTab('journal')" class="text-emerald-800 hover:underline font-bold px-1">Journal</button> •
+        <button onclick="switchChildTab('timeline')" class="text-emerald-800 hover:underline font-bold px-1">Timeline</button>
+      </div>
     </div>
 
     <!-- Child Snapshot Header (Visible when in Child Workspace or reviewing child records) -->

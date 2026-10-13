@@ -2,8 +2,8 @@ let currentChildId = null;
 let currentTab = 'dashboard';
 let childrenList = [];
 
-// Sprout Environment State ('' = Unselected [Default Welcome Portal], 'sample' = Dev Sandbox, 'local' = Local Live Data)
-let currentSproutMode = localStorage.getItem('sproutMode') || '';
+// Sprout Environment State (Defaults directly to 'local' for Candy Chevalier)
+let currentSproutMode = localStorage.getItem('sproutMode') || 'local';
 
 const LOCAL_CAREGIVERS = [
   { id: 'Candy Chevalier', name: 'Candy Chevalier (Primary Caregiver)', initials: 'CC', color: 'bg-emerald-700' },
@@ -29,19 +29,14 @@ const SAMPLE_CAREGIVERS = [
   { id: 'Sample Caregiver (Grace & Lydia Holloway)', name: 'Grace & Lydia Holloway (HH-115 • Multi-Generational • Closed/Retired)', initials: 'GH', color: 'bg-blue-700' }
 ];
 
-let activeCaregiverUser = localStorage.getItem('caregiverUser') || '';
+let activeCaregiverUser = localStorage.getItem('caregiverUser') || 'Candy Chevalier';
 
 // Initialize app on load
 document.addEventListener('DOMContentLoaded', async () => {
   const subNav = document.getElementById('childWorkspaceSubNav');
   if (subNav) subNav.classList.add('hidden');
 
-  const sproutSelect = document.getElementById('sproutModeSelect');
-  if (sproutSelect) {
-    sproutSelect.value = currentSproutMode;
-  }
-
-  populateCaregiverDropdown();
+  updateWorkspaceToggleUI();
   updateSproutTheme();
 
   await loadChildren();
@@ -101,43 +96,56 @@ function updateSproutTheme() {
   }
 }
 
-function onSproutModeChange() {
-  const sproutSelect = document.getElementById('sproutModeSelect');
-  if (sproutSelect) {
-    currentSproutMode = sproutSelect.value;
-    if (currentSproutMode) {
-      localStorage.setItem('sproutMode', currentSproutMode);
-    } else {
-      localStorage.removeItem('sproutMode');
+function updateWorkspaceToggleUI() {
+  const toggleBtn = document.getElementById('btnToggleWorkspaceMode');
+  const labelEl = document.getElementById('workspaceToggleLabel');
+  const displayEl = document.getElementById('activeCaregiverDisplay');
+  const avatarEl = document.getElementById('caregiverAvatar');
+
+  if (currentSproutMode === 'sample') {
+    if (labelEl) labelEl.textContent = 'Practice Sandbox';
+    if (toggleBtn) {
+      toggleBtn.className = "flex items-center bg-blue-900/90 hover:bg-blue-800 border border-blue-700/80 rounded-xl px-3 py-1.5 text-xs font-bold transition shadow-xs gap-1.5 text-white";
+    }
+    if (displayEl) displayEl.textContent = activeCaregiverUser || 'Sarah Jenkins (Sample)';
+    if (avatarEl) {
+      avatarEl.className = "w-6 h-6 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs shrink-0 border border-blue-400";
+      avatarEl.textContent = "SJ";
+    }
+  } else {
+    currentSproutMode = 'local';
+    activeCaregiverUser = 'Candy Chevalier';
+    if (labelEl) labelEl.textContent = 'Real Family Workspace';
+    if (toggleBtn) {
+      toggleBtn.className = "flex items-center bg-emerald-900/90 hover:bg-emerald-800 border border-emerald-700/80 rounded-xl px-3 py-1.5 text-xs font-bold transition shadow-xs gap-1.5 text-white";
+    }
+    if (displayEl) displayEl.textContent = 'Candy Chevalier';
+    if (avatarEl) {
+      avatarEl.className = "w-6 h-6 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-xs shrink-0 border border-emerald-400";
+      avatarEl.textContent = "CC";
     }
   }
-  
-  // Reset caregiver selection to unselected prompt upon mode switch
-  activeCaregiverUser = '';
-  localStorage.removeItem('caregiverUser');
+}
 
-  populateCaregiverDropdown();
+function toggleSproutWorkspaceMode() {
+  if (currentSproutMode === 'local') {
+    currentSproutMode = 'sample';
+    activeCaregiverUser = 'Sample Caregiver (Sarah Jenkins)';
+  } else {
+    currentSproutMode = 'local';
+    activeCaregiverUser = 'Candy Chevalier';
+  }
+  localStorage.setItem('sproutMode', currentSproutMode);
+  localStorage.setItem('caregiverUser', activeCaregiverUser);
+
+  updateWorkspaceToggleUI();
   updateSproutTheme();
   loadChildren();
   loadTabContent();
 }
 
 function resetToHomeLanding() {
-  currentSproutMode = '';
-  activeCaregiverUser = '';
-  localStorage.removeItem('sproutMode');
-  localStorage.removeItem('caregiverUser');
-
-  const sproutSelect = document.getElementById('sproutModeSelect');
-  if (sproutSelect) sproutSelect.value = '';
-
-  const caregiverSelect = document.getElementById('caregiverSelect');
-  if (caregiverSelect) caregiverSelect.value = '';
-
-  populateCaregiverDropdown();
-  updateSproutTheme();
-  loadChildren();
-  loadTabContent();
+  toggleSproutWorkspaceMode();
 }
 
 function activateSampleCaregiverProfile(primaryName) {
@@ -491,15 +499,52 @@ function switchMainSection(sectionKey) {
   loadTabContent();
 }
 
-function switchChildTab(subTabKey) {
-  currentChildSubTab = subTabKey;
-  document.querySelectorAll('.child-subtab-btn').forEach(btn => {
-    if (btn.getAttribute('data-childtab') === subTabKey) {
-      btn.className = "child-subtab-btn active px-2.5 py-1.5 rounded-lg transition text-emerald-900 bg-white shadow-sm border border-emerald-200";
+let currentChildDomain = 'health';
+
+function switchChildDomain(domainKey) {
+  currentChildDomain = domainKey;
+  document.querySelectorAll('.child-domain-btn').forEach(btn => {
+    if (btn.getAttribute('data-childdomain') === domainKey) {
+      btn.className = "child-domain-btn active px-3 py-1.5 rounded-lg transition text-emerald-950 bg-white shadow-xs border border-emerald-300 font-bold flex items-center gap-1.5";
     } else {
-      btn.className = "child-subtab-btn px-2.5 py-1.5 rounded-lg transition text-slate-600 hover:bg-white/80";
+      btn.className = "child-domain-btn px-3 py-1.5 rounded-lg transition text-slate-700 hover:bg-white/80 font-medium flex items-center gap-1.5";
     }
   });
+
+  // Map 4 cognitive domains to subtabs
+  if (domainKey === 'health') {
+    currentChildSubTab = 'medical';
+  } else if (domainKey === 'visits') {
+    currentChildSubTab = 'visits';
+  } else if (domainKey === 'milestones') {
+    currentChildSubTab = 'education';
+  } else if (domainKey === 'documents') {
+    currentChildSubTab = 'documents';
+  }
+  loadTabContent();
+}
+
+function switchChildTab(subTabKey) {
+  currentChildSubTab = subTabKey;
+  // Sync domain button highlighting
+  if (['medical', 'posc', 'benefits'].includes(subTabKey)) {
+    currentChildDomain = 'health';
+  } else if (['visits', 'appointments', 'chins', 'legal'].includes(subTabKey)) {
+    currentChildDomain = 'visits';
+  } else if (['education', 'journal', 'daily', 'timeline'].includes(subTabKey)) {
+    currentChildDomain = 'milestones';
+  } else if (['documents', 'binder', 'expenses', 'contacts'].includes(subTabKey)) {
+    currentChildDomain = 'documents';
+  }
+
+  document.querySelectorAll('.child-domain-btn').forEach(btn => {
+    if (btn.getAttribute('data-childdomain') === currentChildDomain) {
+      btn.className = "child-domain-btn active px-3 py-1.5 rounded-lg transition text-emerald-950 bg-white shadow-xs border border-emerald-300 font-bold flex items-center gap-1.5";
+    } else {
+      btn.className = "child-domain-btn px-3 py-1.5 rounded-lg transition text-slate-700 hover:bg-white/80 font-medium flex items-center gap-1.5";
+    }
+  });
+
   loadTabContent();
 }
 
@@ -978,11 +1023,98 @@ async function renderDashboardView(container) {
     households = activeHouseholdsCache || [];
   }
 
-  const activeUser = getActiveCaregiver();
-  const isSample = activeUser === 'Sample User';
+  const alias = child ? (child.alias || 'CD') : 'Child';
+  const topFollowUp = followUps[0];
+  const secondFollowUp = followUps[1];
+  const activeUser = getActiveCaregiver() || 'Candy Chevalier';
+  const isSample = currentSproutMode === 'sample';
 
   container.innerHTML = `
-    <div class="space-y-6">
+    <div class="space-y-5">
+
+      <!-- ========================================== -->
+      <!-- P0.2 NEXT 3 ACTIONS FLIGHT STRIP (Cockpit Rule) -->
+      <!-- ========================================== -->
+      <div class="bg-gradient-to-r from-amber-500 via-emerald-600 to-teal-700 p-0.5 rounded-2xl shadow-sm">
+        <div class="bg-white rounded-[14px] p-4 space-y-3">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-100 pb-2">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+              <h3 class="font-extrabold text-slate-900 text-sm tracking-tight flex items-center gap-1.5">
+                <i data-lucide="compass" class="w-4 h-4 text-emerald-700"></i>
+                <span>FLIGHT STRIP: NEXT 3 PRIORITY ACTIONS</span>
+              </h3>
+            </div>
+            <span class="text-[11px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+              Operator: Candy Chevalier • 60-Second Orientation
+            </span>
+          </div>
+
+          <!-- 3 Priority Action Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+            
+            <!-- Action 1: Health & Med Check -->
+            <div class="bg-blue-50/80 border border-blue-200 rounded-xl p-3 flex flex-col justify-between space-y-2">
+              <div>
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-blue-900 uppercase text-[10px] tracking-wider flex items-center gap-1">
+                    <i data-lucide="pill" class="w-3.5 h-3.5 text-blue-700"></i> 1. Health Routine
+                  </span>
+                  <span class="text-[10px] bg-blue-200 text-blue-900 font-bold px-1.5 py-0.2 rounded">Active</span>
+                </div>
+                <div class="font-bold text-slate-900 mt-1">Daily Medication Administration</div>
+                <p class="text-slate-600 text-[11px] mt-0.5">Administer morning/evening dose and log 1-tap confirmation.</p>
+              </div>
+              <button onclick="logTodayMedDose('Daily Routine Dose')" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-1.5 rounded-lg shadow-2xs flex items-center justify-center gap-1">
+                <i data-lucide="check" class="w-3 h-3"></i> Mark Dose Administered
+              </button>
+            </div>
+
+            <!-- Action 2: Top Pending Follow-Up / Blocker -->
+            <div class="bg-amber-50/80 border border-amber-200 rounded-xl p-3 flex flex-col justify-between space-y-2">
+              <div>
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-amber-900 uppercase text-[10px] tracking-wider flex items-center gap-1">
+                    <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-amber-700"></i> 2. Immediate Follow-Up
+                  </span>
+                  <span class="text-[10px] bg-amber-200 text-amber-900 font-bold px-1.5 py-0.2 rounded">Due Now</span>
+                </div>
+                <div class="font-bold text-slate-900 mt-1 truncate" title="${topFollowUp ? topFollowUp.title : 'Well-Child EPSDT Check'}">
+                  ${topFollowUp ? topFollowUp.title : 'EPSDT 30-Day Screening Check'}
+                </div>
+                <p class="text-slate-600 text-[11px] mt-0.5 line-clamp-1">
+                  ${topFollowUp ? (topFollowUp.follow_up_notes || topFollowUp.summary) : 'Verify pediatric screening compliance within statutory clock.'}
+                </p>
+              </div>
+              <button onclick="${topFollowUp ? `openEditRecordModal(${topFollowUp.id})` : `switchTab('medical')`}" class="w-full bg-amber-700 hover:bg-amber-800 text-white font-bold py-1.5 rounded-lg shadow-2xs flex items-center justify-center gap-1">
+                <i data-lucide="edit-2" class="w-3 h-3"></i> Review & Resolve
+              </button>
+            </div>
+
+            <!-- Action 3: Caseworker Comms / Mileage Claim -->
+            <div class="bg-emerald-50/80 border border-emerald-200 rounded-xl p-3 flex flex-col justify-between space-y-2">
+              <div>
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-emerald-900 uppercase text-[10px] tracking-wider flex items-center gap-1">
+                    <i data-lucide="send" class="w-3.5 h-3.5 text-emerald-700"></i> 3. DCF Review & Claim
+                  </span>
+                  <span class="text-[10px] bg-emerald-200 text-emerald-900 font-bold px-1.5 py-0.2 rounded">${pendingComms.length > 0 ? 'Draft Ready' : 'Reimbursement'}</span>
+                </div>
+                <div class="font-bold text-slate-900 mt-1 truncate">
+                  ${pendingComms.length > 0 ? 'DCF Notification Email Draft' : 'Vermont Mileage Claim (FS-334B)'}
+                </div>
+                <p class="text-slate-600 text-[11px] mt-0.5 line-clamp-1">
+                  ${pendingComms.length > 0 ? pendingComms[0].title : 'Download official monthly travel reimbursement at $0.67/mi.'}
+                </p>
+              </div>
+              <button onclick="${pendingComms.length > 0 ? `switchTab('communications')` : `generateDcfClaimForm('FS-334B')`}" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-1.5 rounded-lg shadow-2xs flex items-center justify-center gap-1">
+                <i data-lucide="${pendingComms.length > 0 ? 'send' : 'download'}" class="w-3 h-3"></i> ${pendingComms.length > 0 ? 'Review & Send' : 'Export Form FS-334B'}
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
 
       <!-- 1. Caregiver Household & Team Command Banner -->
       <div class="bg-gradient-to-r ${isSample ? 'from-slate-900 via-indigo-950 to-slate-900 border-indigo-800' : 'from-emerald-950 via-emerald-900 to-teal-950 border-emerald-800'} text-white rounded-2xl p-5 shadow-sm border space-y-4">
