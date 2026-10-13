@@ -270,3 +270,277 @@ Sprout defines 5 operational roles adhering strictly to the **Principle of Least
 └───────────────────────────────────┘   └────────────────────────────────┘
 ```
 
+---
+
+## 9. Database Architecture (SQLite Engine)
+
+### A. Architectural Principles
+1. **Local-First & Offline Resilience**: The primary operational datastore is an un-networked SQLite 3 database (`foster_binder.db` or `portal.db`) stored in the local application directory.
+2. **Strict Cryptographic Child Alias Split**:
+   - The UI never exposes or queries full legal names.
+   - The database stores initials in `alias` (e.g., `CD`) and reserves `legal_name_enc` for authenticated cryptographic access.
+3. **Foreign Key Integrity**:
+   - `PRAGMA foreign_keys = ON` is enforced across all connections. Child-linked tables use `ON DELETE CASCADE` to guarantee referential cleanup.
+4. **Tamper-Evident Hashing Chain**:
+   - The `audit_log` table employs cryptographic SHA-256 block-chaining (`prev_hash` $\rightarrow$ `row_hash`), preventing undetected local log tampering.
+
+### B. Entity-Relationship (ER) Diagram
+
+```mermaid
+erDiagram
+    HOUSEHOLDS ||--o{ CHILDREN : "houses"
+    HOUSEHOLDS ||--o{ COMPLIANCE_ITEMS : "certifies"
+    CHILDREN ||--o{ TIMELINE_RECORDS : "logs"
+    CHILDREN ||--o{ CONTACTS : "associates"
+    CHILDREN ||--o{ BENEFIT_CLAIMS : "claims"
+    CHILDREN ||--o{ CHINS_PROCEEDINGS : "tracks"
+    CHILDREN ||--o| POSC_PLANS : "mandates"
+    CHILDREN ||--o{ AUDIT_LOG : "audits"
+    HOUSEHOLDS ||--o{ LICENSING_RECORDS : "maintains"
+
+    HOUSEHOLDS {
+        INTEGER id PK
+        TEXT label
+        TEXT address
+        TEXT status
+        TEXT license_status
+        TEXT primary_caregiver
+        TEXT secondary_caregiver
+        TEXT home_owner
+        TEXT notes
+        TEXT created_at
+    }
+
+    CHILDREN {
+        INTEGER id PK
+        INTEGER household_id FK
+        TEXT alias
+        TEXT legal_name_enc
+        TEXT child_code
+        TEXT preferred_name
+        TEXT dob
+        TEXT placement_date
+        TEXT gender
+        TEXT status
+        TEXT permanency_goal
+        TEXT school
+        TEXT grade
+        TEXT medicaid_number
+        TEXT allergies
+        TEXT relationship_type
+        TEXT episode_status
+        TEXT food_preferences
+        TEXT behavioral_supports
+        TEXT comfort_items
+        TEXT care_routines
+        TEXT created_at
+        TEXT updated_at
+    }
+
+    TIMELINE_RECORDS {
+        INTEGER id PK
+        INTEGER child_id FK
+        TEXT category
+        TEXT sub_type
+        TEXT severity
+        TEXT title
+        TEXT event_date
+        TEXT location
+        TEXT participants
+        TEXT summary
+        TEXT details
+        TEXT author
+        REAL mileage
+        TEXT reimbursement_status
+        TEXT rpps_category
+        TEXT rpps_decision
+        INTEGER follow_up_needed
+        TEXT follow_up_due_date
+        INTEGER is_completed
+        TEXT attachment_path
+        TEXT attachment_name
+        INTEGER dcf_draft_generated
+        TEXT dcf_draft_text
+        TEXT gal_draft_text
+        TEXT communication_status
+        TEXT created_at
+    }
+
+    COMPLIANCE_ITEMS {
+        INTEGER id PK
+        INTEGER household_id FK
+        TEXT category
+        TEXT title
+        TEXT status
+        TEXT target_date
+        TEXT completed_date
+        TEXT notes
+        TEXT created_at
+    }
+
+    BENEFIT_CLAIMS {
+        INTEGER id PK
+        INTEGER child_id FK
+        TEXT benefit_type
+        REAL amount_claimed
+        REAL amount_approved
+        TEXT status
+        TEXT filed_date
+        TEXT decision_date
+        TEXT notes
+        TEXT created_at
+    }
+
+    CHINS_PROCEEDINGS {
+        INTEGER id PK
+        INTEGER child_id FK
+        TEXT stage_name
+        TEXT statutory_timeline
+        TEXT hearing_date
+        TEXT status
+        TEXT caregiver_report_due
+        TEXT court_docket
+        TEXT notes
+        TEXT created_at
+    }
+
+    POSC_PLANS {
+        INTEGER id PK
+        INTEGER child_id FK
+        TEXT infant_specialty_clinic
+        TEXT nurse_home_visiting
+        TEXT cis_contact
+        TEXT help_me_grow_notes
+        TEXT feeding_method
+        TEXT safe_sleep_plan
+        TEXT soothing_techniques
+        TEXT updated_at
+    }
+
+    CONTACTS {
+        INTEGER id PK
+        INTEGER child_id FK
+        TEXT role_type
+        TEXT full_name
+        TEXT organization
+        TEXT phone
+        TEXT email
+        TEXT address
+        INTEGER is_emergency
+        TEXT preferred_method
+        TEXT notes
+        TEXT created_at
+    }
+
+    LICENSING_RECORDS {
+        INTEGER id PK
+        TEXT record_type
+        TEXT title
+        TEXT record_date
+        REAL hours
+        TEXT provider
+        TEXT status
+        TEXT notes
+        TEXT expiry_date
+        TEXT attachment_path
+        TEXT created_at
+    }
+
+    AUDIT_LOG {
+        INTEGER id PK
+        TEXT ts
+        TEXT actor
+        TEXT action
+        TEXT entity
+        INTEGER entity_id
+        INTEGER child_id
+        TEXT changes
+        TEXT reason
+        TEXT prev_hash
+        TEXT row_hash
+    }
+```
+
+---
+
+## 10. API Contract Architecture
+
+All endpoints require loopback binding (`Host: 127.0.0.1:5858`), CORS prevention, and security verification headers.
+
+### A. Endpoint Reference Table
+
+| Method | Endpoint | Purpose | Params / Payload | Response Format | Security / Guards |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **GET** | `/api/households` | Fetch active care households | Header: `X-Caregiver`, `X-Sprout-Mode` | `JSON [Household]` | Empty if unselected; scoped to verified address in local |
+| **POST** | `/api/households` | Create new household | Body: `{name, address, status, ...}` | `JSON {id, message}` | Local live mode only |
+| **GET** | `/api/children` | List placed children | Header: `X-Caregiver`, `X-Sprout-Mode` | `JSON [Child (Initials Only)]` | Returns `[]` if unselected; aliases only |
+| **POST** | `/api/children` | Intake new child | Body: `{alias, dob, relationship_type, ...}` | `JSON {id, child_code}` | Regex enforces 1-4 uppercase letters/digits |
+| **GET** | `/api/children/:id/records` | Query child records | Query: `?category={all, daily, medical...}` | `JSON [TimelineRecord]` | Scoped strictly to active child ID |
+| **POST** | `/api/children/:id/records` | Log note / journal / incident | Body: `{title, event_date, summary, severity...}` | `JSON {id, dcf_draft}` | Auto-generates DCF/GAL notification draft |
+| **GET** | `/api/compliance` | Get licensing checklist | Header: `X-Caregiver`, `X-Sprout-Mode` | `JSON [ComplianceItem]` | Empty if unselected; synthesizes sample in sandbox |
+| **GET** | `/api/children/:id/posc` | Get Plan of Safe Care | URL param: `child_id` | `JSON PoscPlan` | Returns infant safe sleep & feeding protocols |
+| **POST** | `/api/children/:id/posc` | Update Plan of Safe Care | Body: `{safe_sleep_plan, feeding_method...}` | `JSON {success: true}` | Mandates CAPTA infant protocol compliance |
+| **GET** | `/api/children/:id/benefits` | Query financial benefits | URL param: `child_id` | `JSON [BenefitClaim]` | Tracks Reach Up, Vouchers, Support Funds |
+| **PUT** | `/api/benefits/:id` | Update benefit status | Body: `{status, amount_approved, ...}` | `JSON {success: true}` | Financial audit logged |
+| **GET** | `/api/children/:id/chins` | CHINS court stages | URL param: `child_id` | `JSON [ChinsStage]` | Statutory deadlines & docket tracking |
+| **GET** | `/api/shared-docs` | Search document registry | Query: `?category={cat}` | `JSON [DocumentRef]` | **BLOCKED in Sample Mode** (fictional guides only) |
+| **POST** | `/api/open-doc` | Launch file in desktop OS | Body: `{rel_path: "path/to/doc.pdf"}` | `JSON {success: true}` | **403 Forbidden in Sample Mode**; path traversal blocked |
+| **GET** | `/api/sample-data/:entity` | Synthetic sandbox fixtures | URL param: `households, children...` | `JSON [Synthetic]` | Powered by in-memory `sample_dataset.py` |
+
+### B. Standard Error Response Contract
+```json
+{
+  "error": "Access Denied: Opening live personal documents is disabled in Sample Dev Sandbox.",
+  "status_code": 403,
+  "timestamp": "2026-10-13T00:41:00Z"
+}
+```
+
+---
+
+## 11. OneDrive Integration Architecture
+
+### A. Architectural Principle: Decoupled Authority
+> **SQLite is the authoritative operational index.**  
+> **OneDrive is the authoritative document repository.**  
+> *The database knows WHAT a document is. OneDrive knows WHERE it is stored.*
+
+```
+┌─────────────────────────────────┐       ┌─────────────────────────────────┐
+│     SQLITE (OPERATIONAL INDEX)  │       │   ONEDRIVE (PHYSICAL STORAGE)   │
+│  • Metadata & Document Title    │       │  • Original PDF & Signed Forms  │
+│  • Category Classification      │       │  • Court Orders & Petitions     │
+│  • Compliance Expiration Date   │ ────► │  • Scanned Pediatric Records    │
+│  • Child ID Association         │       │  • Mileage Receipts             │
+│  • Relative Storage Path        │       │  • Encrypted Local File Sync    │
+└─────────────────────────────────┘       └─────────────────────────────────┘
+```
+
+### B. Document Storage Rules & Controls
+1. **Zero Binary Storage in Database**:
+   - SQLite never stores binary BLOBs or large file payloads. It stores clean relative file paths (e.g. `medical/2026-10-Pediatric-Exam.pdf`).
+2. **Elimination of Dynamic Disk Crawling Dependency**:
+   - The dashboard never scans physical folders recursively during UI renders.
+   - All document counts, missing requirements, and expiration badges are driven purely by index metadata in SQLite.
+3. **Canonical Folder Structure (OneDrive)**:
+   ```
+   OneDrive/Davis & VTDCF Shared Folder/
+   ├── 01_LEGAL_COURT_ORDERS/          # CHINS petitions, temporary care orders, GAL reports
+   ├── 02_DCF_AGREEMENTS_FORMS/        # FS-221A, placement agreements, normalcy forms
+   ├── 03_MEDICAL_DENTAL/              # Well-child exams, POSC plans, immunization cards
+   ├── 04_EDUCATION_IEP/               # School enrollment, IEP plans, report cards
+   ├── 05_FINANCIAL_EXPENSES/          # Clothing voucher receipts, mileage reimbursement
+   └── 06_TRAINING_LICENSING/          # VCWTP certificates, home safety inspection logs
+   ```
+4. **Desktop Launch & Path Traversal Security**:
+   - Document viewing is executed through the native desktop application (`os.startfile`) via `/api/open-doc`.
+   - Before launch, the server enforces strict path normalization and common-path containment:
+     ```python
+     root = os.path.realpath(SHARED_ROOT)
+     full_path = os.path.realpath(os.path.join(root, rel_path))
+     if os.path.commonpath([root, full_path]) != root:
+         return json_res({"error": "Path traversal attempt blocked"}, 403)
+     ```
+   - In **Sample Mode**, `/api/open-doc` unconditionally responds with `403 Forbidden` to preserve strict privacy boundaries.
+
+
