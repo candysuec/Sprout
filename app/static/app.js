@@ -3926,15 +3926,15 @@ function renderWelcomeLandingView(container) {
             or explore the interactive sandbox profiles and state resource directory below.
           </p>
           <div class="pt-2 flex flex-wrap items-center gap-3">
-            <button onclick="activateSampleCaregiverProfile('Sarah Jenkins')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center gap-2">
+            <button id="btnHeroLaunchSarah" onclick="activateSampleCaregiverProfile('Sarah Jenkins')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center gap-2">
               <i data-lucide="play" class="w-4 h-4"></i>
               <span>Launch Sample Sandbox (Sarah Jenkins • Established)</span>
             </button>
-            <button onclick="openCaregiverProfilesModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center gap-2">
+            <button id="btnHeroBrowseProfiles" onclick="openCaregiverProfilesModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center gap-2">
               <i data-lucide="users" class="w-4 h-4"></i>
               <span>Browse 15 Caregiver Lifecycle Profiles</span>
             </button>
-            <button onclick="openSystemHelpModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl text-xs border border-slate-600 transition flex items-center gap-2">
+            <button id="btnHeroSystemHelp" onclick="openSystemHelpModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl text-xs border border-slate-600 transition flex items-center gap-2">
               <i data-lucide="help-circle" class="w-4 h-4"></i>
               <span>System Help & Architecture</span>
             </button>
@@ -3971,7 +3971,7 @@ function renderWelcomeLandingView(container) {
               <div class="text-[11px] text-slate-600 mt-1">Approvals: <span class="font-semibold text-slate-800">Foster, Respite</span></div>
               <div class="text-[11px] text-slate-500">Tenure: 2.5 yrs • Placements: 1 Active / 3 Completed</div>
             </div>
-            <button onclick="activateSampleCaregiverProfile('Sarah Jenkins')" class="w-full mt-2 py-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg text-xs transition flex items-center justify-center gap-1.5">
+            <button id="btnActivateCard-SarahJenkins" onclick="activateSampleCaregiverProfile('Sarah Jenkins')" class="w-full mt-2 py-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg text-xs transition flex items-center justify-center gap-1.5">
               <span>Activate Profile</span> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
             </button>
           </div>
@@ -3987,7 +3987,7 @@ function renderWelcomeLandingView(container) {
               <div class="text-[11px] text-slate-600 mt-1">Approvals: <span class="font-semibold text-slate-800">Foster, Therapeutic, Independent Living</span></div>
               <div class="text-[11px] text-slate-500">Tenure: 5.0 yrs • Placements: 2 Active / 8 Completed</div>
             </div>
-            <button onclick="activateSampleCaregiverProfile('Marcus Vance')" class="w-full mt-2 py-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg text-xs transition flex items-center justify-center gap-1.5">
+            <button id="btnActivateCard-MarcusVance" onclick="activateSampleCaregiverProfile('Marcus Vance')" class="w-full mt-2 py-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg text-xs transition flex items-center justify-center gap-1.5">
               <span>Activate Profile</span> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
             </button>
           </div>
@@ -4003,7 +4003,7 @@ function renderWelcomeLandingView(container) {
               <div class="text-[11px] text-slate-600 mt-1">Approvals: <span class="font-semibold text-slate-800">Foster, Foster-to-Adopt</span></div>
               <div class="text-[11px] text-slate-500">Tenure: 4.0 yrs • Adoptions Finalized: 2</div>
             </div>
-            <button onclick="activateSampleCaregiverProfile('David & Emily Miller')" class="w-full mt-2 py-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg text-xs transition flex items-center justify-center gap-1.5">
+            <button id="btnActivateCard-DavidMiller" onclick="activateSampleCaregiverProfile('David & Emily Miller')" class="w-full mt-2 py-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg text-xs transition flex items-center justify-center gap-1.5">
               <span>Activate Profile</span> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
             </button>
           </div>
@@ -4019,7 +4019,7 @@ function renderWelcomeLandingView(container) {
               <div class="text-[11px] text-slate-600 mt-1">Approvals: <span class="font-semibold text-slate-800">Foster, Medical Foster Care</span></div>
               <div class="text-[11px] text-slate-500">Tenure: 3.5 yrs • Placements: 1 Active / 4 Completed</div>
             </div>
-            <button onclick="activateSampleCaregiverProfile('Elena Ramos & Chloe Bennett')" class="w-full mt-2 py-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg text-xs transition flex items-center justify-center gap-1.5">
+            <button id="btnActivateCard-ElenaRamos" onclick="activateSampleCaregiverProfile('Elena Ramos & Chloe Bennett')" class="w-full mt-2 py-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg text-xs transition flex items-center justify-center gap-1.5">
               <span>Activate Profile</span> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
             </button>
           </div>
@@ -4035,7 +4035,7 @@ function renderWelcomeLandingView(container) {
               <div class="text-[11px] text-slate-600 mt-1">Approvals: <span class="font-semibold text-slate-800">Kinship, Respite</span></div>
               <div class="text-[11px] text-slate-500">Tenure: 1.5 yrs • Placements: 2 Active Kinship</div>
             </div>
-            <button onclick="activateSampleCaregiverProfile('Hannah & Beatrice Abbott')" class="w-full mt-2 py-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg text-xs transition flex items-center justify-center gap-1.5">
+            <button id="btnActivateCard-HannahAbbott" onclick="activateSampleCaregiverProfile('Hannah & Beatrice Abbott')" class="w-full mt-2 py-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg text-xs transition flex items-center justify-center gap-1.5">
               <span>Activate Profile</span> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
             </button>
           </div>
@@ -4051,7 +4051,7 @@ function renderWelcomeLandingView(container) {
               <div class="text-[11px] text-slate-600 mt-1">Approvals: <span class="font-semibold text-slate-800">Kinship, Foster-to-Adopt</span></div>
               <div class="text-[11px] text-slate-500">Tenure: 5.5 yrs • Permanent Guardianship Finalized</div>
             </div>
-            <button onclick="activateSampleCaregiverProfile('Eleanor & Arthur Vance')" class="w-full mt-2 py-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg text-xs transition flex items-center justify-center gap-1.5">
+            <button id="btnActivateCard-EleanorVance" onclick="activateSampleCaregiverProfile('Eleanor & Arthur Vance')" class="w-full mt-2 py-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg text-xs transition flex items-center justify-center gap-1.5">
               <span>Activate Profile</span> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
             </button>
           </div>
