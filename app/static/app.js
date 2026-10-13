@@ -383,13 +383,12 @@ async function renderChildSnapshot() {
         </div>
       </div>
 
-      <!-- Vital Alerts Section -->
+      <!-- Vital Alerts & Emergency Handoff Section -->
       <div class="flex flex-wrap items-center gap-3">
-        ${['Temporary Respite', 'Emergency Respite', 'Respite Care'].includes(relType) ? `
-          <button onclick="switchMainSection('reports')" class="bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-900 rounded-xl px-3 py-2 text-xs font-bold flex items-center gap-1.5 transition">
-            <i data-lucide="file-check" class="w-4 h-4 text-purple-600"></i> Handoff Card Ready
-          </button>
-        ` : ''}
+        <button onclick="openEmergencyHandoffCard()" class="bg-rose-700 hover:bg-rose-800 text-white rounded-xl px-3.5 py-2 text-xs font-bold flex items-center gap-2 shadow transition" title="Print/View 1-Click Care Handoff Card for ER, Doctor, or Babysitter">
+          <i data-lucide="shield-alert" class="w-4 h-4 text-rose-200"></i>
+          <span>Emergency / Babysitter Card</span>
+        </button>
 
         <div class="bg-rose-50 border border-rose-200 rounded-xl px-3.5 py-2">
           <div class="text-[10px] uppercase font-bold tracking-wider text-rose-600 flex items-center gap-1">
@@ -2486,6 +2485,214 @@ async function generateRespiteCard() {
     status.textContent = "Error: " + err.message;
   } finally {
     btn.disabled = false;
+  }
+}
+
+// 1-Click Emergency & Babysitter Care Handoff Card Logic
+async function openEmergencyHandoffCard() {
+  const modal = document.getElementById('emergencyHandoffModal');
+  const container = document.getElementById('emergencyHandoffCardContent');
+  if (!modal || !container) return;
+
+  const child = childrenList.find(c => c.id === currentChildId);
+  if (!child) {
+    alert("Please select a child first.");
+    return;
+  }
+
+  modal.classList.remove('hidden');
+  container.innerHTML = `
+    <div class="p-8 text-center text-slate-500">
+      <i data-lucide="loader" class="w-6 h-6 animate-spin mx-auto text-rose-600 mb-2"></i>
+      <p class="font-semibold text-xs">Assembling urgent care records, contacts, and soothing plan...</p>
+    </div>
+  `;
+  lucide.createIcons();
+
+  try {
+    // Concurrent fetch of child records, POSC soothing plan, and emergency contacts
+    const [recRes, poscRes, contactRes] = await Promise.all([
+      apiFetch(`/api/children/${currentChildId}/records?category=all`),
+      apiFetch(`/api/children/${currentChildId}/posc`),
+      apiFetch(`/api/contacts`)
+    ]);
+
+    const records = await recRes.json();
+    const poscData = await poscRes.json();
+    const contacts = await contactRes.json();
+
+    const alias = child.alias || `${child.first_name || ''} ${child.last_name || ''}`.trim() || 'CD';
+    const medRecords = records.filter(r => r.category === 'medical' && (
+      r.title.toLowerCase().includes('med') || 
+      (r.summary || '').toLowerCase().includes('dose') || 
+      (r.summary || '').toLowerCase().includes('mg') ||
+      (r.summary || '').toLowerCase().includes('prescription')
+    ));
+
+    // Identify primary worker, doctor, and emergency contacts
+    const workerContact = contacts.find(c => (c.role || '').toLowerCase().includes('worker') || (c.role || '').toLowerCase().includes('dcf')) || contacts[0];
+    const pedContact = contacts.find(c => (c.role || '').toLowerCase().includes('pediatric') || (c.role || '').toLowerCase().includes('doctor') || (c.role || '').toLowerCase().includes('physician'));
+
+    container.innerHTML = `
+      <!-- Printable Card Frame -->
+      <div id="printableCardFrame" class="border-2 border-slate-900 rounded-xl p-5 bg-white space-y-4 font-sans text-slate-900">
+        
+        <!-- Header Banner with Vital Identifiers -->
+        <div class="flex items-start justify-between border-b-2 border-slate-900 pb-3">
+          <div>
+            <div class="text-[10px] font-black uppercase tracking-wider text-rose-700">Vermont Foster / Kinship Care • Urgent Information Card</div>
+            <h2 class="text-xl font-black text-slate-900 mt-0.5">${alias}</h2>
+            <div class="text-xs text-slate-600 mt-0.5">
+              <span>DOB: <strong>${child.dob || 'Not specified'}</strong></span> • 
+              <span>Care Status: <strong>${child.relationship_type || 'Active Placement'}</strong></span> • 
+              <span>Medicaid / VT ID: <strong>${child.medicaid_number || 'On File with DCF'}</strong></span>
+            </div>
+          </div>
+          <div class="text-right">
+            <span class="px-2.5 py-1 rounded bg-rose-100 border border-rose-300 font-black text-rose-800 text-xs inline-block">
+              EMERGENCY ONLY
+            </span>
+            <div class="text-[10px] text-slate-400 mt-1">Generated: ${new Date().toLocaleDateString()}</div>
+          </div>
+        </div>
+
+        <!-- High-Priority Alerts Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="bg-rose-50 border-2 border-rose-400 rounded-lg p-3">
+            <div class="text-[10px] font-black uppercase tracking-wider text-rose-900 flex items-center gap-1">
+              <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-rose-600"></i> Known Allergies & Medical Alerts
+            </div>
+            <div class="text-xs font-bold text-rose-950 mt-1">${child.allergies && child.allergies.trim() ? child.allergies : 'No known drug or environmental allergies logged.'}</div>
+            <div class="text-[11px] text-rose-800 mt-0.5">${child.emergency_notes || 'Call 911 immediately in acute respiratory distress.'}</div>
+          </div>
+
+          <div class="bg-amber-50 border-2 border-amber-400 rounded-lg p-3">
+            <div class="text-[10px] font-black uppercase tracking-wider text-amber-900 flex items-center gap-1">
+              <i data-lucide="heart" class="w-3.5 h-3.5 text-amber-600"></i> Comfort Items & Soothing Routines
+            </div>
+            <div class="text-xs font-bold text-amber-950 mt-1">${poscData.soothing_techniques || child.comfort_items || 'Quiet space, gentle rock, bedtime comfort blanket/lovey.'}</div>
+            <div class="text-[11px] text-amber-800 mt-0.5">Special Diet: ${child.food_preferences || 'Standard balanced toddler meals & hydration.'}</div>
+          </div>
+        </div>
+
+        <!-- Active Medications Section -->
+        <div class="border border-slate-300 rounded-lg p-3 bg-slate-50/70">
+          <div class="text-[10px] font-black uppercase tracking-wider text-slate-700 flex items-center justify-between">
+            <span class="flex items-center gap-1"><i data-lucide="pill" class="w-3.5 h-3.5 text-blue-600"></i> Active Daily Medications / Prescriptions</span>
+            <span class="text-[10px] font-semibold text-slate-500">${medRecords.length} Documented</span>
+          </div>
+          ${medRecords.length === 0 ? `
+            <p class="text-xs text-slate-600 italic mt-1">No ongoing prescription medications logged. Follow standard pediatrician over-the-counter dosage rules only if directed.</p>
+          ` : `
+            <div class="mt-2 divide-y divide-slate-200 text-xs">
+              ${medRecords.slice(0, 4).map(m => `
+                <div class="py-1 flex items-center justify-between">
+                  <span class="font-bold text-slate-800">${m.title}</span>
+                  <span class="text-slate-600 text-[11px]">${m.summary ? m.summary.substring(0, 50) : m.event_date}</span>
+                </div>
+              `).join('')}
+            </div>
+          `}
+        </div>
+
+        <!-- Emergency Contact Directory Strip -->
+        <div class="border-t border-slate-200 pt-3">
+          <div class="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-2">Immediate Response Contacts</div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px]">
+            <div class="bg-slate-100 p-2 rounded border border-slate-200">
+              <span class="font-black block text-slate-900">Current Caregiver:</span>
+              <span class="text-slate-700 font-semibold">${activeCaregiverUser ? (LOCAL_CAREGIVERS.find(c => c.id === activeCaregiverUser) || SAMPLE_CAREGIVERS.find(c => c.id === activeCaregiverUser) || {}).name : 'Caregiver on File'}</span>
+              <span class="text-slate-500 block text-[10px]">Primary Home Provider</span>
+            </div>
+            <div class="bg-slate-100 p-2 rounded border border-slate-200">
+              <span class="font-black block text-slate-900">DCF Family Worker:</span>
+              <span class="text-slate-700 font-semibold">${workerContact ? workerContact.name : 'District Family Services'}</span>
+              <span class="text-slate-500 block text-[10px]">${workerContact ? (workerContact.phone || workerContact.email || 'District Office') : 'State Emergency Duty Line'}</span>
+            </div>
+            <div class="bg-slate-100 p-2 rounded border border-slate-200">
+              <span class="font-black block text-slate-900">Pediatrician / Clinic:</span>
+              <span class="text-slate-700 font-semibold">${pedContact ? pedContact.name : 'Assigned Pediatrician'}</span>
+              <span class="text-slate-500 block text-[10px]">${pedContact ? (pedContact.phone || 'Local Health Center') : 'Local Clinic On File'}</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    `;
+    lucide.createIcons();
+  } catch (err) {
+    container.innerHTML = `
+      <div class="p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs">
+        <p class="font-bold">Unable to load emergency card details:</p>
+        <p class="mt-1">${err.message}</p>
+      </div>
+    `;
+  }
+}
+
+function closeEmergencyHandoffModal() {
+  const modal = document.getElementById('emergencyHandoffModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function printEmergencyHandoffCard() {
+  const frame = document.getElementById('printableCardFrame');
+  if (!frame) {
+    window.print();
+    return;
+  }
+
+  // Create isolated print iframe or window
+  const printWindow = window.open('', '_blank', 'width=800,height=600');
+  if (printWindow) {
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Emergency & Care Handoff Card</title>
+        <style>
+          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 20px; color: #0f172a; }
+          .border-2 { border: 2px solid #0f172a; }
+          .rounded-xl { border-radius: 12px; }
+          .rounded-lg { border-radius: 8px; }
+          .p-5 { padding: 20px; }
+          .p-3 { padding: 12px; }
+          .p-2 { padding: 8px; }
+          .space-y-4 > * + * { margin-top: 16px; }
+          .grid { display: grid; }
+          .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+          .gap-3 { gap: 12px; }
+          .gap-2 { gap: 8px; }
+          .bg-rose-50 { background-color: #fff1f2; }
+          .border-rose-400 { border-color: #fb7185; }
+          .bg-amber-50 { background-color: #fffbeb; }
+          .border-amber-400 { border-color: #fbbf24; }
+          .bg-slate-100 { background-color: #f1f5f9; }
+          .font-black { font-weight: 900; }
+          .font-bold { font-weight: 700; }
+          .text-xl { font-size: 20px; }
+          .text-xs { font-size: 12px; }
+          .text-10 { font-size: 10px; }
+          @media print {
+            body { margin: 0; }
+          }
+        </style>
+      </head>
+      <body>
+        ${frame.outerHTML}
+        <script>
+          window.onload = function() {
+            window.print();
+            window.close();
+          };
+        </script>
+      </body>
+      </html>
+    `);
+    printWindow.document.close();
+  } else {
+    window.print();
   }
 }
 
