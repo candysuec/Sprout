@@ -131,3 +131,142 @@ foster-portal/
   - `cc4e2e6`: Initial repository baseline with git-ignored private stores.
   - `992ca04`: Master welcome portal, state resource directory, and brand reset implementation.
   - `b0d10de`: Dynamic concealment of primary navigation bar on the unselected welcome view.
+  - `a5bf443`: Documentation hub creation & Springboard Enhancement Plan v2 publishing.
+
+---
+
+## 7. Authentication & User Identity Model
+
+### A. Local-First & Zero-Network Authentication Principle
+Sprout operates under a **Zero-Cloud, Local-First identity paradigm**. In a child-welfare environment, sensitive custodial decisions, medical prescriptions, and family court orders must never traverse third-party authentication services, remote OAuth providers, or identity brokers. 
+
+Instead, identity binding is executed purely within the local system runtime (`127.0.0.1:5858`) through explicit actor verification and environment scope controls.
+
+### B. The 4-Stage Identity State Machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> Welcome_State : Fresh Launch or Brand Reset
+    
+    state Welcome_State {
+        [*] --> Unselected_Mode
+        Unselected_Mode --> Zero_Data_Guard : Enforce return []
+        Zero_Data_Guard --> Display_State_Resources : Rates, CWTP, VKAP, 12 Districts
+    }
+
+    Welcome_State --> Sphere_Selected : Select Sphere (Sample / Local)
+    
+    state Sphere_Selected {
+        Prompt_Caregiver : Populate Scoped Caregivers Dropdown
+        Wait_Identity_Binding : Block all child queries until selected
+    }
+
+    Sphere_Selected --> Caregiver_Selected : Select Caregiver Identity
+    
+    state Caregiver_Selected {
+        Bind_Session : Store in LocalStorage (caregiverUser, sproutMode)
+        Inject_Headers : Attach X-Caregiver & X-Sprout-Mode to all fetch()
+        Verify_Scope : Validate Household Association
+    }
+
+    Caregiver_Selected --> Application_Access : Launch Scoped Command Center
+    
+    state Application_Access {
+        Render_Nav : Reveal #mainNavigationContainer
+        Render_Child_Pill : Mount Initials-Only Child Selector
+        Scoped_Queries : Execute Queries Bound to Verified Caregiver & Address
+    }
+
+    Application_Access --> Welcome_State : Click Brand Logo (resetToHomeLanding)
+    Caregiver_Selected --> Welcome_State : Switch Sphere or User
+```
+
+### C. Identity Validation & Impersonation Prevention
+1. **Caregiver Identity Validation**:
+   - The frontend validates every active caregiver against strict predefined authority rosters (`LOCAL_CAREGIVERS` for live operations, `SAMPLE_CAREGIVERS` for dev testing).
+   - If an unlisted or malformed identity string is injected, the client falls back to the unselected placeholder (`""`) and purges local storage.
+2. **Backend Header Enforcement**:
+   - Every client request attaches `X-Caregiver` and `X-Sprout-Mode` headers via the `apiFetch()` bridge.
+   - The backend server inspects these headers prior to executing any SQLite query:
+     ```python
+     caregiver = (request.headers.get('X-Caregiver') or '').strip()
+     sprout_mode = (request.headers.get('X-Sprout-Mode') or '').strip().lower()
+     if not sprout_mode or not caregiver:
+         return json_res([])  # Absolute zero data leakage
+     ```
+3. **Impersonation & Crossover Prevention**:
+   - In **Local Live Mode**, household queries are strictly pinned to verified caregiver physical residences (41 Elmwood Dr & 22 East Parkside).
+   - In **Sample Mode**, household queries map strictly to synthetic household IDs (`HH-101` through `HH-115`).
+   - The backend rejects cross-sphere requests: a sample caregiver requesting live documents or a live caregiver accessing synthetic fixtures triggers an immediate `403 Forbidden` error.
+4. **Session Handling & Reset (`LocalStorage`)**:
+   - Identity is persisted across page reloads via `localStorage.getItem('caregiverUser')` and `localStorage.getItem('sproutMode')`.
+   - Clicking the Sprout logo triggers `resetToHomeLanding()`, which explicitly executes:
+     ```javascript
+     localStorage.removeItem('sproutMode');
+     localStorage.removeItem('caregiverUser');
+     ```
+     This instantly restores the zero-query Welcome Portal.
+
+---
+
+## 8. Authorization & Security Model
+
+### A. Role Definitions
+Sprout defines 5 operational roles adhering strictly to the **Principle of Least Privilege**:
+
+1. **Unselected Public Visitor (Welcome State)**:
+   - Unauthenticated, unassigned identity.
+   - Has read access only to state-level public guidance, rate schedules, training portals, and crisis lines.
+   - Zero access to child records, journals, binders, or audit logs.
+2. **Sample Caregiver User (Dev Sandbox)**:
+   - Fictional caregiver identity (e.g., Sarah Jenkins, Marcus Vance).
+   - Full read/write access strictly within the in-memory synthetic dataset.
+   - Zero access to real SQLite tables (`portal.db`) or local OneDrive files.
+3. **Verified Primary Caregiver (Local Live)**:
+   - Full legal primary caregiver (Candy Chevalier).
+   - Full operational access to real child dossiers, daily journals, medical administration logs, school IEP records, and mileage reimbursement claims.
+4. **Homeowner & Resource Caregiver (Local Live)**:
+   - Co-caregiver and property owner (Robin Davis, Mallory Wheeler).
+   - Full access to household compliance checklists, facility safety inspections (FS-221A), and secondary supervision logs.
+5. **Auditor / Caseworker (Read-Only Export Mode - Future Scope)**:
+   - External DCF Family Services Worker or Guardian ad Litem (GAL).
+   - Cryptographically read-only access restricted to court-admissible PDF binders and date-scoped journal excerpts.
+
+### B. Comprehensive Role-Based Access Control (RBAC) Matrix
+
+| Feature / Domain | Welcome State | Sample Mode (`sample`) | Local Primary Caregiver | Local Resource Caregiver | Future Auditor / Caseworker |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Public State Resource Hub** | **Full Access** | **Full Access** | **Full Access** | **Full Access** | **Full Access** |
+| **Top Navigation Toolbar** | **Hidden** | **Active** | **Active** | **Active** | Restricted |
+| **Household & Bed Capacity** | None | Synthetic Only | **Full Edit** | **Full Edit** | Read-Only |
+| **Child Demographics & Initials**| None | Synthetic Only | **Full Edit** | Read-Only | Read-Only |
+| **Daily Journaling & Observations**| None | Synthetic Only | **Full Log / Edit** | Co-Signature Only| Read-Only |
+| **Medication Administration Tracking**| None | Synthetic Only | **Full Log / Admin**| Administer Only | Audit View |
+| **Document Binder (OneDrive)** | Blocked | Blocked (`403`) | **Full Launch** | **Full Launch** | Watermarked PDF |
+| **Expense & Mileage Tracking** | None | Synthetic Only | **Full Submit** | Mileage Only | Financial Audit |
+| **CHINS Court Timeline** | None | Synthetic Only | **Full View / Edit**| Read-Only | Legal View |
+| **Audit Log & Security Settings** | None | Synthetic Only | **Admin View** | Read-Only | Audit Log Only |
+
+### C. Security Rule Enforcement by Sphere
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                              WELCOME STATE                             │
+│   • No LocalStorage identity binding                                    │
+│   • API endpoints immediately return [] (Zero database execution)      │
+│   • Top Navigation Toolbar: HIDDEN                                     │
+│   • Child Initials Dropdown: HIDDEN                                    │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │
+                  ┌─────────────────┴─────────────────┐
+                  ▼                                   ▼
+┌───────────────────────────────────┐   ┌────────────────────────────────┐
+│         SAMPLE DEV SANDBOX        │   │        LOCAL LIVE SPHERE       │
+│  • Bounded to sample_dataset.py   │   │  • Bounded to SQLite portal.db │
+│  • 15 Caregiver Journey homes     │   │  • Verified caregivers only    │
+│  • Synthetic Placements only      │   │  • Child CD records only       │
+│  • Local OneDrive: 403 FORBIDDEN  │   │  • Local OneDrive: AUTHORIZED  │
+│  • Zero disk-write pollution      │   │  • Git Ignored: Zero cloud sync│
+└───────────────────────────────────┘   └────────────────────────────────┘
+```
+
