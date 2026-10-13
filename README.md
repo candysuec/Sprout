@@ -76,15 +76,19 @@ Sprout normalizes caregiver management across real-world dimensions:
 
 ---
 
-## 📚 Architecture & Project Management Documentation
+## 📚 Architecture, Foundation & Governance Documentation
 
-Production specifications, system topologies, UX audits, and project governance boards are maintained in the [`docs/`](docs/) directory:
+Production specifications, system topologies, privacy audits, training flight simulators, and project governance boards are maintained in the [`docs/`](docs/) directory:
 
-- [Project Management Board & Plan Approvals](docs/PROJECT_MANAGEMENT_BOARD.md): Formal sign-off record, stakeholder governance, and sprint backlogs.
+- [Sprout Foundation & North Star Constitution](docs/SPRINGBOARD_FOUNDATION.md): Governing specifications, 8 Non-Negotiable Tenets, Product Boundaries, and the 8-Point Decision Gate (Phase 6).
+- [Privacy Hardening Audit Report](docs/PRIVACY_HARDENING_REPORT.md): Enforcement of the Child Reference ID standard, 1-tap Privacy Shield / Blur Mode, metadata scrubbing, and export sanitization (Phase 7).
+- [Caregiver Flight Simulator & Sandbox Excellence Report](docs/QA_PHASE8_SANDBOX_EXCELLENCE.md): Complete documentation for interactive first-run onboarding, role-based personas, scenario flight simulations, and synthetic document vault (Phase 8).
+- [Vermont DCF Excellence & Operations Architecture](docs/VERMONT_DCF_EXCELLENCE_ARCHITECTURE.md): Statewide gap analysis, Title 33 CHINS timeline engine, State Form FS-334B reimbursement claims, and 12-District Office Directory (Phase 9).
+- [Master Project Management Board](docs/PROJECT_MANAGEMENT_BOARD.md): Formal sign-off record, phase completion tracker, and sprint backlogs.
+- [Sandbox & Sample Data Validation Audit](docs/QA_SANDBOX_VALIDATION_AUDIT.md): Comprehensive validation of environment isolation (`Welcome ≠ Sandbox ≠ Local`) and 15-household relational dataset.
 - [Technical Summary & System Map (v2)](docs/TECHNICAL_SUMMARY_SYSTEM_MAP.md): Production architectural reference covering all 18 technical sections.
-- [UX Enhancement & Caregiver Usability Audit](docs/UX_ENHANCEMENT_AUDIT.md): Comprehensive evaluation of daily friction, cognitive load, and automation opportunities.
-- [UI Process Flow & Button Interaction Blueprint](docs/UI_PROCESS_FLOW_BLUEPRINT.md): Finite state machine mapping every button and modal to deterministic flows.
-- [Springboard Enhancement Plan (v2)](docs/SPRINGBOARD_ENHANCEMENT_PLAN_V2.md): 5-phase engineering roadmap and milestone tracking.
+- [UX Enhancement & Caregiver Usability Audit](docs/UX_ENHANCEMENT_AUDIT.md): Comprehensive evaluation of daily friction, cognitive load, and orientation metrics.
+- [UI Process Flow Blueprint](docs/UI_PROCESS_FLOW_BLUEPRINT.md): Finite state machine mapping every button and modal to deterministic flows.
 
 ---
 
