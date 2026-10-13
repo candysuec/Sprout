@@ -45,8 +45,11 @@
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col relative">
-  <!-- Sandbox Watermark Strip -->
+  <!-- Sandbox Watermark Strip & Floating Badge -->
   <div class="sandbox-watermark-overlay fixed inset-x-0 top-0 h-1 bg-amber-400 z-50 pointer-events-none"></div>
+  <div class="sandbox-watermark-overlay fixed bottom-3 right-3 bg-blue-900/90 text-amber-300 border border-blue-600 rounded-full px-3 py-1 text-[11px] font-black z-50 pointer-events-none shadow-lg items-center gap-1.5 uppercase tracking-wider">
+    <span>🛡️ Practice Sandbox • Synthetic Data Only</span>
+  </div>
 
   <!-- Top App Navigation Bar (Clean, uncluttered, caregiver-first) -->
   <header id="topHeader" class="bg-emerald-950 text-white shadow-sm sticky top-0 z-40 border-b border-emerald-900 transition-colors duration-300">
@@ -182,11 +185,13 @@
             <span class="absolute right-2 top-2 px-1.5 py-0.5 rounded text-[10px] bg-slate-200/80 text-slate-600 font-bold border border-slate-300 pointer-events-none">Ctrl K</span>
           </div>
 
-          <!-- Child Initials Selector -->
-          <div class="flex items-center bg-slate-50 rounded-xl px-3 py-1.5 border border-slate-200 shadow-sm" title="Active Child in Care">
-            <i data-lucide="baby" class="w-4 h-4 text-emerald-600 mr-1.5 shrink-0"></i>
-            <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mr-1">Child:</span>
-            <select id="childSelect" onchange="onChildChange()" class="bg-transparent text-slate-900 font-extrabold text-xs focus:outline-none cursor-pointer">
+          <!-- Child Initials Selector (Enhanced Contrast & Avatar Indicator) -->
+          <div class="flex items-center bg-white rounded-xl px-3 py-1.5 border-2 border-emerald-500 shadow-xs" title="Active Child in Care (Surnames Shielded)">
+            <div class="w-5 h-5 rounded-full bg-emerald-700 text-white font-extrabold flex items-center justify-center text-[10px] mr-1.5 shrink-0">
+              👶
+            </div>
+            <span class="text-[10px] text-emerald-900 font-extrabold uppercase tracking-wider mr-1">Child:</span>
+            <select id="childSelect" onchange="onChildChange()" class="bg-transparent text-emerald-950 font-black text-xs focus:outline-none cursor-pointer">
               <!-- Populated with Initials Only -->
             </select>
           </div>
@@ -364,6 +369,7 @@
             <div class="flex items-center justify-between mb-1">
               <label class="block font-bold text-emerald-950 flex items-center gap-1.5 text-xs">
                 <i data-lucide="navigation" class="w-4 h-4 text-emerald-600"></i> Round-Trip Mileage (DCF Reimbursable)
+                <span class="text-[10px] bg-emerald-200 text-emerald-900 font-black px-1.5 py-0.5 rounded border border-emerald-300">($0.67/mi State Rate)</span>
               </label>
               <span id="recMileagePayout" class="text-xs font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded border border-emerald-300">$0.00 Est. Payout</span>
             </div>
