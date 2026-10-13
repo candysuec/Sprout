@@ -469,8 +469,12 @@ async function loadTabContent() {
   const container = document.getElementById('tabContent');
   if (!container) return;
 
+  const mainNav = document.getElementById('mainNavigationContainer');
+
   // WELCOME / ENTRY PORTAL: When no sphere mode or caregiver is selected, render the master welcome portal & state resource center
   if (!currentSproutMode || !activeCaregiverUser) {
+    if (mainNav) mainNav.classList.add('hidden');
+
     const card = document.getElementById('snapshotCard');
     if (card) {
       card.classList.add('hidden');
@@ -483,6 +487,9 @@ async function loadTabContent() {
     lucide.createIcons();
     return;
   }
+
+  // Caregiver and Sphere selected: reveal main navigation toolbar
+  if (mainNav) mainNav.classList.remove('hidden');
 
   if (currentMainSection === 'dashboard') {
     await renderDashboardView(container);
