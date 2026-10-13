@@ -1213,6 +1213,64 @@ async function renderDashboardView(container) {
         </div>
       </div>
 
+      <!-- Daily Medication & Wellness Administration Check-Off (1-Tap Safety Record) -->
+      <div class="bg-gradient-to-r from-blue-50/90 via-sky-50/70 to-indigo-50/80 rounded-2xl border border-blue-200 p-5 shadow-xs space-y-3">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-blue-200/60 pb-2.5">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold shadow-xs">
+              <i data-lucide="pill" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h4 class="font-bold text-blue-950 text-sm flex items-center gap-1.5">
+                <span>Daily Medication Administration & Health Log — ${alias}</span>
+                <span class="text-[10px] bg-blue-100 text-blue-800 border border-blue-300 font-bold px-2 py-0.5 rounded-full uppercase">3-Sec Confirmation</span>
+              </h4>
+              <p class="text-xs text-blue-900/80">Confirm morning, noon, and evening doses or administration with a single click.</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="logTodayMedDose('Morning Dose')" class="px-3 py-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1 transition">
+              <i data-lucide="check" class="w-3.5 h-3.5"></i> Mark Dose Administered
+            </button>
+            <button onclick="quickOpenAction('medical', 'Medication Refill / Change', 'Prescription refilled or dosage adjusted.')" class="px-2.5 py-1.5 bg-white hover:bg-blue-50 text-blue-900 border border-blue-300 font-semibold text-xs rounded-xl shadow-xs transition">
+              Refill / Log Details
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs pt-1">
+          <div class="bg-white/90 p-3 rounded-xl border border-blue-100 flex items-center justify-between">
+            <div>
+              <span class="font-bold text-slate-800 block text-xs">Morning Schedule</span>
+              <span class="text-[11px] text-slate-500">With breakfast / 8:00 AM</span>
+            </div>
+            <button onclick="logTodayMedDose('Morning Dose')" class="px-2.5 py-1 rounded-lg font-bold text-xs bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100 flex items-center gap-1">
+              <i data-lucide="check-circle" class="w-3 h-3 text-emerald-600"></i> Done
+            </button>
+          </div>
+
+          <div class="bg-white/90 p-3 rounded-xl border border-blue-100 flex items-center justify-between">
+            <div>
+              <span class="font-bold text-slate-800 block text-xs">Mid-Day / School</span>
+              <span class="text-[11px] text-slate-500">Nurse protocol / 12:00 PM</span>
+            </div>
+            <button onclick="logTodayMedDose('Mid-Day Dose')" class="px-2.5 py-1 rounded-lg font-bold text-xs bg-blue-50 text-blue-800 border border-blue-300 hover:bg-blue-100 flex items-center gap-1">
+              <i data-lucide="check-circle" class="w-3 h-3 text-blue-600"></i> Log
+            </button>
+          </div>
+
+          <div class="bg-white/90 p-3 rounded-xl border border-blue-100 flex items-center justify-between">
+            <div>
+              <span class="font-bold text-slate-800 block text-xs">Evening / Bedtime</span>
+              <span class="text-[11px] text-slate-500">With dinner / 7:30 PM</span>
+            </div>
+            <button onclick="logTodayMedDose('Evening Dose')" class="px-2.5 py-1 rounded-lg font-bold text-xs bg-purple-50 text-purple-800 border border-purple-300 hover:bg-purple-100 flex items-center gap-1">
+              <i data-lucide="check-circle" class="w-3 h-3 text-purple-600"></i> Log
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Two-Column Priority Command Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Open Follow-Ups -->
@@ -1324,6 +1382,46 @@ function quickOpenAction(category, defaultTitle, defaultSummary) {
   document.getElementById('recCategory').value = category;
   document.getElementById('recTitle').value = defaultTitle;
   document.getElementById('recSummary').value = defaultSummary;
+}
+
+// 1-Tap Daily Medication Administration Logger
+async function logTodayMedDose(slotName = 'Daily Dose') {
+  const child = childrenList.find(c => c.id === currentChildId);
+  const alias = child ? (child.alias || 'Child') : 'Child';
+  const today = new Date().toISOString().split('T')[0];
+  const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  const payload = {
+    child_id: currentChildId,
+    category: 'medical',
+    title: `Medication Administered — ${slotName}`,
+    severity: 'Routine',
+    event_date: today,
+    location: 'Home',
+    participants: `Caregiver (${getActiveCaregiver() || 'Primary'})`,
+    summary: `Prescribed ${slotName.toLowerCase()} successfully administered to ${alias} at ${now}. Child tolerated well with no adverse reaction noted.`,
+    follow_up_needed: false,
+    follow_up_notes: '',
+    follow_up_due_date: '',
+    mileage: 0,
+    rpps_category: ''
+  };
+
+  try {
+    const res = await apiFetch('/api/records', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      await loadTabContent();
+      renderChildSnapshot();
+    } else {
+      alert("Could not log dose record.");
+    }
+  } catch (err) {
+    alert("Error recording medication dose: " + err.message);
+  }
 }
 
 // Resources Tab 20: Folder File Viewer with DCF Category Classification
