@@ -73,8 +73,8 @@ This document serves as the formal record that the **Springboard Enhancement Pro
   - 6 instant logging buttons added to Dashboard: Meds, Feeding, DCF Call, Family Visit, Doctor Visit, and Incident/Safety.
 
 ### Sprint 2: Core Workflow Enhancements (Next 2 Weeks)
-- [ ] **Task 2.1: Navigation Consolidation**
-  - Consolidate 11 main nav buttons into 4 unified action hubs (*Today*, *My Children*, *Binder*, *Household & Compliance*).
+- [x] **Task 2.1: Navigation Consolidation** (Completed - Commit pending)
+  - Streamlined 11 scattered navigation buttons into 4 unified primary action hubs (*Today*, *My Children*, *Care Binder*, *Home & Licensing*) with secondary utilities cleanly isolated.
 - [x] **Task 2.2: Daily Medication Dose Check-Off** (Completed - Commit pending)
   - 1-tap confirmation card added to caregiver dashboard covering morning, school/mid-day, and evening schedules with 3-second auto-logging.
 - [x] **Task 2.3: Automated Vermont DCF Mileage Calculator & Destination Presets** (Completed - Commit pending)

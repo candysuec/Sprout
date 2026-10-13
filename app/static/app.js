@@ -463,11 +463,11 @@ function switchMainSection(sectionKey) {
 
   // Update top main navigation styles
   document.querySelectorAll('.main-nav-btn').forEach(btn => {
-    btn.classList.remove('bg-slate-100', 'font-bold', 'text-emerald-800');
+    btn.classList.remove('bg-white', 'text-emerald-800', 'shadow-sm', 'font-bold');
   });
   const activeBtn = document.getElementById(`navBtn-${sectionKey}`);
   if (activeBtn) {
-    activeBtn.classList.add('bg-slate-100', 'font-bold', 'text-emerald-800');
+    activeBtn.classList.add('bg-white', 'text-emerald-800', 'shadow-sm', 'font-bold');
   }
 
   // Toggle visibility of Child Workspace sub-navigation strip
