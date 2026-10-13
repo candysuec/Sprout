@@ -76,6 +76,15 @@ Sprout normalizes caregiver management across real-world dimensions:
 
 ---
 
+## 📚 Architecture & Engineering Documentation
+
+Production specifications, system topologies, and roadmap artifacts are maintained in the [`docs/`](docs/) directory:
+
+- [Technical Summary & System Map](docs/TECHNICAL_SUMMARY_SYSTEM_MAP.md): Complete architectural breakdown, security boundaries, dual-sphere routing, and Vermont caregiver tools.
+- [Springboard Enhancement Project Plan (v2)](docs/SPRINGBOARD_ENHANCEMENT_PLAN_V2.md): 5-phase engineering roadmap covering all 18 operational and security sections.
+
+---
+
 ## 🔒 Security & Privacy Notice
 
 - **No Cloud Transmission**: Sprout runs entirely on your local machine.
