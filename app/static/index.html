@@ -23,9 +23,30 @@
     .badge-education { background: #f3e8ff; color: #6b21a8; }
     .custom-scroll::-webkit-scrollbar { width: 6px; }
     .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    
+    /* Privacy Blur Mode for Presentations, Screenshots, and Training */
+    body.privacy-blur-active .privacy-sensitive {
+      filter: blur(5px) grayscale(80%);
+      user-select: none;
+      transition: filter 0.2s ease-in-out;
+    }
+    body.privacy-blur-active .privacy-sensitive:hover {
+      filter: blur(2px);
+    }
+    
+    /* Sandbox Watermark Banner */
+    .sandbox-watermark-overlay {
+      display: none;
+    }
+    body.sprout-sandbox-active .sandbox-watermark-overlay {
+      display: flex;
+      pointer-events: none;
+    }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col relative">
+  <!-- Sandbox Watermark Strip -->
+  <div class="sandbox-watermark-overlay fixed inset-x-0 top-0 h-1 bg-amber-400 z-50 pointer-events-none"></div>
 
   <!-- Top App Navigation Bar (Clean, uncluttered, caregiver-first) -->
   <header id="topHeader" class="bg-emerald-950 text-white shadow-sm sticky top-0 z-40 border-b border-emerald-900 transition-colors duration-300">
@@ -58,6 +79,12 @@
           <i data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-300"></i>
           <span id="workspaceToggleLabel" class="text-white">Real Family Workspace</span>
           <span class="text-[10px] bg-emerald-700/80 text-emerald-200 px-1.5 py-0.2 rounded font-semibold uppercase">Switch</span>
+        </button>
+
+        <!-- Privacy Shield / Blur Mode Toggle (Phase 7 Privacy Hardening) -->
+        <button id="btnTogglePrivacyBlur" onclick="togglePrivacyBlurMode()" class="flex items-center bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 rounded-xl px-2.5 py-1.5 text-xs font-bold transition shadow-xs gap-1.5 text-slate-200" title="Toggle Privacy Blur Mode (Shield sensitive child info for screenshots/demos)">
+          <i id="privacyShieldIcon" data-lucide="eye" class="w-3.5 h-3.5 text-emerald-400"></i>
+          <span id="privacyShieldLabel" class="hidden md:inline">Shield PII</span>
         </button>
 
         <!-- Active Caregiver Identity Badge (Candy Chevalier auto-selected) -->

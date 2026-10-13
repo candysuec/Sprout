@@ -71,6 +71,12 @@ def serve_uploads(filename):
 
 @app.route('/exports/<filename:path>')
 def serve_exports(filename):
+    # Phase 7: Export Validation Scanner
+    # Validates that exported files are safely inside the exports folder and sanitized
+    safe_root = os.path.realpath(EXPORT_DIR)
+    target = os.path.realpath(os.path.join(safe_root, filename))
+    if os.path.commonpath([safe_root, target]) != safe_root or not os.path.isfile(target):
+        return json_res({"error": "Exported file not found or unauthorized."}, 404)
     return static_file(filename, root=EXPORT_DIR, download=True)
 
 

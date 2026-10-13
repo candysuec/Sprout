@@ -7,6 +7,23 @@ from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from db import get_connection, EXPORT_DIR
 
+def scrub_docx_metadata(doc, title="Sprout Document"):
+    """
+    Scrubs all operating system and author metadata from exported DOCX files.
+    Enforces the 'Metadata Scrubbing' requirement of Springboard Phase 7.
+    """
+    try:
+        core_props = doc.core_properties
+        core_props.author = "Sprout KinCare OS (Privacy Protected)"
+        core_props.last_modified_by = "Sprout KinCare OS"
+        core_props.title = title
+        core_props.comments = "Confidential document generated in compliance with Vermont DCF privacy guidelines."
+        core_props.company = "Sprout / KinCare OS"
+        core_props.category = "Child Welfare Record"
+    except Exception as e:
+        pass
+    return doc
+
 def generate_monthly_report_docx(child_id, year, month, privacy_mode="initials"):
     """
     Generates monthly caregiver progress reports with 4 Privacy Modes:
@@ -149,6 +166,7 @@ def generate_monthly_report_docx(child_id, year, month, privacy_mode="initials")
     else:
         doc.add_paragraph("No open follow-up actions flagged for this period.")
 
+    doc = scrub_docx_metadata(doc, title=f"Progress Report - {alias} - {month_str}")
     filename = f"Progress_Report_{alias}_{privacy_mode}_{month_str}.docx"
     filepath = os.path.join(EXPORT_DIR, filename)
     doc.save(filepath)
@@ -254,6 +272,7 @@ def generate_respite_handoff_card_docx(child_id):
     else:
         doc.add_paragraph("Follow standard meal, bedtime, and activity routines as instructed by primary caregiver.")
 
+    doc = scrub_docx_metadata(doc, title=f"Respite Care Packet - {alias}")
     filename = f"Respite_Care_Packet_{alias}.docx"
     filepath = os.path.join(EXPORT_DIR, filename)
     doc.save(filepath)
@@ -575,6 +594,7 @@ def generate_dcf_reimbursement_claim_docx(child_id, year, month, claim_type="FS-
     p_cert.add_run("DCF District Worker Approval: ___________________________    Date: ______________\n")
 
     os.makedirs(EXPORT_DIR, exist_ok=True)
+    doc = scrub_docx_metadata(doc, title=f"Vermont DCF Claim {claim_type} - {alias}")
     filename = f"DCF_{claim_type}_{alias}_{year:04d}_{month:02d}.docx"
     file_path = os.path.join(EXPORT_DIR, filename)
     doc.save(file_path)

@@ -4,6 +4,7 @@ let childrenList = [];
 
 // Sprout Environment State (Defaults directly to 'local' for Candy Chevalier)
 let currentSproutMode = localStorage.getItem('sproutMode') || 'local';
+let isPrivacyBlurActive = localStorage.getItem('privacyBlur') === 'true';
 
 const LOCAL_CAREGIVERS = [
   { id: 'Candy Chevalier', name: 'Candy Chevalier (Primary Caregiver)', initials: 'CC', color: 'bg-emerald-700' },
@@ -38,6 +39,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   updateWorkspaceToggleUI();
   updateSproutTheme();
+  applyPrivacyBlurState();
 
   await loadChildren();
   lucide.createIcons();
@@ -55,9 +57,47 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
+function togglePrivacyBlurMode() {
+  isPrivacyBlurActive = !isPrivacyBlurActive;
+  localStorage.setItem('privacyBlur', isPrivacyBlurActive);
+  applyPrivacyBlurState();
+}
+
+function applyPrivacyBlurState() {
+  const body = document.body;
+  const btn = document.getElementById('btnTogglePrivacyBlur');
+  const icon = document.getElementById('privacyShieldIcon');
+  const label = document.getElementById('privacyShieldLabel');
+
+  if (isPrivacyBlurActive) {
+    body.classList.add('privacy-blur-active');
+    if (btn) btn.className = "flex items-center bg-amber-900/90 hover:bg-amber-800 border border-amber-600 rounded-xl px-2.5 py-1.5 text-xs font-bold transition shadow-xs gap-1.5 text-amber-200";
+    if (label) label.textContent = "PII Shielded";
+    if (icon) {
+      icon.setAttribute('data-lucide', 'eye-off');
+      icon.className = "w-3.5 h-3.5 text-amber-400";
+    }
+  } else {
+    body.classList.remove('privacy-blur-active');
+    if (btn) btn.className = "flex items-center bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 rounded-xl px-2.5 py-1.5 text-xs font-bold transition shadow-xs gap-1.5 text-slate-200";
+    if (label) label.textContent = "Shield PII";
+    if (icon) {
+      icon.setAttribute('data-lucide', 'eye');
+      icon.className = "w-3.5 h-3.5 text-emerald-400";
+    }
+  }
+  lucide.createIcons();
+}
+
 function updateSproutTheme() {
   const header = document.getElementById('topHeader');
   const isSample = currentSproutMode === 'sample';
+  
+  if (isSample) {
+    document.body.classList.add('sprout-sandbox-active');
+  } else {
+    document.body.classList.remove('sprout-sandbox-active');
+  }
   if (header) {
     if (isSample) {
       header.classList.remove('bg-emerald-950', 'border-emerald-900');
@@ -434,8 +474,9 @@ async function renderChildSnapshot() {
             </span>
           </div>
           <p class="text-xs text-slate-500 mt-1">
-            DOB: <span class="font-semibold text-slate-700">${child.dob || 'Not set'}</span> • 
-            Placement Date: <span class="font-semibold text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded">${child.placement_date || 'N/A'}</span> • 
+            Ref ID: <span class="font-bold text-slate-800 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">${child.child_code || `CH-${child.id || '001'}`}</span> • 
+            DOB: <span class="font-semibold text-slate-700 privacy-sensitive">${child.dob || 'Not set'}</span> • 
+            Placement Date: <span class="font-semibold text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded privacy-sensitive">${child.placement_date || 'N/A'}</span> • 
             Goal: <span class="font-semibold text-emerald-700 uppercase tracking-wider">${child.permanency_goal || 'Reunification'}</span>
           </p>
         </div>
@@ -1430,15 +1471,15 @@ async function renderDashboardView(container) {
       <!-- Quick Metrics Strip -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Child Identifier</div>
-          <div class="text-base font-bold text-slate-800 mt-1">${alias}</div>
-          <div class="text-[11px] text-emerald-700 font-semibold mt-0.5">ID: ${child ? (child.child_code || 'CCC-000001') : 'N/A'}</div>
+          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Child Reference ID</div>
+          <div class="text-base font-bold text-slate-800 mt-1">${child ? (child.child_code || `CH-${child.id || '001'}`) : 'CH-001'}</div>
+          <div class="text-[11px] text-emerald-700 font-semibold mt-0.5">Alias: ${alias}</div>
         </div>
 
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
           <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Placement Target</div>
           <div class="text-base font-bold text-emerald-800 mt-1 flex items-center gap-1">
-            <i data-lucide="calendar" class="w-4 h-4"></i> ${child.placement_date || 'Wed Oct 14'}
+            <i data-lucide="calendar" class="w-4 h-4"></i> <span class="privacy-sensitive">${child.placement_date || 'Wed Oct 14'}</span>
           </div>
           <div class="text-[11px] text-slate-500 mt-0.5">Status: ${child.status}</div>
         </div>
@@ -3014,7 +3055,7 @@ async function executeOmnibarSearch(query) {
           <div onclick="closeOmnibarModal(); switchMainSection('contacts');" class="p-3 hover:bg-slate-50 cursor-pointer flex items-center justify-between transition">
             <div>
               <div class="font-bold text-slate-900">${c.name} <span class="text-xs text-indigo-700 font-semibold">(${c.role})</span></div>
-              <div class="text-[11px] text-slate-500">${c.organization || ''} • ${c.phone || c.email || 'No direct phone'}</div>
+              <div class="text-[11px] text-slate-500">${c.organization || ''} • <span class="privacy-sensitive">${c.phone || c.email || 'No direct phone'}</span></div>
             </div>
             <span class="text-[10px] bg-indigo-100 text-indigo-800 font-bold px-2 py-0.5 rounded">View Contact</span>
           </div>
@@ -3046,7 +3087,7 @@ async function executeOmnibarSearch(query) {
           <div onclick="closeOmnibarModal(); openEditRecordModal(${r.id});" class="p-3 hover:bg-slate-50 cursor-pointer flex items-start justify-between transition gap-3">
             <div>
               <div class="font-bold text-slate-900">${r.title} <span class="text-[11px] text-slate-400 font-normal">(${r.event_date})</span></div>
-              <div class="text-xs text-slate-600 mt-0.5 line-clamp-1">${r.summary || 'Logged observation.'}</div>
+              <div class="text-xs text-slate-600 mt-0.5 line-clamp-1 privacy-sensitive">${r.summary || 'Logged observation.'}</div>
             </div>
             <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded uppercase shrink-0">${r.category}</span>
           </div>
