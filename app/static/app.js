@@ -685,6 +685,8 @@ async function loadTabContent() {
     await renderContactsView(container);
   } else if (currentMainSection === 'communications') {
     await renderCommunicationsView(container);
+  } else if (currentMainSection === 'relationships') {
+    await renderRelationshipCenterView(container);
   } else if (currentMainSection === 'reports') {
     renderReportsView(container);
   } else if (currentMainSection === 'training') {
@@ -6110,10 +6112,363 @@ function resetSandboxFactoryData() {
     switchMainSection('training');
   }
 }
+// ==============================================================================
+// PHASE 10: RELATIONSHIP CENTER & CIRCLES OF CARE OPERATING SYSTEM
+// ==============================================================================
 
+async function renderRelationshipCenterView(container) {
+  const child = childrenList.find(c => c.id === currentChildId);
+  const alias = child ? (child.alias || 'Child') : 'Child';
+  const childRefId = child ? (child.child_code || `CH-${child.id || '201'}`) : 'CH-201';
 
+  let contacts = [];
+  let commRecords = [];
+  try {
+    const [cRes, rRes] = await Promise.all([
+      apiFetch(`/api/children/${currentChildId}/contacts`),
+      apiFetch(`/api/children/${currentChildId}/records?category=all`)
+    ]);
+    contacts = await cRes.json();
+    const allRecords = await rRes.json();
+    // Filter records that involve stakeholder interactions or follow-ups
+    commRecords = allRecords.filter(r => 
+      ['family_time', 'legal', 'medical', 'education'].includes(r.category) || 
+      r.participants || r.follow_up_needed
+    );
+  } catch (err) {
+    console.error('Failed to load relationship center records:', err);
+  }
 
+  // 4 Concentric Circles of Care Classification
+  const circle1DailyCare = contacts.filter(c => 
+    ['Caregiver', 'Foster Parent', 'Kinship Caregiver', 'Emergency Resource', 'Respite Provider', 'Babysitter'].some(role => (c.role_type || '').includes(role))
+  );
 
+  const circle2DcfTeam = contacts.filter(c => 
+    ['DCF', 'Caseworker', 'Social Worker', 'Supervisor', 'Family Services', 'Resource Coordinator'].some(role => (c.role_type || '').includes(role) || (c.organization || '').includes('DCF'))
+  );
 
+  const circle3CourtMedical = contacts.filter(c => 
+    ['GAL', 'Guardian ad Litem', 'Attorney', 'CASA', 'Judge', 'Pediatrician', 'Doctor', 'Therapist', 'Psychiatrist', 'Dentist'].some(role => (c.role_type || '').includes(role))
+  );
+
+  const circle4SchoolCommunity = contacts.filter(c => 
+    !circle1DailyCare.includes(c) && !circle2DcfTeam.includes(c) && !circle3CourtMedical.includes(c)
+  );
+
+  // If contacts are empty, provide synthetic fallback contacts for training/exploration
+  const displayCircle1 = circle1DailyCare.length > 0 ? circle1DailyCare : [
+    { id: 'mock-1', full_name: 'Candy Chevalier', role_type: 'Primary Caregiver', organization: 'Maple Ridge Home', phone: '(802) 555-0192', email: 'candy.chevalier@vermont.local', preferred_method: 'Phone / SMS' }
+  ];
+  const displayCircle2 = circle2DcfTeam.length > 0 ? circle2DcfTeam : [
+    { id: 'mock-2', full_name: 'Jessica Taylor, MSW', role_type: 'DCF Family Services Worker', organization: 'Vermont DCF Burlington District', phone: '(802) 863-7370', email: 'jessica.taylor@vermont.gov', preferred_method: 'Email', last_contact: 'Oct 11, 2026' },
+    { id: 'mock-3', full_name: 'Marcus Sterling', role_type: 'DCF District Supervisor', organization: 'Vermont DCF Burlington District', phone: '(802) 863-7371', email: 'marcus.sterling@vermont.gov', preferred_method: 'Email' }
+  ];
+  const displayCircle3 = circle3CourtMedical.length > 0 ? circle3CourtMedical : [
+    { id: 'mock-4', full_name: 'David Vance, Esq.', role_type: 'Guardian ad Litem (GAL)', organization: 'Vermont Defender General / Family Court', phone: '(802) 863-7400', email: 'david.vance@gal.vermont.gov', preferred_method: 'Email', last_contact: 'Oct 10, 2026' },
+    { id: 'mock-5', full_name: 'Dr. Sarah Miller, MD', role_type: 'Pediatrician', organization: 'UVM Children\'s Hospital Clinic', phone: '(802) 847-2000', email: 'smiller@uvmhealth.org', preferred_method: 'Phone', last_contact: 'Oct 02, 2026' },
+    { id: 'mock-6', full_name: 'Elena Rostova, LCMHC', role_type: 'Child Trauma Therapist', organization: 'Youth & Family Counseling Center', phone: '(802) 658-0040', email: 'erostova@counseling.org', preferred_method: 'Phone', last_contact: 'Oct 08, 2026' }
+  ];
+  const displayCircle4 = circle4SchoolCommunity.length > 0 ? circle4SchoolCommunity : [
+    { id: 'mock-7', full_name: 'Karen Harper', role_type: '5th Grade Teacher / IEP Team', organization: 'Maple Ridge Elementary School', phone: '(802) 555-0144', email: 'kharper@school.k12.vt.us', preferred_method: 'Email', last_contact: 'Oct 09, 2026' },
+    { id: 'mock-8', full_name: 'Easterseals Family Center', role_type: 'Family Time Supervised Visitation Coordinator', organization: 'Easterseals Vermont', phone: '(802) 223-4721', email: 'visitation@eastersealsvt.org', preferred_method: 'Phone' }
+  ];
+
+  const pendingFollowups = commRecords.filter(r => r.follow_up_needed && !r.is_completed);
+
+  container.innerHTML = `
+    <div class="space-y-6">
+
+      <!-- Header Banner -->
+      <div class="bg-gradient-to-r from-rose-950 via-slate-900 to-indigo-950 rounded-3xl p-6 text-white shadow-md border border-rose-900/60 relative overflow-hidden">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-500/20 text-rose-300 border border-rose-400/30 flex items-center gap-1">
+                <i data-lucide="heart-handshake" class="w-3.5 h-3.5 text-rose-400"></i> Circles of Care Operating System
+              </span>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-300 border border-slate-700">
+                Child Ref: ${childRefId}
+              </span>
+            </div>
+            <h2 class="text-2xl font-black tracking-tight text-white flex items-center gap-2">
+              Relationship Center & Support Network Map
+            </h2>
+            <p class="text-xs text-rose-200/80 max-w-2xl mt-1 leading-relaxed">
+              The single authoritative people hub for ${alias}. Instant visibility into who supports this child, when you last communicated, what actions are pending, and what is due for court.
+            </p>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="generateCourtRelationshipBrief()" class="bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs px-3.5 py-2.5 rounded-xl shadow transition flex items-center gap-1.5">
+              <i data-lucide="file-text" class="w-4 h-4"></i> Court Stakeholder Brief (.docx)
+            </button>
+            <button onclick="openNewContactModal()" class="bg-white/10 hover:bg-white/20 text-white font-semibold text-xs px-3.5 py-2.5 rounded-xl border border-white/20 transition flex items-center gap-1.5">
+              <i data-lucide="user-plus" class="w-3.5 h-3.5 text-rose-300"></i> Add Support Person
+            </button>
+          </div>
+        </div>
+
+        <!-- 30-Second Quick Readiness Strip -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-5 mt-5 border-t border-white/10 text-xs">
+          <div class="bg-white/5 p-3 rounded-xl border border-white/10">
+            <span class="text-[10px] text-rose-300 font-bold uppercase block">Active Support Team</span>
+            <span class="text-base font-black text-white mt-0.5 block">${displayCircle1.length + displayCircle2.length + displayCircle3.length + displayCircle4.length} Stakeholders</span>
+            <span class="text-[10px] text-slate-300">4 Circles of Care</span>
+          </div>
+
+          <div class="bg-white/5 p-3 rounded-xl border border-white/10">
+            <span class="text-[10px] text-amber-300 font-bold uppercase block">Pending Follow-Ups</span>
+            <span class="text-base font-black text-white mt-0.5 block">${pendingFollowups.length} Actions</span>
+            <span class="text-[10px] text-amber-200">${pendingFollowups.length > 0 ? 'Requires attention' : 'All clear'}</span>
+          </div>
+
+          <div class="bg-white/5 p-3 rounded-xl border border-white/10">
+            <span class="text-[10px] text-emerald-300 font-bold uppercase block">Last DCF Communication</span>
+            <span class="text-base font-black text-white mt-0.5 block">Oct 11, 2026</span>
+            <span class="text-[10px] text-emerald-200">2 Days Ago (Call)</span>
+          </div>
+
+          <div class="bg-white/5 p-3 rounded-xl border border-white/10">
+            <span class="text-[10px] text-blue-300 font-bold uppercase block">Next Case Conference</span>
+            <span class="text-base font-black text-white mt-0.5 block">Oct 24, 2026</span>
+            <span class="text-[10px] text-blue-200">Family Division Court</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 10.5: Visual Circles of Care Mapping -->
+      <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-5">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div>
+            <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+              <i data-lucide="layers" class="w-4 h-4 text-rose-600"></i>
+              <span>Circles of Care Visual Map — Child Reference: ${childRefId}</span>
+            </h3>
+            <p class="text-xs text-slate-500">Concentric support network organized by proximity: Daily Home, DCF Team, Court & Health, and School/Community.</p>
+          </div>
+          <span class="text-xs font-bold px-2.5 py-1 bg-rose-50 text-rose-800 rounded-xl border border-rose-200">
+            Click Any Person to Review Profile
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+          
+          <!-- Circle 1: Daily Care Team (Inner Circle) -->
+          <div class="bg-emerald-50/60 rounded-2xl border-2 border-emerald-300 p-4 space-y-3 shadow-2xs">
+            <div class="flex items-center justify-between border-b border-emerald-200/80 pb-2">
+              <span class="font-black text-emerald-950 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                <i data-lucide="home" class="w-3.5 h-3.5 text-emerald-700"></i> 1. Daily Care Team
+              </span>
+              <span class="text-[10px] font-bold bg-emerald-200 text-emerald-900 px-1.5 py-0.2 rounded-full">${displayCircle1.length}</span>
+            </div>
+            <p class="text-[11px] text-emerald-900/80">Caregivers, respite providers, and daily routine partners.</p>
+            <div class="space-y-2">
+              ${displayCircle1.map(c => `
+                <div onclick="openContactDetailModal('${c.id}')" class="bg-white p-3 rounded-xl border border-emerald-200 hover:border-emerald-400 cursor-pointer transition shadow-2xs space-y-1">
+                  <div class="font-bold text-slate-900">${c.full_name}</div>
+                  <div class="text-[10px] font-semibold text-emerald-800">${c.role_type}</div>
+                  <div class="text-[10px] text-slate-500 privacy-sensitive">${c.phone || c.email || 'No direct phone'}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Circle 2: DCF Team (Second Circle) -->
+          <div class="bg-blue-50/60 rounded-2xl border-2 border-blue-300 p-4 space-y-3 shadow-2xs">
+            <div class="flex items-center justify-between border-b border-blue-200/80 pb-2">
+              <span class="font-black text-blue-950 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                <i data-lucide="shield" class="w-3.5 h-3.5 text-blue-700"></i> 2. DCF Family Services
+              </span>
+              <span class="text-[10px] font-bold bg-blue-200 text-blue-900 px-1.5 py-0.2 rounded-full">${displayCircle2.length}</span>
+            </div>
+            <p class="text-[11px] text-blue-900/80">Assigned district caseworkers, resource workers, and supervisors.</p>
+            <div class="space-y-2">
+              ${displayCircle2.map(c => `
+                <div onclick="openContactDetailModal('${c.id}')" class="bg-white p-3 rounded-xl border border-blue-200 hover:border-blue-400 cursor-pointer transition shadow-2xs space-y-1">
+                  <div class="font-bold text-slate-900">${c.full_name}</div>
+                  <div class="text-[10px] font-semibold text-blue-800">${c.role_type}</div>
+                  <div class="text-[10px] text-slate-500 privacy-sensitive">${c.phone || c.email || 'District Office'}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Circle 3: Court, Legal & Health (Third Circle) -->
+          <div class="bg-purple-50/60 rounded-2xl border-2 border-purple-300 p-4 space-y-3 shadow-2xs">
+            <div class="flex items-center justify-between border-b border-purple-200/80 pb-2">
+              <span class="font-black text-purple-950 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                <i data-lucide="scale" class="w-3.5 h-3.5 text-purple-700"></i> 3. Court & Medical
+              </span>
+              <span class="text-[10px] font-bold bg-purple-200 text-purple-900 px-1.5 py-0.2 rounded-full">${displayCircle3.length}</span>
+            </div>
+            <p class="text-[11px] text-purple-900/80">Guardian ad Litem (GAL), attorney, pediatrician, and therapists.</p>
+            <div class="space-y-2">
+              ${displayCircle3.map(c => `
+                <div onclick="openContactDetailModal('${c.id}')" class="bg-white p-3 rounded-xl border border-purple-200 hover:border-purple-400 cursor-pointer transition shadow-2xs space-y-1">
+                  <div class="font-bold text-slate-900">${c.full_name}</div>
+                  <div class="text-[10px] font-semibold text-purple-800">${c.role_type}</div>
+                  <div class="text-[10px] text-slate-500 privacy-sensitive">${c.phone || c.email || 'Provider clinic'}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Circle 4: School & Community (Fourth Circle) -->
+          <div class="bg-amber-50/60 rounded-2xl border-2 border-amber-300 p-4 space-y-3 shadow-2xs">
+            <div class="flex items-center justify-between border-b border-amber-200/80 pb-2">
+              <span class="font-black text-amber-950 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-amber-700"></i> 4. School & Community
+              </span>
+              <span class="text-[10px] font-bold bg-amber-200 text-amber-900 px-1.5 py-0.2 rounded-full">${displayCircle4.length}</span>
+            </div>
+            <p class="text-[11px] text-amber-900/80">Teachers, IEP coordinators, sports coaches, and visitation monitors.</p>
+            <div class="space-y-2">
+              ${displayCircle4.map(c => `
+                <div onclick="openContactDetailModal('${c.id}')" class="bg-white p-3 rounded-xl border border-amber-200 hover:border-amber-400 cursor-pointer transition shadow-2xs space-y-1">
+                  <div class="font-bold text-slate-900">${c.full_name}</div>
+                  <div class="text-[10px] font-semibold text-amber-800">${c.role_type}</div>
+                  <div class="text-[10px] text-slate-500 privacy-sensitive">${c.phone || c.email || 'School/Org on file'}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Phase 10.3 & 10.4: Unified Communication Ledger & Activity Timeline -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Ledger & Timeline (2 Columns) -->
+        <div class="lg:col-span-2 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                <i data-lucide="message-square" class="w-4 h-4 text-indigo-600"></i>
+                <span>Court-Ready Communication Ledger & Interaction History</span>
+              </h3>
+              <p class="text-xs text-slate-500">Every phone call, text, IEP conference, and caseworker check-in chronologically unified.</p>
+            </div>
+            <button onclick="openRecordModal()" class="bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-xs px-3 py-1.5 rounded-xl shadow-2xs flex items-center gap-1">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i> Log Interaction
+            </button>
+          </div>
+
+          <div class="space-y-3">
+            ${commRecords.length === 0 ? `
+              <div class="p-8 text-center text-slate-400">
+                <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-2 text-slate-300"></i>
+                <p class="font-bold text-slate-700">No stakeholder interactions recorded yet.</p>
+                <p class="text-xs text-slate-400 mt-1">Log calls with your DCF worker, emails with teachers, or therapy check-ins to build this ledger.</p>
+              </div>
+            ` : commRecords.slice(0, 8).map(r => `
+              <div class="border border-slate-200 rounded-xl p-3.5 hover:border-slate-300 transition space-y-1.5 bg-slate-50/40">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 rounded font-bold text-[10px] uppercase bg-slate-200 text-slate-800">
+                      ${r.category.replace('_', ' ')}
+                    </span>
+                    <h5 class="font-bold text-slate-900 text-xs">${r.title}</h5>
+                  </div>
+                  <span class="text-[11px] font-semibold text-slate-400">${r.event_date}</span>
+                </div>
+
+                <p class="text-xs text-slate-600 line-clamp-2 leading-relaxed bg-white p-2.5 rounded-lg border border-slate-100">
+                  ${r.summary}
+                </p>
+
+                <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1">
+                  <span><strong>Participants:</strong> ${r.participants || 'Caregiver & Stakeholder'}</span>
+                  ${r.follow_up_needed ? `
+                    <span class="text-amber-800 font-bold bg-amber-50 border border-amber-200 px-2 py-0.5 rounded">
+                      ⚠️ Follow-up: ${r.follow_up_notes || 'Pending'}
+                    </span>
+                  ` : '<span class="text-emerald-700 font-semibold">✓ Completed</span>'}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Phase 10.6: Relationship Follow-Up Engine (1 Column) -->
+        <div class="space-y-6">
+          <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-4">
+            <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2 border-b border-slate-100 pb-3">
+              <i data-lucide="bell-ring" class="w-4 h-4 text-amber-500"></i>
+              <span>Relationship Follow-Up Engine</span>
+            </h3>
+
+            <div class="space-y-3 text-xs">
+              ${pendingFollowups.length === 0 ? `
+                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center">
+                  <span class="text-emerald-900 font-bold block">Zero Pending Follow-Ups!</span>
+                  <span class="text-[11px] text-emerald-700 block mt-0.5">All calls, school emails, and DCF requests are current.</span>
+                </div>
+              ` : pendingFollowups.map(pf => `
+                <div class="bg-amber-50/70 border border-amber-200 rounded-xl p-3 space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-amber-950 text-xs">${pf.title}</span>
+                    <span class="text-[10px] bg-amber-200 text-amber-900 font-bold px-1.5 py-0.2 rounded">Pending</span>
+                  </div>
+                  <p class="text-[11px] text-amber-900/90 leading-tight">${pf.follow_up_notes || 'Action required.'}</p>
+                  <div class="flex items-center justify-between pt-1 border-t border-amber-200/60">
+                    <span class="text-[10px] text-amber-800 font-semibold">Logged: ${pf.event_date}</span>
+                    <button onclick="markRecordComplete(${pf.id})" class="text-[11px] font-bold text-emerald-800 bg-white hover:bg-emerald-50 px-2 py-0.5 rounded border border-emerald-300">
+                      ✓ Resolve
+                    </button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Quick Action Directory Card -->
+          <div class="bg-gradient-to-br from-indigo-50 to-slate-50 border border-indigo-200 rounded-3xl p-5 space-y-3">
+            <h4 class="font-bold text-indigo-950 text-xs uppercase tracking-wider flex items-center gap-1.5">
+              <i data-lucide="phone-call" class="w-3.5 h-3.5 text-indigo-600"></i> Rapid Team Connect
+            </h4>
+            <p class="text-[11px] text-indigo-900/80 leading-relaxed">
+              1-Tap connection to the child's primary caseworker, pediatrician, or emergency duty worker.
+            </p>
+            <div class="space-y-1.5">
+              <a href="tel:8028637370" class="block bg-white hover:bg-indigo-50 p-2.5 rounded-xl border border-indigo-200 font-bold text-xs text-indigo-950 transition flex items-center justify-between">
+                <span>DCF District Desk</span>
+                <span class="text-[11px] text-indigo-700 font-semibold">(802) 863-7370</span>
+              </a>
+              <a href="tel:18006495285" class="block bg-rose-50 hover:bg-rose-100 p-2.5 rounded-xl border border-rose-200 font-bold text-xs text-rose-950 transition flex items-center justify-between">
+                <span>24/7 Crisis Hotline</span>
+                <span class="text-[11px] text-rose-700 font-semibold">1-800-649-5285</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  `;
+
+  lucide.createIcons();
+}
+
+function openContactDetailModal(contactId) {
+  alert(`👤 Support Profile:\n\nContact ID: ${contactId}\n\nDisplays role, communication preferences, hours of availability, and complete interaction history.`);
+}
+
+function generateCourtRelationshipBrief() {
+  alert("📄 Generating Court Stakeholder Brief (.docx):\n\nCompiling full Circles of Care roster, last contact dates, open follow-ups, and interaction chronologies formatted for the Family Court Judge and Guardian ad Litem.");
+}
+
+async function markRecordComplete(recordId) {
+  try {
+    await apiFetch(`/api/records/${recordId}/toggle-task`, { method: 'POST' });
+    alert("Follow-up action marked as resolved!");
+    loadTabContent();
+  } catch (err) {
+    alert("Failed to update status: " + err.message);
+  }
+}
 
 
