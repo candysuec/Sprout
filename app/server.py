@@ -6,7 +6,8 @@ from bottle import Bottle, request, response, static_file, run, abort
 from db import (get_connection, init_db, UPLOAD_DIR, audit, diff_fields,
                 verify_audit_chain)
 from services import (generate_monthly_report_docx, generate_respite_handoff_card_docx,
-                generate_dcf_reimbursement_claim_docx, query_ollama_summary, EXPORT_DIR)
+                generate_dcf_reimbursement_claim_docx, generate_child_calendar_ics,
+                create_offline_encrypted_snapshot_zip, query_ollama_summary, EXPORT_DIR)
 
 app = Bottle()
 
@@ -1148,6 +1149,36 @@ def create_dcf_claim():
         "filename": filename,
         "message": f"State of Vermont Form {claim_type} generated"
     })
+
+
+@app.route('/api/calendar/export-ics', method=['POST'])
+def export_calendar_ics():
+    data = request.json or {}
+    child_id = data.get('child_id')
+    filename = generate_child_calendar_ics(child_id)
+    if not filename:
+        return json_res({"error": "Failed to generate iCalendar (.ics) export"}, 400)
+
+    return json_res({
+        "download_url": f"/exports/{filename}",
+        "filename": filename,
+        "message": "iCalendar (.ics) schedule generated"
+    })
+
+
+@app.route('/api/system/backup-snapshot', method=['POST'])
+def system_backup_snapshot():
+    filename = create_offline_encrypted_snapshot_zip()
+    if not filename:
+        return json_res({"error": "Failed to create database snapshot archive"}, 500)
+
+    return json_res({
+        "download_url": f"/exports/{filename}",
+        "filename": filename,
+        "message": "Offline database backup snapshot created successfully"
+    })
+
+
 
 
 # --- OLLAMA LOCAL AI SUMMARY ---

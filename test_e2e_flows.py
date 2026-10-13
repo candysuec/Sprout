@@ -137,9 +137,25 @@ def run_e2e_suite():
     conn.close()
     assert_test("Audit Trail: SHA-256 block-chain is intact and verified", ok, f"Compromised row: {bad_id}")
 
+    # TEST GROUP 7: Calendar Sync & Horizon Automation
+    print("\n--- 7. Testing Calendar Integration & Form Services ---")
+    import services
+    ics_file = services.generate_child_calendar_ics(1)
+    assert_test("iCalendar Export: RFC 5545 .ics schedule file generated", bool(ics_file and os.path.exists(os.path.join(services.EXPORT_DIR, ics_file))))
+    if ics_file:
+        with open(os.path.join(services.EXPORT_DIR, ics_file), 'r', encoding='utf-8') as f:
+            ics_content = f.read()
+        assert_test("iCalendar Syntax: Valid VCALENDAR & PRODID headers present", "BEGIN:VCALENDAR" in ics_content and "PRODID:" in ics_content)
+
+    # TEST GROUP 8: Encrypted Offline Backup Snapshot
+    print("\n--- 8. Testing Offline Disaster Recovery Backup Snapshot ---")
+    zip_backup = services.create_offline_encrypted_snapshot_zip()
+    assert_test("Backup Snapshot: Disaster-recovery .zip file successfully packaged", bool(zip_backup and os.path.exists(os.path.join(services.EXPORT_DIR, zip_backup))))
+
     print("\n" + "=" * 70)
     print(f"E2E FLOW & BOUNDARY VERIFICATION COMPLETE: {passed}/{total} TESTS PASSED (100%)")
     print("=" * 70)
 
 if __name__ == "__main__":
     run_e2e_suite()
+

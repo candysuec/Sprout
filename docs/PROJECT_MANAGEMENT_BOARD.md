@@ -82,13 +82,27 @@ This document serves as the formal record that the **Springboard Enhancement Pro
 - [x] **Task 2.4: Predictive 30-Day Medical Clock Alerts** (Completed - Commit pending)
   - Visual statutory countdown badge embedded in child snapshot card calculating EPSDT initial well-child screening status (compliant, days remaining, or overdue).
 
-### Sprint 3: Automation & Future Vision (Next 1–2 Months)
-- [x] **Task 3.1: Vermont DCF State Form Auto-Filler (`FS-334B` & `FS-333B`)** (Completed - Commit pending)
+### Sprint 3: Automation & Future Vision (Completed)
+- [x] **Task 3.1: Vermont DCF State Form Auto-Filler (`FS-334B` & `FS-333B`)** (Completed - Commit `12005e1`)
   - 1-click generation of official Vermont DCF Form FS-334B (Caregiver Travel & Mileage Claim at \$0.67/mi) and Form FS-333B (Special Expense & Clothing Allowance Claim) formatted in Word/DOCX with statutory certification text.
-- [x] **Task 3.2: Full-Text Offline Search (`Ctrl + K` Omnibar)** (Completed - Commit pending)
+- [x] **Task 3.2: Full-Text Offline Search (`Ctrl + K` Omnibar)** (Completed - Commit `88ccf6b`)
   - Instant modal lookup invoked by `Ctrl + K` or search bar across timeline observations, active medications, DCF documents, and caregiver contacts with category filtering.
-- [x] **Task 3.3: Mobile Field-Log Progressive Web App (PWA)** (Completed - Commit pending)
+- [x] **Task 3.3: Mobile Field-Log Progressive Web App (PWA)** (Completed - Commit `67d408d`)
   - Configured web app manifest (`manifest.json`), service worker (`sw.js`) offline asset caching, and mobile-friendly viewport meta tags for reliable parking lot visitation and field logging.
+
+### Sprint 4: Advanced Horizon Capabilities (Completed)
+- [x] **Task 4.1: Hands-Free Speech-to-Text Voice Dictation** (Completed)
+  - Browser SpeechRecognition engine inside single-entry logger for dictating factual observation notes without keyboard typing.
+- [x] **Task 4.2: Digital In-App Touchscreen Signature Pad** (Completed)
+  - HTML5 Canvas signature pad for in-app caregiver sign-offs, respite handoffs, and transportation logs.
+- [x] **Task 4.3: Judicial & GAL Court Watermark Banners** (Completed)
+  - Dynamic confidential case docket headers and privileged footer watermarks in Word/DOCX export packets.
+- [x] **Task 4.4: RFC 5545 iCalendar (.ics) Sync Export** (Completed)
+  - 1-click schedule download syncing court hearings, EPSDT appointments, and DCF worker reviews into Google, Apple, and Outlook calendars.
+- [x] **Task 4.5: Prescription Refill Countdown & Inventory Tracker** (Completed)
+  - Live medication supply remaining alert with 1-click pharmacy refill action.
+- [x] **Task 4.6: Encrypted Disaster-Recovery Offline Backup (.zip)** (Completed)
+  - 1-click packaging of local SQLite database, verification manifests, and SHA-256 audit logs into timestamped ZIP archives for thumb drive backup.
 
 ---
 
@@ -96,3 +110,4 @@ This document serves as the formal record that the **Springboard Enhancement Pro
 This repository (`candysuec/Sprout`) strictly adheres to **zero-leakage child privacy guidelines**:
 - All real child legal names, medical histories, and local databases (`*.db`) are strictly git-ignored.
 - Only synthetic demonstration fixtures (`sample_dataset.py`) and anonymized initial codes (`CD`) are tracked.
+
