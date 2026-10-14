@@ -30,7 +30,7 @@ const SAMPLE_CAREGIVERS = [
   { id: 'Sample Caregiver (Grace & Lydia Holloway)', name: 'Grace & Lydia Holloway (HH-115 • Multi-Generational • Closed/Retired)', initials: 'GH', color: 'bg-blue-700' }
 ];
 
-let activeCaregiverUser = localStorage.getItem('caregiverUser') || 'Sample Caregiver (Sarah Jenkins)';
+let activeCaregiverUser = localStorage.getItem('caregiverUser') || '';
 
 // Initialize app on load
 document.addEventListener('DOMContentLoaded', async () => {
@@ -150,11 +150,11 @@ function updateWorkspaceToggleUI() {
       toggleBtn.className = "flex items-center bg-blue-900/90 hover:bg-blue-800 border border-blue-700/80 rounded-xl px-3 py-1.5 text-xs font-bold transition shadow-xs gap-1.5 text-white";
     }
     const caregiverSelect = document.getElementById('caregiverSelect');
-    if (caregiverSelect && activeCaregiverUser) {
-      caregiverSelect.value = activeCaregiverUser;
+    if (caregiverSelect) {
+      caregiverSelect.value = activeCaregiverUser || '';
     }
-    if (displayEl) displayEl.textContent = activeCaregiverUser || 'Sarah Jenkins (Sample)';
-    updateCaregiverAvatarDisplay(activeCaregiverUser || 'Sample Caregiver (Sarah Jenkins)');
+    if (displayEl) displayEl.textContent = activeCaregiverUser || 'Sandbox Select Care giver';
+    updateCaregiverAvatarDisplay(activeCaregiverUser);
   } else {
     currentSproutMode = 'local';
     activeCaregiverUser = 'Candy Chevalier';
@@ -239,11 +239,11 @@ function populateCaregiverDropdown() {
 
   const list = currentSproutMode === 'local' ? LOCAL_CAREGIVERS : SAMPLE_CAREGIVERS;
 
-  // Placeholder Prompt Option: "-- Select Caregiver User --"
+  // Placeholder Prompt Option: "Sandbox Select Care giver"
   const defaultOpt = document.createElement('option');
   defaultOpt.value = '';
-  defaultOpt.textContent = currentSproutMode === 'local' ? '-- Select Caregiver User --' : '-- Select Sample Caregiver --';
-  defaultOpt.className = 'bg-slate-800 text-slate-400 italic';
+  defaultOpt.textContent = currentSproutMode === 'local' ? '-- Select Caregiver User --' : 'Sandbox Select Care giver';
+  defaultOpt.className = 'bg-slate-800 text-blue-200 font-semibold italic';
   select.appendChild(defaultOpt);
 
   list.forEach(c => {
@@ -653,8 +653,8 @@ async function loadTabContent() {
 
   const mainNav = document.getElementById('mainNavigationContainer');
 
-  // WELCOME / ENTRY PORTAL: When no sphere mode or caregiver is selected, render the master welcome portal & state resource center
-  if (!currentSproutMode || !activeCaregiverUser) {
+  // In Sample/Sandbox mode, Training Hub and Mission Control are immediately available to guide the user
+  if (!currentSproutMode || (!activeCaregiverUser && currentMainSection !== 'training' && currentMainSection !== 'mission_control')) {
     if (mainNav) mainNav.classList.add('hidden');
 
     const card = document.getElementById('snapshotCard');
@@ -670,7 +670,7 @@ async function loadTabContent() {
     return;
   }
 
-  // Caregiver and Sphere selected: reveal main navigation toolbar
+  // Caregiver and Sphere selected or Training/Mission Control active: reveal main navigation toolbar
   if (mainNav) mainNav.classList.remove('hidden');
 
   if (currentMainSection === 'mission_control') {
