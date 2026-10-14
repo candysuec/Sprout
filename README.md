@@ -81,9 +81,10 @@ Sprout normalizes caregiver management across real-world dimensions:
 
 ## 📚 Architecture, Foundation & Governance Documentation
 
-Production specifications, system topologies, privacy audits, training flight simulators, and instructor guides are maintained in the [`docs/`](docs/) directory:
+Production specifications, system topologies, privacy audits, training flight simulators, and instructor guides are maintained in the [`docs/`](docs/) directory. Consult the [**Master Documentation Catalog**](docs/README.md) for the full categorized index:
 
-### Core Governance & System Architecture
+### 🌟 Master System State & Governance
+- [**Sprout Canonical System State & Audit Registry**](docs/SPROUT_SYSTEM_STATE.md): **The authoritative single source of truth** covering all 36 API endpoints, 12 primary view renderers, 10 modal dialogs, 6 SQLite tables, dual-sphere isolation matrix, and readiness scores.
 - [Sprout Foundation & North Star Constitution](docs/SPRINGBOARD_FOUNDATION.md): Governing specifications, 8 Non-Negotiable Tenets, Product Boundaries, and the 8-Point Decision Gate (Phase 6).
 - [Master Project Management Board](docs/PROJECT_MANAGEMENT_BOARD.md): Formal sign-off record, phase completion tracker, and sprint backlogs across all 12 Phases.
 - [Mission Control & System Understanding Layer](docs/MISSION_CONTROL_ARCHITECTURE.md): Root cockpit layout, 4 operational quadrants, and self-guiding interaction model (Phase 12A).
