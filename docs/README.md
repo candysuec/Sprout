@@ -13,9 +13,14 @@ All official documentation, architecture specifications, training curricula, leg
 
 ```
 foster-portal/docs/
+├── CHILD_AND_FAMILY_SUCCESS_OPERATING_SYSTEM.md <-- Foundational Strategic Constitution (What Sprout Is & Is Not)
 ├── SPROUT_SYSTEM_STATE.md            <-- Canonical System State & Feature Registry (Single Source of Truth)
 ├── SPRINGBOARD_FOUNDATION.md         <-- North Star Constitution & Non-Negotiable Tenets
 ├── PROJECT_MANAGEMENT_BOARD.md       <-- Phase Execution & Sign-Off Governance
+│
+├── 👨‍👩‍👧 Family Success & Parent Participation
+│   ├── CHILD_AND_FAMILY_SUCCESS_OPERATING_SYSTEM.md
+│   └── PARENT_PARTICIPANT_WORKSPACE_SPECIFICATION.md
 │
 ├── 🏗️ Architecture & Operations
 │   ├── MISSION_CONTROL_ARCHITECTURE.md
@@ -51,13 +56,15 @@ foster-portal/docs/
 
 ---
 
-## 1. Authoritative System State & Governance
+## 1. Authoritative System State & Strategic Governance
 
 | Document | Purpose | Audience | Status |
 | :--- | :--- | :--- | :---: |
+| **[`CHILD_AND_FAMILY_SUCCESS_OPERATING_SYSTEM.md`](CHILD_AND_FAMILY_SUCCESS_OPERATING_SYSTEM.md)** | **Foundational Strategic Constitution**: Defines what Sprout is/is not, DCF output principle, homepage attention principle, 4 data ownership domains, 4-tier note classifications, high-conflict mode, and 8-role permission matrix. | All Stakeholders, Founders | **CORE CONSTITUTION** |
+| **[`PARENT_PARTICIPANT_WORKSPACE_SPECIFICATION.md`](PARENT_PARTICIPANT_WORKSPACE_SPECIFICATION.md)** | **Parent Workspace Specification**: Dignity-first parent portal, goal tracking, evidence locker, and Structured Family Engagement Feed. | Product, UX, Engineers | **STRATEGIC SPEC** |
 | **[`SPROUT_SYSTEM_STATE.md`](SPROUT_SYSTEM_STATE.md)** | **Canonical System State & Audit Registry**: 36 API endpoints, 12 primary views, 10 modals, 6 SQLite tables, dual-sphere isolation matrix, and readiness scores. | Developers, Auditors, Founders | **CANONICAL BASELINE** |
 | **[`SPRINGBOARD_FOUNDATION.md`](SPRINGBOARD_FOUNDATION.md)** | **North Star Constitution**: The 8 non-negotiable tenets, product scope boundaries, 8-point architectural decision gate, and trauma-informed design principles. | Leadership, Engineers | **PERMANENT STANDARD** |
-| **[`PROJECT_MANAGEMENT_BOARD.md`](PROJECT_MANAGEMENT_BOARD.md)** | **Execution & Phase Tracker**: Milestone sign-offs, phase execution log (Phases 1–12), stakeholder register, and roadmap status. | Project Managers, QA | **ACTIVE** |
+| **[`PROJECT_MANAGEMENT_BOARD.md`](PROJECT_MANAGEMENT_BOARD.md)** | **Execution & Phase Tracker**: Milestone sign-offs, phase execution log (Phases 1–16), stakeholder register, and roadmap status. | Project Managers, QA | **ACTIVE** |
 
 ---
 

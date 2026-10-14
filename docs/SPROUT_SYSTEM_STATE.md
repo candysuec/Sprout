@@ -1,8 +1,8 @@
 # SPROUT / KINCARE OS — CANONICAL SYSTEM STATE & AUDIT REGISTRY
-**Document Version:** 2.0.0 (Post-Phase 12 Real-World Readiness Baseline)  
-**Status:** Canonical System State Document  
+**Document Version:** 3.0.0 (Child & Family Success Transformation Baseline)  
+**Status:** Canonical System State Document & Architecture Registry  
 **Last Verified Date:** October 14, 2026  
-**Governing Standard:** `docs/SPRINGBOARD_FOUNDATION.md` & `docs/PRIVACY_HARDENING_REPORT.md`  
+**Governing Standard:** [`docs/CHILD_AND_FAMILY_SUCCESS_OPERATING_SYSTEM.md`](CHILD_AND_FAMILY_SUCCESS_OPERATING_SYSTEM.md) & [`docs/SPRINGBOARD_FOUNDATION.md`](SPRINGBOARD_FOUNDATION.md)  
 **Test Suite Verification:** 73 / 73 Tests Passing (100% CI Baseline)  
 
 ---
@@ -11,7 +11,16 @@
 
 > **"Protect Children. Reduce Caregiver Burden. Make The Next Step Obvious."**
 
-Sprout / KinCare OS is a **100% local, offline-first, dual-sphere Caregiver Operating System** built specifically for Vermont foster, kinship, respite, and adoptive families. It automates documentation, legal compliance, and daily care routines without cloud exposure.
+Sprout is a **100% local, offline-first Child and Family Success Operating System**.
+
+### What Sprout Is NOT:
+* Not a DCF case management system
+* Not a GAL or juvenile court platform
+* Not a state database or SACWIS/CCWIS replacement
+* Not a social media network or unrestricted messaging platform
+
+### What Sprout IS:
+A unified command center supporting foster, kinship, relative, respite, adoptive caregivers, and approved Parent Participants. It accelerates child safety, family stability, and reunification through structured outputs (DCF Monthly Summaries, Title 33 court exhibits, State Form FS-334B mileage claims) without requiring DCF to log in, configure, or administer the system.
 
 ---
 
@@ -181,7 +190,49 @@ All local data is persisted in SQLite 3 at `%LOCALAPPDATA%\CaregiverCommandCente
 
 ---
 
-## 7. Verification & Readiness Assessment
+## 7. Data Sovereignty & Note Classification Model
+
+Sprout implements a strict 4-domain data sovereignty model and a 4-tier note classification engine (detailed in [`docs/CHILD_AND_FAMILY_SUCCESS_OPERATING_SYSTEM.md`](CHILD_AND_FAMILY_SUCCESS_OPERATING_SYSTEM.md)):
+
+### 7.1 Data Sovereignty Domains
+* **Child Data:** Lifebook stories, artwork, photos, personal milestones. Belongs to the child; transfers with child upon permanency.
+* **Case Data:** Medical visits, IEP conferences, visit logs, court dates, FS-334B mileage. Immutable for court defense.
+* **Caregiver Data:** Personal reflections, draft observations, internal tasks. Strictly private; never shared or exported.
+* **Parent Participant Data:** Goal progress, certificates, housing updates, reflections. Belongs to the parent participant.
+
+### 7.2 4-Tier Note Classification Engine
+1. `private`: Completely confidential to caregiver. Excluded from all reports, exports, and parent views.
+2. `working`: Draft notes and co-caregiver coordination. Not finalized for court or state review.
+3. `official`: Objective, timestamped records for court, GAL, and DCF monthly reports. SHA-256 audited.
+4. `shared_family`: Uplifting milestones, artwork, and photos explicitly approved for the Parent Workspace.
+
+---
+
+## 8. Eight-Role Permission Matrix & Safety Boundaries
+
+| Role | View Child Official Records | Log Daily Notes & Meds | View Private Notes | Access Parent Workspace | Upload Parent Evidence | Generate DCF Claims (FS-334B) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Primary Caregiver** | ✅ Full | ✅ Full | ✅ Yes | ✅ Admin | ❌ No | ✅ Yes |
+| **Secondary Caregiver** | ✅ Full | ✅ Full | ✅ Yes | ✅ Review | ❌ No | ✅ Yes |
+| **Add'l Household** | ✅ Full | ✅ Full | ❌ No | ❌ No | ❌ No | ❌ No |
+| **Respite Caregiver** | 🟡 Need-to-know | ✅ Temp Logs | ❌ No | ❌ No | ❌ No | ❌ No |
+| **Parent Participant** | ❌ No | ❌ No | ❌ No | ✅ Parent View | ✅ Yes | ❌ No |
+| **Guardian Participant** | 🟡 Approved | ❌ No | ❌ No | ✅ Parent View | ✅ Yes | ❌ No |
+| **Child Archive Viewer** | 🟡 Lifebook Only | ❌ No | ❌ No | ❌ No | ❌ No | ❌ No |
+| **System Administrator** | ❌ Zero PII | ❌ No | ❌ No | ❌ No | ❌ No | ❌ No (DB only) |
+
+*DCF Caseworkers, GALs, Attorneys, Pediatricians, and Judges are **Consumers of Outputs**, not users.*
+
+---
+
+## 9. Non-Destructive Archive Engine & High-Conflict Safety
+
+* **Zero-Deletion Standard:** Active Child $\rightarrow$ Archived Child. Records remain searchable, viewable, and legally defensible indefinitely.
+* **High-Conflict Mode:** When enabled, caregiver location/town is masked, Exif/GPS metadata is scrubbed from media, and sharing must clear the 4-tier gate: Court Order $\rightarrow$ Safety Plan $\rightarrow$ System Guardrails $\rightarrow$ Caregiver Discretion.
+
+---
+
+## 10. Verification & Readiness Assessment
 
 - **Automated Verification:** 73 of 73 end-to-end tests passing (`test_e2e_flows.py`).
 - **Caregiver Usability Score:** 98 / 100.
@@ -190,3 +241,4 @@ All local data is persisted in SQLite 3 at `%LOCALAPPDATA%\CaregiverCommandCente
 - **Training Flight Simulator Score:** 99 / 100.
 - **Zero-Leakage Data Protection Score:** 100 / 100 (Air-gapped).
 - **Composite Production Readiness:** **97.3 / 100 (Production Ready)**.
+

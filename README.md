@@ -83,10 +83,12 @@ Sprout normalizes caregiver management across real-world dimensions:
 
 Production specifications, system topologies, privacy audits, training flight simulators, and instructor guides are maintained in the [`docs/`](docs/) directory. Consult the [**Master Documentation Catalog**](docs/README.md) for the full categorized index:
 
-### 🌟 Master System State & Governance
+### 🌟 Master Strategic State & Governance
+- [**Child & Family Success Operating System Architecture**](docs/CHILD_AND_FAMILY_SUCCESS_OPERATING_SYSTEM.md): **The Foundational Strategic Constitution** establishing non-negotiable principles, DCF output integration, homepage attention philosophy, 4 data sovereignty domains, 4-tier note classifications, and the 8-role permission matrix.
+- [**Parent Participant Workspace Specification**](docs/PARENT_PARTICIPANT_WORKSPACE_SPECIFICATION.md): Dedicated specification for dignity-first parent goal tracking, evidence portfolios, and the anti-conflict Structured Family Engagement Feed.
 - [**Sprout Canonical System State & Audit Registry**](docs/SPROUT_SYSTEM_STATE.md): **The authoritative single source of truth** covering all 36 API endpoints, 12 primary view renderers, 10 modal dialogs, 6 SQLite tables, dual-sphere isolation matrix, and readiness scores.
 - [Sprout Foundation & North Star Constitution](docs/SPRINGBOARD_FOUNDATION.md): Governing specifications, 8 Non-Negotiable Tenets, Product Boundaries, and the 8-Point Decision Gate (Phase 6).
-- [Master Project Management Board](docs/PROJECT_MANAGEMENT_BOARD.md): Formal sign-off record, phase completion tracker, and sprint backlogs across all 12 Phases.
+- [Master Project Management Board](docs/PROJECT_MANAGEMENT_BOARD.md): Formal sign-off record, phase completion tracker, and sprint backlogs across all 16 Phases.
 - [Mission Control & System Understanding Layer](docs/MISSION_CONTROL_ARCHITECTURE.md): Root cockpit layout, 4 operational quadrants, and self-guiding interaction model (Phase 12A).
 - [Relationship Center & Circles of Care](docs/RELATIONSHIP_CENTER_ARCHITECTURE.md): 4 concentric stakeholder circles, role directory, and privacy boundary controls (Phase 10).
 - [Life Journey & Milestone Architecture](docs/LIFE_JOURNEY_MILESTONE_ARCHITECTURE.md): Child-centered keepsake preservation, strengths-based metrics, and trauma-informed language (Phase 11).
