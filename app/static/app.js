@@ -676,43 +676,46 @@ async function loadTabContent() {
     return;
   }
 
-  // Caregiver and Sphere selected or Training/Mission Control active: reveal main navigation toolbar
-  if (mainNav) mainNav.classList.remove('hidden');
-
+  // Hide operational toolbar on Mission Control (root launchpad) so it remains clean
+  // Hide operational toolbar on Mission Control (root launchpad) so it remains clean
   if (currentMainSection === 'mission_control') {
+    if (mainNav) mainNav.classList.add('hidden');
     await renderMissionControlView(container);
-  } else if (currentMainSection === 'dashboard') {
-    await renderDashboardView(container);
-  } else if (currentMainSection === 'households') {
-    await renderCaregiverAndHouseholdsView(container);
-  } else if (currentMainSection === 'children') {
-    await renderChildWorkspaceView(container);
-  } else if (currentMainSection === 'journal') {
-    await renderTimelineView(container, 'daily', 'Daily Journal & Observations');
-  } else if (currentMainSection === 'binder') {
-    await renderBinderFoldersView(container);
-  } else if (currentMainSection === 'timeline') {
-    await renderTimelineView(container, 'all', 'Unified Chronological Timeline');
-  } else if (currentMainSection === 'documents') {
-    await renderResourcesView(container);
-  } else if (currentMainSection === 'appointments') {
-    await renderAppointmentsView(container);
-  } else if (currentMainSection === 'contacts') {
-    await renderContactsView(container);
-  } else if (currentMainSection === 'communications') {
-    await renderCommunicationsView(container);
-  } else if (currentMainSection === 'relationships') {
-    await renderRelationshipCenterView(container);
-  } else if (currentMainSection === 'life_journey') {
-    await renderLifeJourneyView(container);
-  } else if (currentMainSection === 'reports') {
-    renderReportsView(container);
-  } else if (currentMainSection === 'training') {
-    await renderTrainingSimulatorView(container);
-  } else if (currentMainSection === 'sample_data') {
-    await renderSampleDataExplorerView(container);
-  } else if (currentMainSection === 'settings') {
-    await renderSettingsView(container);
+  } else {
+    if (mainNav) mainNav.classList.remove('hidden');
+    if (currentMainSection === 'dashboard') {
+      await renderDashboardView(container);
+    } else if (currentMainSection === 'households') {
+      await renderCaregiverAndHouseholdsView(container);
+    } else if (currentMainSection === 'children') {
+      await renderChildWorkspaceView(container);
+    } else if (currentMainSection === 'journal') {
+      await renderTimelineView(container, 'daily', 'Daily Journal & Observations');
+    } else if (currentMainSection === 'binder') {
+      await renderBinderFoldersView(container);
+    } else if (currentMainSection === 'timeline') {
+      await renderTimelineView(container, 'all', 'Unified Chronological Timeline');
+    } else if (currentMainSection === 'documents') {
+      await renderResourcesView(container);
+    } else if (currentMainSection === 'appointments') {
+      await renderAppointmentsView(container);
+    } else if (currentMainSection === 'contacts') {
+      await renderContactsView(container);
+    } else if (currentMainSection === 'communications') {
+      await renderCommunicationsView(container);
+    } else if (currentMainSection === 'relationships') {
+      await renderRelationshipCenterView(container);
+    } else if (currentMainSection === 'life_journey') {
+      await renderLifeJourneyView(container);
+    } else if (currentMainSection === 'reports') {
+      renderReportsView(container);
+    } else if (currentMainSection === 'training') {
+      await renderTrainingSimulatorView(container);
+    } else if (currentMainSection === 'sample_data') {
+      await renderSampleDataExplorerView(container);
+    } else if (currentMainSection === 'settings') {
+      await renderSettingsView(container);
+    }
   }
   lucide.createIcons();
 }
