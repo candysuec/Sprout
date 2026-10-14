@@ -8,11 +8,14 @@ Sprout is a dedicated digital binder and documentation management platform desig
 
 ## 🌟 Key Capabilities
 
-- **Strict Zero-Leakage Architecture**: Seamless dual-sphere operation between a complete **Developer Sandbox** (preloaded with synthetic data) and a **Local Live Data** workspace with 100% offline local SQLite storage.
+- **Strict Zero-Leakage Architecture**: Seamless dual-sphere operation between a complete **Practice Sandbox** (preloaded with 15 synthetic household models) and a **Real Family Workspace** with 100% offline local SQLite storage.
+- **Mission Control Launchpad**: Clean root landing cockpit with 4 operational quadrants (**TRAIN**, **CARE**, **DCF**, **SYSTEM**) and 7 guided caregiver pathways.
 - **Caregiver Journey Model**: Multi-dimensional modeling of caregiver households across 8 lifecycle stages, 8 household structures, and 9 approved caregiving pathways.
+- **Circles of Care & Relationship Center**: 4 concentric support tiers (Core DCF Team, Legal & Advocacy, Health & School, Extended Village/Mentors) with communication logs and zero-leakage privacy boundary controls.
+- **Life Journey & Milestone Center**: Trauma-informed child keepsake and achievement catalog preserving positive childhood milestones, artwork, reading progress, and portable care transition packets.
 - **15-Second Fast Logging**: High-speed journal, pediatric medical visit, school IEP conference, and family time visitation logging with automatic notification drafting for DCF Family Services Workers and Guardians ad Litem (GAL).
-- **Vermont Compliance (FS-221A)**: Built-in milestone tracker for provisional home studies, annual fire safety drills, smoke/CO detector inspections, and 90-day fingerprint deadlines.
-- **VCWTP Training & Mileage Tracking**: Real-time logging of Vermont Child Welfare Training Partnership hours and DCF travel reimbursement monitoring at the official standard rate.
+- **Vermont Compliance (FS-221A & CHINS Stepper)**: Built-in milestone tracker for provisional home studies, annual safety drills, 90-day fingerprint deadlines, and Title 33 CHINS court hearing milestones.
+- **VCWTP Training & Mileage Tracking**: Real-time logging of Vermont Child Welfare Training Partnership hours and automated State Form FS-334B travel reimbursement generation at the official standard rate ($0.67/mi).
 
 ---
 
@@ -78,17 +81,30 @@ Sprout normalizes caregiver management across real-world dimensions:
 
 ## 📚 Architecture, Foundation & Governance Documentation
 
-Production specifications, system topologies, privacy audits, training flight simulators, and project governance boards are maintained in the [`docs/`](docs/) directory:
+Production specifications, system topologies, privacy audits, training flight simulators, and instructor guides are maintained in the [`docs/`](docs/) directory:
 
+### Core Governance & System Architecture
 - [Sprout Foundation & North Star Constitution](docs/SPRINGBOARD_FOUNDATION.md): Governing specifications, 8 Non-Negotiable Tenets, Product Boundaries, and the 8-Point Decision Gate (Phase 6).
-- [Privacy Hardening Audit Report](docs/PRIVACY_HARDENING_REPORT.md): Enforcement of the Child Reference ID standard, 1-tap Privacy Shield / Blur Mode, metadata scrubbing, and export sanitization (Phase 7).
-- [Caregiver Flight Simulator & Sandbox Excellence Report](docs/QA_PHASE8_SANDBOX_EXCELLENCE.md): Complete documentation for interactive first-run onboarding, role-based personas, scenario flight simulations, and synthetic document vault (Phase 8).
-- [Vermont DCF Excellence & Operations Architecture](docs/VERMONT_DCF_EXCELLENCE_ARCHITECTURE.md): Statewide gap analysis, Title 33 CHINS timeline engine, State Form FS-334B reimbursement claims, and 12-District Office Directory (Phase 9).
-- [Master Project Management Board](docs/PROJECT_MANAGEMENT_BOARD.md): Formal sign-off record, phase completion tracker, and sprint backlogs.
-- [Sandbox & Sample Data Validation Audit](docs/QA_SANDBOX_VALIDATION_AUDIT.md): Comprehensive validation of environment isolation (`Welcome ≠ Sandbox ≠ Local`) and 15-household relational dataset.
+- [Master Project Management Board](docs/PROJECT_MANAGEMENT_BOARD.md): Formal sign-off record, phase completion tracker, and sprint backlogs across all 12 Phases.
+- [Mission Control & System Understanding Layer](docs/MISSION_CONTROL_ARCHITECTURE.md): Root cockpit layout, 4 operational quadrants, and self-guiding interaction model (Phase 12A).
+- [Relationship Center & Circles of Care](docs/RELATIONSHIP_CENTER_ARCHITECTURE.md): 4 concentric stakeholder circles, role directory, and privacy boundary controls (Phase 10).
+- [Life Journey & Milestone Architecture](docs/LIFE_JOURNEY_MILESTONE_ARCHITECTURE.md): Child-centered keepsake preservation, strengths-based metrics, and trauma-informed language (Phase 11).
+- [Vermont DCF Excellence & Operations Architecture](docs/VERMONT_DCF_EXCELLENCE_ARCHITECTURE.md): Statewide gap analysis, Title 33 CHINS timeline engine, State Form FS-334B claims, and 12-District Directory (Phase 9).
 - [Technical Summary & System Map (v2)](docs/TECHNICAL_SUMMARY_SYSTEM_MAP.md): Production architectural reference covering all 18 technical sections.
-- [UX Enhancement & Caregiver Usability Audit](docs/UX_ENHANCEMENT_AUDIT.md): Comprehensive evaluation of daily friction, cognitive load, and orientation metrics.
-- [UI Process Flow Blueprint](docs/UI_PROCESS_FLOW_BLUEPRINT.md): Finite state machine mapping every button and modal to deterministic flows.
+
+### Training & Instructor Packages
+- [Training Transcript & Instructor Guide](docs/TRAINING_TRANSCRIPT_AND_INSTRUCTOR_GUIDE.md): Master script and instructional guide for walkthroughs, VCWTP demonstrations, and caregiver onboarding.
+- [Video Recording Script](docs/VIDEO_RECORDING_SCRIPT.md): Minute-by-minute 14-minute platform walkthrough script with exact click cues.
+- [Caregiver Scenario Library](docs/CAREGIVER_SCENARIO_LIBRARY.md): 9 simulated foster and kinship scenarios (emergency intake, missed visit, court prep, IEP conference).
+- [Live Demo Runbook](docs/LIVE_DEMO_RUNBOOK.md): Trainer checklist, pause points, and audience demonstration instructions.
+- [Frequently Asked Questions (FAQ)](docs/FAQ_AND_COMMON_QUESTIONS.md): Clear answers to common foster care, kinship, legal, and privacy questions.
+
+### Audits & Validation Reports
+- [Privacy Hardening Audit Report](docs/PRIVACY_HARDENING_REPORT.md): Enforcement of the Child Reference ID standard, 1-tap Privacy Shield / Blur Mode, metadata scrubbing, and export sanitization (Phase 7).
+- [Caregiver Flight Simulator & Sandbox Excellence Report](docs/QA_PHASE8_SANDBOX_EXCELLENCE.md): Complete documentation for interactive first-run onboarding, role-based personas, scenario simulations, and synthetic document vault (Phase 8).
+- [Real-World Readiness Validation Report](docs/REAL_WORLD_READINESS_VALIDATION.md): End-to-end stress testing across 11 emergency scenarios, accessibility benchmarks, and deployment matrices (Phase 12B).
+- [Final Release Scorecard](docs/FINAL_RELEASE_SCORECARD.md): Comprehensive platform audit rating Sprout at 96.3 / 100 Production Ready.
+- [System Navigation & Interaction Audit](docs/SYSTEM_NAVIGATION_AND_INTERACTION_AUDIT.md): Complete site map, screen inventory, decision trees, and interaction model.
 
 ---
 
