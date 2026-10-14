@@ -55,6 +55,8 @@ def security_headers():
     response.headers['Referrer-Policy'] = 'no-referrer'
     if request.path.startswith('/api/'):
         response.headers['Cache-Control'] = 'no-store'
+    elif request.path.endswith('.html') or request.path.endswith('.js') or request.path == '/':
+        response.headers['Cache-Control'] = 'no-cache, must-revalidate'
     if request.path.startswith('/uploads/'):
         response.headers['Content-Security-Policy'] = 'sandbox'
 

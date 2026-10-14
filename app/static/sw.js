@@ -1,9 +1,9 @@
 // Service Worker for Sprout KinCare OS (Offline Field Logging Support)
-const CACHE_NAME = 'sprout-kincare-v1';
+const CACHE_NAME = 'sprout-kincare-v2';
 const STATIC_ASSETS = [
   '/',
   '/static/index.html',
-  '/static/app.js',
+  '/static/app.js?v=mc1',
   '/static/manifest.json'
 ];
 

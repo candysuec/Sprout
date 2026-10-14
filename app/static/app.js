@@ -32,6 +32,12 @@ const SAMPLE_CAREGIVERS = [
 
 let activeCaregiverUser = localStorage.getItem('caregiverUser') || '';
 
+// If activeCaregiverUser is currently Sarah Jenkins from legacy session, reset it to prompt option for sandbox
+if (currentSproutMode === 'sample' && (!localStorage.getItem('caregiverUser') || localStorage.getItem('caregiverUser') === 'Sample Caregiver (Sarah Jenkins)')) {
+  activeCaregiverUser = '';
+  localStorage.removeItem('caregiverUser');
+}
+
 // Initialize app on load
 document.addEventListener('DOMContentLoaded', async () => {
   const subNav = document.getElementById('childWorkspaceSubNav');
@@ -43,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   applyPrivacyBlurState();
 
   await loadChildren();
-  switchMainSection(currentMainSection);
+  switchMainSection('mission_control');
   lucide.createIcons();
   
   // Set default date picker to today
