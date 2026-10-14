@@ -121,13 +121,13 @@
           <!-- 6 Unified Action Hubs (High-Contrast, Cognitive-Load Reduced) -->
           <div class="flex items-center bg-slate-100/90 p-1.5 rounded-xl border border-slate-200 space-x-1.5 shadow-2xs">
             <!-- Hub 0: Training Hub (Practice Sandbox & Flight Simulator) -->
-            <button onclick="switchMainSection('training')" id="navBtn-training" class="main-nav-btn active px-4 py-2 rounded-lg transition flex items-center gap-2 font-bold text-xs bg-white text-blue-900 shadow-sm border border-blue-200/80" title="Practice Sandbox, Scenarios & Caregiver Flight Simulator">
+            <button onclick="switchMainSection('training')" id="navBtn-training" class="main-nav-btn px-4 py-2 rounded-lg transition flex items-center gap-2 font-semibold text-xs text-slate-700 hover:bg-white" title="Practice Sandbox, Scenarios & Caregiver Flight Simulator">
               <i data-lucide="graduation-cap" class="w-4 h-4 text-blue-600"></i>
               <span>Training Hub</span>
             </button>
 
             <!-- Hub 1: Mission Control (Universal Safe Home & System Guide) -->
-            <button onclick="switchMainSection('mission_control')" id="navBtn-mission_control" class="main-nav-btn px-3.5 py-2 rounded-lg transition text-slate-700 hover:bg-white flex items-center gap-1.5 font-bold text-xs" title="Sprout Mission Control, System Guide, & Decision Trees">
+            <button onclick="switchMainSection('mission_control')" id="navBtn-mission_control" class="main-nav-btn active px-3.5 py-2 rounded-lg transition flex items-center gap-1.5 font-bold text-xs bg-white text-emerald-800 shadow-sm border border-emerald-200/80" title="Sprout Mission Control, System Guide, & Decision Trees">
               <i data-lucide="compass" class="w-4 h-4 text-emerald-600"></i>
               <span>Mission Control</span>
             </button>
@@ -1036,6 +1036,6 @@
   </footer>
 
   <!-- App Core JavaScript Logic -->
-  <script src="/static/app.js"></script>
+  <script src="/static/app.js?v=mc1"></script>
 </body>
 </html>

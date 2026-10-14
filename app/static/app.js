@@ -552,7 +552,7 @@ async function renderChildSnapshot() {
   lucide.createIcons();
 }
 
-let currentMainSection = 'training';
+let currentMainSection = 'mission_control';
 let currentChildSubTab = 'overview';
 
 function switchMainSection(sectionKey) {
