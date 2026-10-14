@@ -1,9 +1,9 @@
 let currentChildId = null;
-let currentTab = 'dashboard';
+let currentTab = 'training';
 let childrenList = [];
 
-// Sprout Environment State (Defaults directly to 'local' for Candy Chevalier)
-let currentSproutMode = localStorage.getItem('sproutMode') || 'local';
+// Sprout Environment State (Defaults to 'sample' Practice Sandbox and Sarah Jenkins)
+let currentSproutMode = localStorage.getItem('sproutMode') || 'sample';
 let isPrivacyBlurActive = localStorage.getItem('privacyBlur') === 'true';
 
 const LOCAL_CAREGIVERS = [
@@ -30,18 +30,20 @@ const SAMPLE_CAREGIVERS = [
   { id: 'Sample Caregiver (Grace & Lydia Holloway)', name: 'Grace & Lydia Holloway (HH-115 • Multi-Generational • Closed/Retired)', initials: 'GH', color: 'bg-blue-700' }
 ];
 
-let activeCaregiverUser = localStorage.getItem('caregiverUser') || 'Candy Chevalier';
+let activeCaregiverUser = localStorage.getItem('caregiverUser') || 'Sample Caregiver (Sarah Jenkins)';
 
 // Initialize app on load
 document.addEventListener('DOMContentLoaded', async () => {
   const subNav = document.getElementById('childWorkspaceSubNav');
   if (subNav) subNav.classList.add('hidden');
 
+  populateCaregiverDropdown();
   updateWorkspaceToggleUI();
   updateSproutTheme();
   applyPrivacyBlurState();
 
   await loadChildren();
+  switchMainSection(currentMainSection);
   lucide.createIcons();
   
   // Set default date picker to today
@@ -147,11 +149,12 @@ function updateWorkspaceToggleUI() {
     if (toggleBtn) {
       toggleBtn.className = "flex items-center bg-blue-900/90 hover:bg-blue-800 border border-blue-700/80 rounded-xl px-3 py-1.5 text-xs font-bold transition shadow-xs gap-1.5 text-white";
     }
-    if (displayEl) displayEl.textContent = activeCaregiverUser || 'Sarah Jenkins (Sample)';
-    if (avatarEl) {
-      avatarEl.className = "w-6 h-6 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs shrink-0 border border-blue-400";
-      avatarEl.textContent = "SJ";
+    const caregiverSelect = document.getElementById('caregiverSelect');
+    if (caregiverSelect && activeCaregiverUser) {
+      caregiverSelect.value = activeCaregiverUser;
     }
+    if (displayEl) displayEl.textContent = activeCaregiverUser || 'Sarah Jenkins (Sample)';
+    updateCaregiverAvatarDisplay(activeCaregiverUser || 'Sample Caregiver (Sarah Jenkins)');
   } else {
     currentSproutMode = 'local';
     activeCaregiverUser = 'Candy Chevalier';
@@ -159,11 +162,12 @@ function updateWorkspaceToggleUI() {
     if (toggleBtn) {
       toggleBtn.className = "flex items-center bg-emerald-900/90 hover:bg-emerald-800 border border-emerald-700/80 rounded-xl px-3 py-1.5 text-xs font-bold transition shadow-xs gap-1.5 text-white";
     }
-    if (displayEl) displayEl.textContent = 'Candy Chevalier';
-    if (avatarEl) {
-      avatarEl.className = "w-6 h-6 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-xs shrink-0 border border-emerald-400";
-      avatarEl.textContent = "CC";
+    const caregiverSelect = document.getElementById('caregiverSelect');
+    if (caregiverSelect) {
+      caregiverSelect.value = 'Candy Chevalier';
     }
+    if (displayEl) displayEl.textContent = 'Candy Chevalier';
+    updateCaregiverAvatarDisplay('Candy Chevalier');
   }
 }
 
@@ -178,6 +182,7 @@ function toggleSproutWorkspaceMode() {
   localStorage.setItem('sproutMode', currentSproutMode);
   localStorage.setItem('caregiverUser', activeCaregiverUser);
 
+  populateCaregiverDropdown();
   updateWorkspaceToggleUI();
   updateSproutTheme();
   loadChildren();
@@ -547,20 +552,23 @@ async function renderChildSnapshot() {
   lucide.createIcons();
 }
 
-let currentMainSection = 'dashboard';
+let currentMainSection = 'training';
 let currentChildSubTab = 'overview';
 
 function switchMainSection(sectionKey) {
   currentMainSection = sectionKey;
   currentTab = sectionKey; // backwards compatibility for helpers
 
+  const isSample = currentSproutMode === 'sample';
+  const activeColorClass = (isSample || sectionKey === 'training') ? 'text-blue-900' : 'text-emerald-800';
+
   // Update top main navigation styles
   document.querySelectorAll('.main-nav-btn').forEach(btn => {
-    btn.classList.remove('bg-white', 'text-emerald-800', 'shadow-sm', 'font-bold');
+    btn.classList.remove('bg-white', 'text-emerald-800', 'text-blue-900', 'text-blue-800', 'shadow-sm', 'font-bold', 'active');
   });
   const activeBtn = document.getElementById(`navBtn-${sectionKey}`);
   if (activeBtn) {
-    activeBtn.classList.add('bg-white', 'text-emerald-800', 'shadow-sm', 'font-bold');
+    activeBtn.classList.add('bg-white', activeColorClass, 'shadow-sm', 'font-bold', 'active');
   }
 
   // Toggle visibility of Child Workspace sub-navigation strip

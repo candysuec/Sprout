@@ -44,7 +44,7 @@
     }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col relative">
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col relative sprout-sandbox-active">
   <!-- Sandbox Watermark Strip & Floating Badge -->
   <div class="sandbox-watermark-overlay fixed inset-x-0 top-0 h-1 bg-amber-400 z-50 pointer-events-none"></div>
   <div class="sandbox-watermark-overlay fixed bottom-3 right-3 bg-blue-900/90 text-amber-300 border border-blue-600 rounded-full px-3 py-1 text-[11px] font-black z-50 pointer-events-none shadow-lg items-center gap-1.5 uppercase tracking-wider">
@@ -52,7 +52,7 @@
   </div>
 
   <!-- Top App Navigation Bar (Clean, uncluttered, caregiver-first) -->
-  <header id="topHeader" class="bg-emerald-950 text-white shadow-sm sticky top-0 z-40 border-b border-emerald-900 transition-colors duration-300">
+  <header id="topHeader" class="bg-slate-900 text-white shadow-sm sticky top-0 z-40 border-b border-blue-900 transition-colors duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
       
       <!-- Brand & Title: Clickable to Open Mission Control Center (Universal Safe Home) -->
@@ -78,10 +78,10 @@
         </a>
 
         <!-- 1-Click Workspace Toggle (P0.1 Identity Context) -->
-        <button id="btnToggleWorkspaceMode" onclick="toggleSproutWorkspaceMode()" class="flex items-center bg-emerald-900/90 hover:bg-emerald-800 border border-emerald-700/80 rounded-xl px-3 py-1.5 text-xs font-bold transition shadow-xs gap-1.5" title="Click to toggle between Real Family Workspace and Practice Sandbox">
+        <button id="btnToggleWorkspaceMode" onclick="toggleSproutWorkspaceMode()" class="flex items-center bg-blue-900/90 hover:bg-blue-800 border border-blue-700/80 rounded-xl px-3 py-1.5 text-xs font-bold transition shadow-xs gap-1.5 text-white" title="Click to toggle between Real Family Workspace and Practice Sandbox">
           <i data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-300"></i>
-          <span id="workspaceToggleLabel" class="text-white">Real Family Workspace</span>
-          <span class="text-[10px] bg-emerald-700/80 text-emerald-200 px-1.5 py-0.2 rounded font-semibold uppercase">Switch</span>
+          <span id="workspaceToggleLabel" class="text-white">Practice Sandbox</span>
+          <span class="text-[10px] bg-blue-700/80 text-blue-200 px-1.5 py-0.2 rounded font-semibold uppercase">Switch</span>
         </button>
 
         <!-- Privacy Shield / Blur Mode Toggle (Phase 7 Privacy Hardening) -->
@@ -90,14 +90,16 @@
           <span id="privacyShieldLabel" class="hidden md:inline">Shield PII</span>
         </button>
 
-        <!-- Active Caregiver Identity Badge (Candy Chevalier auto-selected) -->
-        <div id="caregiverBadgeContainer" class="flex items-center bg-emerald-950/90 rounded-xl px-3 py-1.5 border border-emerald-800 shadow-sm gap-2" title="Active Caregiver Identity">
-          <div id="caregiverAvatar" class="w-6 h-6 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-xs shrink-0 border border-emerald-400">
-            CC
+        <!-- Active Caregiver Identity Dropdown & Selector -->
+        <div id="caregiverBadgeContainer" class="flex items-center bg-slate-900/90 rounded-xl px-2.5 py-1.5 border border-blue-800 shadow-sm gap-2" title="Active Caregiver Persona (Practice Sandbox)">
+          <div id="caregiverAvatar" class="w-6 h-6 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs shrink-0 border border-blue-400">
+            SJ
           </div>
           <div class="text-left leading-tight">
-            <span class="text-[9px] text-emerald-400 font-semibold block uppercase tracking-wider">Active Caregiver</span>
-            <span id="activeCaregiverDisplay" class="text-xs font-bold text-white block">Candy Chevalier</span>
+            <span class="text-[9px] text-blue-300 font-semibold block uppercase tracking-wider">Active Caregiver</span>
+            <select id="caregiverSelect" onchange="onCaregiverUserChange()" class="bg-transparent text-white font-bold text-xs focus:outline-none cursor-pointer max-w-[140px] sm:max-w-[200px] truncate">
+              <!-- Populated dynamically based on Workspace Mode -->
+            </select>
           </div>
         </div>
 
@@ -116,40 +118,46 @@
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div class="flex flex-wrap items-center gap-2">
           
-          <!-- 5 Unified Action Hubs (High-Contrast, Cognitive-Load Reduced) -->
+          <!-- 6 Unified Action Hubs (High-Contrast, Cognitive-Load Reduced) -->
           <div class="flex items-center bg-slate-100/90 p-1.5 rounded-xl border border-slate-200 space-x-1.5 shadow-2xs">
-            <!-- Hub 0: Mission Control (Universal Safe Home & System Guide) -->
+            <!-- Hub 0: Training Hub (Practice Sandbox & Flight Simulator) -->
+            <button onclick="switchMainSection('training')" id="navBtn-training" class="main-nav-btn active px-4 py-2 rounded-lg transition flex items-center gap-2 font-bold text-xs bg-white text-blue-900 shadow-sm border border-blue-200/80" title="Practice Sandbox, Scenarios & Caregiver Flight Simulator">
+              <i data-lucide="graduation-cap" class="w-4 h-4 text-blue-600"></i>
+              <span>Training Hub</span>
+            </button>
+
+            <!-- Hub 1: Mission Control (Universal Safe Home & System Guide) -->
             <button onclick="switchMainSection('mission_control')" id="navBtn-mission_control" class="main-nav-btn px-3.5 py-2 rounded-lg transition text-slate-700 hover:bg-white flex items-center gap-1.5 font-bold text-xs" title="Sprout Mission Control, System Guide, & Decision Trees">
               <i data-lucide="compass" class="w-4 h-4 text-emerald-600"></i>
               <span>Mission Control</span>
             </button>
 
-            <!-- Hub 1: Today / Command Center -->
-            <button onclick="switchMainSection('dashboard')" id="navBtn-dashboard" class="main-nav-btn active px-4 py-2 rounded-lg transition text-slate-700 hover:bg-white flex items-center gap-2 font-bold text-xs bg-white text-emerald-800 shadow-sm" title="Today's live command center, doses, and actions">
+            <!-- Hub 2: Today / Command Center -->
+            <button onclick="switchMainSection('dashboard')" id="navBtn-dashboard" class="main-nav-btn px-3.5 py-2 rounded-lg transition text-slate-700 hover:bg-white flex items-center gap-2 font-semibold text-xs" title="Today's live command center, doses, and actions">
               <i data-lucide="sun" class="w-4 h-4 text-emerald-600"></i>
               <span>Today</span>
             </button>
 
-            <!-- Hub 2: Children In Care & Workspace -->
-            <button onclick="switchMainSection('children')" id="navBtn-children" class="main-nav-btn px-4 py-2 rounded-lg transition text-slate-700 hover:bg-white flex items-center gap-2 font-semibold text-xs" title="Child records, health, visits, and education profiles">
+            <!-- Hub 3: Children In Care & Workspace -->
+            <button onclick="switchMainSection('children')" id="navBtn-children" class="main-nav-btn px-3.5 py-2 rounded-lg transition text-slate-700 hover:bg-white flex items-center gap-2 font-semibold text-xs" title="Child records, health, visits, and education profiles">
               <i data-lucide="users" class="w-4 h-4 text-emerald-600"></i>
               <span>My Children</span>
             </button>
 
-            <!-- Hub 3: Care Binder & Records (Documents, Journal, Timeline) -->
-            <button onclick="switchMainSection('binder')" id="navBtn-binder" class="main-nav-btn px-4 py-2 rounded-lg transition text-slate-700 hover:bg-white flex items-center gap-2 font-semibold text-xs" title="Full 20-tab binder, file vault, and event chronologies">
+            <!-- Hub 4: Care Binder & Records (Documents, Journal, Timeline) -->
+            <button onclick="switchMainSection('binder')" id="navBtn-binder" class="main-nav-btn px-3.5 py-2 rounded-lg transition text-slate-700 hover:bg-white flex items-center gap-2 font-semibold text-xs" title="Full 20-tab binder, file vault, and event chronologies">
               <i data-lucide="folder-kanban" class="w-4 h-4 text-teal-600"></i>
               <span>Care Binder</span>
             </button>
 
-            <!-- Hub 4: Home, Licensing & DCF Compliance -->
-            <button onclick="switchMainSection('households')" id="navBtn-households" class="main-nav-btn px-4 py-2 rounded-lg transition text-slate-700 hover:bg-white flex items-center gap-2 font-semibold text-xs" title="Households, FS-221A licensure checklist, and DCF mileage">
+            <!-- Hub 5: Home, Licensing & DCF Compliance -->
+            <button onclick="switchMainSection('households')" id="navBtn-households" class="main-nav-btn px-3.5 py-2 rounded-lg transition text-slate-700 hover:bg-white flex items-center gap-2 font-semibold text-xs" title="Households, FS-221A licensure checklist, and DCF mileage">
               <i data-lucide="shield-check" class="w-4 h-4 text-indigo-600"></i>
               <span>Home & Licensing</span>
             </button>
           </div>
 
-          <!-- Secondary Hub Quick-Links (Journal, Comms, Reports) -->
+          <!-- Secondary Hub Quick-Links (Journal, Comms, Reports, Circles of Care, Life Journey) -->
           <div class="hidden xl:flex items-center bg-slate-100/60 p-1 rounded-xl border border-slate-200/60 space-x-1 text-slate-600">
             <button onclick="switchMainSection('journal')" id="navBtn-journal" class="main-nav-btn px-2.5 py-1.5 rounded-lg transition hover:bg-white flex items-center gap-1.5 font-medium text-xs">
               <i data-lucide="book-open" class="w-3.5 h-3.5 text-teal-600"></i> Journal
@@ -165,9 +173,6 @@
             </button>
             <button onclick="switchMainSection('reports')" id="navBtn-reports" class="main-nav-btn px-2.5 py-1.5 rounded-lg transition hover:bg-white flex items-center gap-1.5 font-medium text-xs">
               <i data-lucide="file-text" class="w-3.5 h-3.5 text-cyan-600"></i> Reports
-            </button>
-            <button onclick="switchMainSection('training')" id="navBtn-training" class="main-nav-btn px-2.5 py-1.5 rounded-lg transition hover:bg-white flex items-center gap-1.5 font-bold text-xs text-blue-700 bg-blue-50/50" title="Practice Sandbox & Caregiver Flight Simulator">
-              <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-blue-600"></i> Training Hub
             </button>
             <button onclick="switchMainSection('settings')" id="navBtn-settings" class="main-nav-btn px-2.5 py-1.5 rounded-lg transition hover:bg-white flex items-center gap-1.5 font-medium text-xs">
               <i data-lucide="settings" class="w-3.5 h-3.5 text-slate-500"></i> Audit & Settings
