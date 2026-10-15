@@ -22,7 +22,7 @@ This report evaluates Sprout's operational readiness across 6 distinct deploymen
 
 | Deployment Tier | Readiness Status | Evidence & Enablers | Gaps / Remaining Prerequisites |
 | :--- | :---: | :--- | :--- |
-| **Tier 1: Single Caregiver (Candy Chevalier)** | **100% READY** | Real SQLite DB configured; 2 local residences (41 Elmwood Dr & 22 E Parkside); CD configured; PWA active. | None. Operational now. |
+| **Tier 1: Single Caregiver (Candy Chevalier)** | **100% READY** | Real SQLite DB configured; 2 local residences (Sample Household A & Sample Household B); Sample Child CH-201 configured; PWA active. | None. Operational now. |
 | **Tier 2: Kinship Household** | **100% READY** | Grandparent Kinship personas (`HH-113`); relative search tools; jargon-free navigation. | Standard local installation guide. |
 | **Tier 3: Training Classroom Simulator** | **100% READY** | 15 synthetic household models; 6 emergency scenarios; watermarked mock files; 1-click factory reset. | None. Ready for instructor use. |
 | **Tier 4: VCWTP Statewide Demo** | **100% READY** | `[Shield PII]` presentation blur mode; 10-minute trainer playbook; zero local data exposure. | None. Demo verified. |

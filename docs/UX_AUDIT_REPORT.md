@@ -163,7 +163,7 @@ The Caregiver Command Center ("Sprout / KinCare OS") has reached deep functional
 
 | Question | Current Ability to Answer in 60s | Current Friction Point | Target Cockpit Experience |
 | :--- | :---: | :--- | :--- |
-| **Where am I?** | ⚠️ Yes, with delay | Must check mode + user dropdowns | "Welcome back, Candy • 41 Elmwood Drive" persistent banner |
+| **Where am I?** | ⚠️ Yes, with delay | Must check mode + user dropdowns | "Welcome back, Candy • Confidential Household" persistent banner |
 | **What matters?** | ✅ Yes (20s) | Medical clock badge & med routines clear | Prominent top hero alert card |
 | **What is complete?** | ⚠️ Partial (45s) | Must open timeline to see what happened | "Completed in last 30 days" quick summary drawer |
 | **What is active?** | ✅ Yes (15s) | Active placement initial cards visible | Clear child profile badge with placement days count |

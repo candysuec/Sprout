@@ -1389,6 +1389,125 @@ def create_parent_packet():
 
 
 # --- PARENT PARTICIPANT WORKSPACE API ---
+def resolve_parent_status_info(req, child_id=None):
+    actor, role = resolve_actor_and_role(req)
+    sprout_mode = (req.headers.get('X-Sprout-Mode') or 'local').strip().lower()
+    is_sample = ('Sample' in actor) or (sprout_mode == 'sample')
+
+    # Explicit check for Revoked scenario
+    if any(k in actor for k in ["Revoked", "Emergency Revocation", "Maria Lin"]):
+        return {
+            "state": "REVOKED",
+            "display_name": actor,
+            "child_id": child_id,
+            "child_alias": "None",
+            "linked": False,
+            "is_high_conflict": False,
+            "message": "Parent access has been revoked under safety protocols."
+        }
+    if "Unlinked" in actor:
+        return {
+            "state": "UNLINKED",
+            "display_name": actor,
+            "child_id": None,
+            "child_alias": "None",
+            "linked": False,
+            "is_high_conflict": False,
+            "message": "No child record linked to this parent account."
+        }
+
+    # If DB has parent_users record, respect it
+    conn = get_connection()
+    try:
+        pu = None
+        if child_id:
+            pu = conn.execute("SELECT * FROM parent_users WHERE child_id = ? ORDER BY id DESC LIMIT 1", (child_id,)).fetchone()
+        if not pu and actor:
+            pu = conn.execute("SELECT * FROM parent_users WHERE display_name = ? ORDER BY id DESC LIMIT 1", (actor,)).fetchone()
+
+        if pu:
+            pu_dict = dict(pu)
+            cid = pu_dict['child_id']
+            is_hc = is_high_conflict_active(req, cid, conn)
+            alias_row = conn.execute("SELECT alias FROM children WHERE id = ?", (cid,)).fetchone()
+            child_alias = alias_row[0] if alias_row else "Child"
+            if pu_dict.get('state') == 'REVOKED':
+                return {
+                    "state": "REVOKED",
+                    "display_name": pu_dict['display_name'],
+                    "child_id": cid,
+                    "child_alias": "None",
+                    "linked": False,
+                    "is_high_conflict": False,
+                    "message": "Parent access has been revoked under safety protocols."
+                }
+            return {
+                "state": pu_dict.get('state', 'ACTIVE_ENGAGED'),
+                "display_name": pu_dict['display_name'],
+                "child_id": cid,
+                "child_alias": child_alias,
+                "linked": True,
+                "is_high_conflict": is_hc,
+                "message": f"Parent account active ({pu_dict.get('state', 'ACTIVE_ENGAGED')})."
+            }
+    finally:
+        conn.close()
+
+    # Sample Mode scenarios
+    if is_sample:
+        is_hc = is_high_conflict_active(req, child_id)
+        if any(k in actor for k in ["Danielle", "New Case", "Provisional"]):
+            return {
+                "state": "PROVISIONAL_ACCESS",
+                "display_name": actor,
+                "child_id": child_id or 1,
+                "child_alias": "Liam B.",
+                "linked": True,
+                "is_high_conflict": is_hc,
+                "message": "Provisional 30-day orientation access."
+            }
+        elif any(k in actor for k in ["Jason", "Restricted"]):
+            return {
+                "state": "RESTRICTED_ACCESS",
+                "display_name": actor,
+                "child_id": child_id or 2,
+                "child_alias": "Marcus V.",
+                "linked": True,
+                "is_high_conflict": True,
+                "message": "Restricted Parent Access — High-Conflict Protection Active."
+            }
+        else: # Standard Active (e.g. Angela Davis / Near Reunification)
+            return {
+                "state": "ACTIVE_ENGAGED",
+                "display_name": actor,
+                "child_id": child_id or 1,
+                "child_alias": "SC",
+                "linked": True,
+                "is_high_conflict": is_hc,
+                "message": "Active Engaged Parent Participant."
+            }
+
+    return {
+        "state": "ACTIVE_ENGAGED",
+        "display_name": actor,
+        "child_id": child_id or 1,
+        "child_alias": "Child",
+        "linked": True,
+        "is_high_conflict": is_high_conflict_active(req, child_id),
+        "message": "Active Parent Session."
+    }
+
+
+@app.route('/api/parent/status', method=['GET'])
+def get_parent_status():
+    child_id = request.query.child_id or 1
+    try:
+        child_id = int(child_id)
+    except (ValueError, TypeError):
+        child_id = 1
+    return json_res(resolve_parent_status_info(request, child_id))
+
+
 @app.route('/api/parent/feed', method=['GET'])
 def get_parent_feed():
     actor, role = resolve_actor_and_role(request)
@@ -1398,7 +1517,13 @@ def get_parent_feed():
     except (ValueError, TypeError):
         child_id = 1
 
-    is_hc = is_high_conflict_active(request, child_id)
+    status_info = resolve_parent_status_info(request, child_id)
+    if status_info['state'] == 'REVOKED':
+        return json_res({"error": "Parent access revoked"}, 403)
+    if status_info['state'] == 'UNLINKED':
+        return json_res([])
+
+    is_hc = status_info['is_high_conflict']
     sprout_mode = (request.headers.get('X-Sprout-Mode') or 'local').strip().lower()
     is_sample = ('Sample' in actor) or (sprout_mode == 'sample')
 
@@ -1461,6 +1586,12 @@ def get_parent_goals():
     except (ValueError, TypeError):
         child_id = 1
 
+    status_info = resolve_parent_status_info(request, child_id)
+    if status_info['state'] == 'REVOKED':
+        return json_res({"error": "Parent access revoked"}, 403)
+    if status_info['state'] == 'UNLINKED':
+        return json_res([])
+
     sprout_mode = (request.headers.get('X-Sprout-Mode') or 'local').strip().lower()
     actor, _ = resolve_actor_and_role(request)
     is_sample = ('Sample' in actor) or (sprout_mode == 'sample')
@@ -1485,6 +1616,15 @@ def get_parent_goals():
 def add_parent_goal():
     data = request.json or {}
     child_id = data.get('child_id') or 1
+    try:
+        child_id = int(child_id)
+    except (ValueError, TypeError):
+        child_id = 1
+
+    status_info = resolve_parent_status_info(request, child_id)
+    if status_info['state'] == 'REVOKED':
+        return json_res({"error": "Parent access revoked"}, 403)
+
     title = (data.get('title') or '').strip()
     if not title:
         return json_res({"error": "Goal title is required"}, 400)
@@ -1514,6 +1654,17 @@ def add_parent_goal():
 @app.route('/api/parent/evidence', method=['GET'])
 def get_parent_evidence():
     child_id = request.query.child_id or 1
+    try:
+        child_id = int(child_id)
+    except (ValueError, TypeError):
+        child_id = 1
+
+    status_info = resolve_parent_status_info(request, child_id)
+    if status_info['state'] == 'REVOKED':
+        return json_res({"error": "Parent access revoked"}, 403)
+    if status_info['state'] == 'UNLINKED':
+        return json_res([])
+
     conn = get_connection()
     rows = [dict(r) for r in conn.execute("""
         SELECT e.* FROM parent_evidence e
@@ -1537,6 +1688,16 @@ def get_parent_evidence():
 @app.route('/api/parent/evidence', method=['POST'])
 def add_parent_evidence():
     data = request.json or {}
+    child_id = data.get('child_id') or 1
+    try:
+        child_id = int(child_id)
+    except (ValueError, TypeError):
+        child_id = 1
+
+    status_info = resolve_parent_status_info(request, child_id)
+    if status_info['state'] == 'REVOKED':
+        return json_res({"error": "Parent access revoked"}, 403)
+
     file_name = (data.get('file_name') or '').strip()
     if not file_name:
         return json_res({"error": "File name is required"}, 400)
@@ -1557,7 +1718,7 @@ def add_parent_evidence():
             1 if data.get('verified') else 0
         ))
         new_id = c.lastrowid
-        audit(conn, _actor(data), 'upload_evidence', 'parent_evidence', new_id, data.get('child_id'), {"file": file_name})
+        audit(conn, _actor(data), 'upload_evidence', 'parent_evidence', new_id, child_id, {"file": file_name})
         conn.commit()
     finally:
         conn.close()
@@ -1605,10 +1766,22 @@ def revoke_parent_access():
 @app.route('/api/parent/checkin', method=['GET'])
 def get_parent_checkin():
     child_id = request.query.child_id or 1
+    try:
+        child_id = int(child_id)
+    except (ValueError, TypeError):
+        child_id = 1
+
+    status_info = resolve_parent_status_info(request, child_id)
+    if status_info['state'] == 'REVOKED':
+        return json_res({"status": "REVOKED", "error": "Parent access revoked"}, 403)
+    if status_info['state'] == 'UNLINKED':
+        return json_res({"status": "UNLINKED", "message": "No child linked"})
+
+    loc = "Supervised Family Center / Confidential Site" if status_info['is_high_conflict'] else "Easterseals Family Center"
     return json_res({
         "child_id": child_id,
-        "next_visit": "2026-04-16 15:30:00",
-        "location": "Easterseals Family Center",
+        "next_visit": "2026-04-16",
+        "location": loc,
         "duration_hours": 2.0,
         "status": "Scheduled",
         "total_attended_on_time": 12,
@@ -1621,6 +1794,15 @@ def post_parent_checkin():
     data = request.json or {}
     actor, _ = resolve_actor_and_role(request)
     child_id = data.get('child_id') or 1
+    try:
+        child_id = int(child_id)
+    except (ValueError, TypeError):
+        child_id = 1
+
+    status_info = resolve_parent_status_info(request, child_id)
+    if status_info['state'] == 'REVOKED':
+        return json_res({"status": "REVOKED", "error": "Parent access revoked"}, 403)
+
     conn = get_connection()
     try:
         audit(conn, actor, 'family_time_checkin', 'parent_visit', None, child_id, {

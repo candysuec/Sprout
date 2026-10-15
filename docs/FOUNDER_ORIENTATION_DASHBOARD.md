@@ -16,7 +16,9 @@ You are standing in **Sprout v3.2 Foundation Execution Complete**.
 - **Authorization Middleware Deployed:** `app/auth_middleware.py` mounted. Role resolution, domain gates, high-conflict address masking, and EXIF scrubber active.
 - **Parent Participant Workspace Operational:** 5 benchmark parent scenarios verified; emergency access revocation & legal hold tested.
 - **The Usability Bottlenecks Are Removed:** Mission Control Quick Action Dock, Two-Step Smart Logger, and Parent Workspace operational.
-- **The Entire System Is 100% Tested:** Automated test suites pass 119/119 tests (73 E2E flow tests + 46 Phase 13B governance/security tests).
+- **Parent Participant Workspace Wired & Operational:** Existing 4 modules dynamically wired to persistent backend endpoints with fail-closed gates, location masking, and date quantization.
+- **Repository Documentation PII Sanitized:** Live addresses and personal caregiver identifiers replaced with synthetic placeholders in Git-tracked documentation.
+- **The Entire System Is 100% Tested:** Automated test suites pass 149/149 tests (73 E2E flow tests + 46 Phase 13B governance/security tests + 30 Parent Workspace integration tests).
 
 ---
 
@@ -25,7 +27,7 @@ You are standing in **Sprout v3.2 Foundation Execution Complete**.
 Only two things matter right now:
 
 1. **Protecting Caregiver Cognitive Load:** Never make Candy or any caregiver act as the integration layer, memory clerk, detective, or debugger. Every screen must answer: *Where am I? What is next?*
-2. **Execution Without Regression:** Preserving 100% test pass rate and backward compatibility with local pilot data at 41 Elmwood Drive.
+2. **Execution Without Regression:** Preserving 100% test pass rate and backward compatibility with local workspace data.
 
 ---
 
@@ -35,9 +37,9 @@ These are the only active workstreams currently in motion:
 
 | Workstream | Scope | Target File(s) | Status |
 | :--- | :--- | :--- | :---: |
-| **Phase 13B Governance Execution** | Pre-migration backup, Migration 7, authorization middleware, parent tables, export hardening. | `app/db.py`, `app/server.py`, `app/services.py`, `app/auth_middleware.py` | **100% COMPLETED (119/119 Tests)** |
-| **Parent Participant Lifecycle** | 5 benchmark scenarios verified (goals, evidence, checkins, high-conflict masking, revocation). | `test_phase13b_governance.py` | **VERIFIED & PASSING** |
-| **Founder Home Alignment** | Single source-of-truth project maintenance. | `docs/FOUNDER_ORIENTATION_DASHBOARD.md`, `docs/PROJECT_STATE.md` | **ACTIVE & SYNCHRONIZED** |
+| **Phase 13B Governance Execution** | Pre-migration backup, Migration 7, authorization middleware, parent tables, export hardening. | `app/db.py`, `app/server.py`, `app/services.py`, `app/auth_middleware.py` | **100% COMPLETED (46/46 Tests)** |
+| **Parent Workspace Frontend Integration** | 4 modules dynamically wired to backend endpoints, fail-closed security, 5 benchmark scenarios verified. | `app/static/app.js`, `app/server.py`, `test_parent_workspace_integration.py` | **100% COMPLETED (30/30 Tests)** |
+| **Founder Home Alignment** | Single source-of-truth project maintenance. | `docs/FOUNDER_ORIENTATION_DASHBOARD.md`, `docs/PROJECT_STATE.md` | **ACTIVE & SYNCHRONIZED (149/149 Tests)** |
 
 ---
 
@@ -47,16 +49,15 @@ The following are **INTENTIONALLY HELD (GATED)**:
 
 | Item | Gate Condition | Why It Is Held |
 | :--- | :--- | :--- |
-| **Live Outbound Email / SMS Token Dispatch** | Gated on Vermont DCF physical contact approval policy. | Prevents unapproved external electronic transmission. |
+| **Outbound Invitation Delivery** | Blocked pending verified legal, privacy, identity-verification, consent, and delivery requirements. | Prevents unverified external electronic transmission. |
 | **Child Voice Direct Authoring** | Deferred to Phase 17+. | Intentionally out of scope for v3.x foundation. |
 
 ---
 
 ## ⏩ WHAT IS NEXT?
 
-1. **Next Sprint Target:** Frontend visual wiring for Parent Participant Workspace tabs and 1-tap check-ins in `app/static/index.html`.
-2. **Caregiver Readiness:** Review and intake readiness for child CD at 41 Elmwood Drive.
-3. **Continuous Maintenance:** Update project home ledger at each milestone.
+1. **Caregiver Intake Readiness:** Review and prepare intake workflows and document vaults for Sample Child CH-201 at Sample Household A.
+2. **Continuous Maintenance:** Maintain single source of truth in `FOUNDER_ORIENTATION_DASHBOARD.md` and `PROJECT_STATE.md`.
 
 ---
 

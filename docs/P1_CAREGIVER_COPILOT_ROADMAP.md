@@ -88,7 +88,7 @@ Instead of a simple demographic box, each child's card transforms into an airpla
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
-│ 👶 CHILD: CD (CCC-000001)                                 Kinship Care • 41 Elmwood Dr │
+│ 👶 CHILD: CH-201 (Sample Child CH-201)                     Kinship Care • Confidential Address │
 ├───────────────┬───────────────┬───────────────┬───────────────┬────────────────────────┤
 │ 🩺 HEALTH     │ 🎓 SCHOOL     │ 🚗 VISITS     │ 📄 DOCUMENTS  │ 🛡️ BENEFITS           │
 │ ✅ Current    │ ✅ Current    │ ⚠️ Tomorrow   │ ⚠️ 1 Missing  │ ✅ Current             │

@@ -81,7 +81,7 @@ SPROUT / KINCARE OS
 │   │   └── Folders 9–20: Extended Categorical Archives
 │   │
 │   ├── [Home & Licensing] (`households`) ➔ Residence & Regulatory Compliance
-│   │   ├── Residence Profiles (Real: 41 Elmwood Dr & 22 E Parkside; Synthetic: HH-101 to HH-115)
+│   │   ├── Residence Profiles (Real: Sample Household A & Sample Household B; Synthetic: HH-101 to HH-115)
 │   │   ├── Caregiver Licensing Flight Deck (Current Status, Capacity, Expiration Dates)
 │   │   ├── Vermont State Licensure Checklist (FS-221A 40-Point Inspection)
 │   │   ├── Training Hours Ledger (Vermont Child Welfare Training Partnership — VCWTP Tracker)

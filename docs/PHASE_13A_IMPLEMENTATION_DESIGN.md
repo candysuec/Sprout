@@ -308,7 +308,7 @@ def scrub_image_exif(image_bytes):
 ```
 
 ### 5.2 Physical Address Masking
-All address strings associated with the caregiver household (e.g. `41 Elmwood Dr, West Berlin, VT`) are dynamically intercepted and replaced:
+All address strings associated with the caregiver household (e.g. `Confidential Primary Residence`) are dynamically intercepted and replaced:
 ```python
 CONFIDENTIAL_DCF_SUBSTITUTE = "CONFIDENTIAL ADDRESS — DCF DISTRICT 5 (BARRE) FAMILY SERVICES"
 ```

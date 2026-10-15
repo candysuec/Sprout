@@ -116,16 +116,16 @@ graph TD
 ---
 
 ### Community 5: Real Working Family Baseline (Production Context)
-- **Child Reference:** `CD` • **Initials:** `CD` • **Placement Type:** Primary Foster Placement
+- **Child Reference:** `Sample Child CH-201` • **Initials:** `SC` • **Placement Type:** Primary Foster Placement
 - **Age:** Young Child • **Legal Custody:** Vermont DCF Custody
 - **Permanency Goal:** Reunification / Fictive Kin Support • **Conflict Mode:** Standard
 
 | Role in Ecosystem | Person Name & Identity | Specific Relationship | Assigned Permissions | Participation Status |
 | :--- | :--- | :--- | :--- | :---: |
-| **Primary Caregiver** | **Candy Chevalier** | Primary Foster Caregiver | Full System Authority across all domains and views. | **Active Primary** |
-| **Secondary Caregiver** | **Robin Davis** | Homeowner & Resource Caregiver | Co-Caregiver access, home study documents. | **Active Homeowner** |
-| **Resource Support** | **Mallory Wheeler** | Secondary / Extended Family | Handoff and emergency card access. | **Active Support** |
-| **Parent Participant** | **Angela Davis** | Biological Parent | Dedicated Parent Workspace (Goals, Evidence, Family Time). | **Active Participant** |
+| **Primary Caregiver** | **Sample Primary Caregiver** | Primary Foster Caregiver | Full System Authority across all domains and views. | **Active Primary** |
+| **Secondary Caregiver** | **Sample Secondary Caregiver** | Homeowner & Resource Caregiver | Co-Caregiver access, home study documents. | **Active Homeowner** |
+| **Resource Support** | **Sample Support Caregiver** | Secondary / Extended Family | Handoff and emergency card access. | **Active Support** |
+| **Parent Participant** | **Sample Parent Participant** | Biological Parent | Dedicated Parent Workspace (Goals, Evidence, Family Time). | **Active Participant** |
 | **DCF Team** | **District Caseworker** | Vermont DCF Family Services | Output Consumer (Monthly Reports, Travel Forms). | **External Consumer** |
 
 ---
@@ -134,8 +134,8 @@ graph TD
 
 1. **Dual-Sphere Switch Test:**
    - In Sandbox Mode, selecting `HH-101` automatically mounts `Community 1` (Sarah Jenkins & Liam Brooks).
-   - In Local Mode, selecting `Candy Chevalier` automatically mounts `Community 5` (CD & Family).
+   - In Local Mode, selecting Primary Caregiver profile automatically mounts `Community 5` (Sample Child CH-201 & Family).
 2. **Permission Boundary Audit:**
-   - Logging in as `Angela Davis` MUST return 403 Forbidden on `/api/records?category=incident`.
+   - Logging in as `Sample Parent Participant` MUST return 403 Forbidden on `/api/records?category=incident`.
    - Logging in as `Samantha Price` MUST only receive health records from `/api/children/CH-201/records`.
    - In `Community 3`, exporting court packets MUST automatically redact `David Miller's` street address.

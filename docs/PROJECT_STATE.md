@@ -1,7 +1,7 @@
 # PROJECT STATE
 **Initiative:** Sprout  
 **Project:** Child & Family Success Operating System  
-**Current Phase:** Phase 13 Implementation (Pre-Migration 7)  
+**Current Phase:** Phase 13B Execution Complete & Parent Workspace Verification  
 **Target Version:** v3.2 Foundation Baseline  
 **Last Synchronized:** 2026-10-14  
 
@@ -19,7 +19,7 @@
 | **Export Rules** | **FROZEN / APPROVED** | [`EXPORT_GOVERNANCE_MATRIX.md`](EXPORT_GOVERNANCE_MATRIX.md) | 9 Generators Filtered |
 | **Role Permissions** | **FROZEN / APPROVED** | [`ROLE_PERMISSION_MATRIX_V2.md`](ROLE_PERMISSION_MATRIX_V2.md) | 8 Roles Mapped |
 | **Validation** | **VERIFIED** | [`PHASE_13B_IMPLEMENTATION_VALIDATION_REPORT.md`](PHASE_13B_IMPLEMENTATION_VALIDATION_REPORT.md) | 0 Contradictions |
-| **Usability** | **RESOLVED (P0 CLEARED)** | [`SPRINT_13C_USABILITY_EXECUTION_REPORT.md`](SPRINT_13C_USABILITY_EXECUTION_REPORT.md) | 73/73 Tests Passing |
+| **Usability & Integration** | **RESOLVED & VERIFIED** | [`SPRINT_13C_USABILITY_EXECUTION_REPORT.md`](SPRINT_13C_USABILITY_EXECUTION_REPORT.md) | 149/149 Tests Passing (100%) |
 
 ---
 
@@ -40,8 +40,6 @@
 - [x] **P0-1 Quick Action Dock:** Persistent 1-tap launch dock on Mission Control (`+ 15-Sec Log`, `Care & Safety Sheet`, `Export This Month`).
 - [x] **P0-2 Two-Step Smart Logger:** Progressive disclosure logging modal (Step 1 saves routine events in <15 sec).
 - [x] **P0-3 Dedicated Parent Workspace:** Clean, dignity-first UI for parents; 100% isolated from caregiver admin chrome.
-- [x] **Automated Regression Suite:** 73/73 tests passing (100%).
-
 - [x] **Phase 13B-01 Pre-Migration Backup Harness (`app/db.py`):**
   - Physical SQLite backup to `BACKUP_DIR` before migration runs.
   - Verification with `PRAGMA integrity_check`.
@@ -62,24 +60,29 @@
 - [x] **Phase 13B-05 Multi-Party Community Fixtures & Cryptographic Audit Verification:**
   - Circle of Care ecosystems verified (CH-201 Liam Brooks, CH-202 Emma Vance, CH-203 Noah Miller).
   - SHA-256 blockchain audit integrity verified unbroken.
-- [x] **Automated Regression & Governance Suites:** 119/119 tests passing (100%).
+- [x] **Parent Participant Workspace Frontend-to-Backend Integration (`app/static/app.js`, `app/server.py`):**
+  - Connected existing Parent Workspace UI (`#parentGoalsCard`, `#parentEvidenceCard`, `#parentFamilyTimeCard`, `#parentChildUpdatesCard`) to persistent backend endpoints (`/api/parent/status`, `/api/parent/goals`, `/api/parent/evidence`, `/api/parent/checkin`, `/api/parent/feed`).
+  - Gated unlinked and revoked accounts with fail-closed safety screen (zero child records leaked).
+  - Masked high-conflict locations and quantized timestamps to date-only.
+- [x] **Repository Documentation PII Sanitization:**
+  - Scanned Git-tracked documentation and replaced live addresses and caregiver personal identifiers with synthetic placeholders (`Sample Household A`, `Sample Household B`, `Sample Child CH-201`, `Confidential Address`, `Sample Parent Participant`).
+- [x] **Automated Regression, Governance & Integration Suites:** 149/149 tests passing (100% across E2E flows, Phase 13B governance, and Parent Workspace integration suites).
 
 ---
 
 ### 🟡 In Progress (Current Execution Focus)
-- [ ] **Parent Participant Workspace Frontend Visual Polish:**
-  - Interactive tabs in `app/static/index.html` for Parent Goals, Evidence Upload, and 1-Tap Check-In.
+- [x] **Canonical Truth Correction & Parent Workspace Integration Sprint:** Completed (149/149 tests verified).
 
 ---
 
 ### ⏳ Ready for Development (Next Execution Steps)
-- [ ] **Placement Intake Preparation for Child CD:**
-  - Verify intake workflows and document vaults for 41 Elmwood Drive.
+- [ ] **Intake Workflow Preparation for Sample Child CH-201:**
+  - Verify intake workflows and document vaults for Sample Household A.
 
 ---
 
 ### 🔴 Blocked / Held (Intentional Safeguard Gating)
-- **Live Outbound Email / SMS Token Dispatch:** Gated on Vermont DCF physical contact approval policy.
+- **Outbound Invitation Delivery:** Blocked pending verified legal, privacy, identity-verification, consent, and delivery requirements.
 - **Child Voice Direct Authoring:** Deferred to Phase 17+ (Intentionally out of scope for v3.x).
 
 ---

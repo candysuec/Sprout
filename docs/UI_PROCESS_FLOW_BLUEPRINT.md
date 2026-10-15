@@ -104,7 +104,7 @@ flowchart TD
 | Nav Button | Click Handler | Pre-Condition | Process Flow & Data Flow | Target View |
 | :--- | :--- | :--- | :--- | :--- |
 | **Dashboard** | `switchMainSection('dashboard')` | Logged In | Queries `/api/compliance`, `/api/licensing`, and calculates metrics. | Renders household overview, urgent alerts, and recent activities. |
-| **Households** | `switchMainSection('households')` | Logged In | Queries `/api/households`. In sample mode, returns synthetic home; in local, queries 41 Elmwood / 22 Parkside. | Renders bed capacity, resident caregivers, and home licensing status. |
+| **Households** | `switchMainSection('households')` | Logged In | Queries `/api/households`. In sample mode, returns synthetic home; in local, queries Sample Household A / Sample Household B. | Renders bed capacity, resident caregivers, and home licensing status. |
 | **Children in Care** | `switchMainSection('children')` | Logged In | Reveals `#childWorkspaceSubNav`. Loads active child profile. | Mounts 12-tab Child Workspace router (Overview, Medical, Education, Visits). |
 | **Journal** | `switchMainSection('journal')` | Logged In | Queries `/api/children/:id/records?category=daily`. | Chronological daily observations feed with filtering by author. |
 | **Binder** | `switchMainSection('binder')` | Logged In | In local, walks OneDrive shared folders via `/api/shared-docs`. In sample, returns sample guide list. | Categorized file cards with 1-click desktop OS open button. |

@@ -37,7 +37,7 @@ Sprout enforces a strict dual-sphere runtime state model:
 | **Available Caregivers** | 15 Model Households (HH-101 through HH-115) | Verified Household Residents (Candy, Robin, Mallory) |
 | **Database Connection** | In-Memory / Synthetic Scoped Data | Local SQLite (`%LOCALAPPDATA%\CaregiverCommandCenter\data\foster_binder.db`) |
 | **Filesystem Access** | Synthetic Sample Templates Only | Verified Local Drive (`c:\Users\candy\...\foster-portal`) |
-| **Physical Addresses** | Fictional Vermont Towns (Meadow Lane, etc.) | 41 Elmwood Dr (West Berlin, VT) & 22 East Parkside |
+| **Physical Addresses** | Fictional Vermont Towns (Meadow Lane, etc.) | Sample Household A & Sample Household B (Confidential Addresses) |
 | **Security Barrier** | Live document opening returns `403 Forbidden` | Native desktop document launch (`os.startfile`) |
 | **Watermark Overlay** | Visible floating badge: `🛡️ Practice Sandbox • Synthetic Data Only` | Hidden |
 

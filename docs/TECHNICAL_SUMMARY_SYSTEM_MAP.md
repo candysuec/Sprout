@@ -7,7 +7,7 @@
 The platform enforces a strict **Dual-Sphere Architecture**:
 1. **Unselected / Welcome State**: Zero database execution, zero private records loaded, clean public landing page featuring the complete Vermont state caregiver resource directory and sample sandbox launcher.
 2. **Dev Sandbox Mode (`sample`)**: An isolated environment operating on a normalized 15-household Caregiver Journey Model with synthetic placements, completely disjoint from any private disk storage or live production data.
-3. **Local Live Mode (`local`)**: The encrypted, private operational sphere bound to verified caregivers (Candy Chevalier, Robin Davis, Mallory Wheeler) and designated physical properties (41 Elmwood Dr, 22 East Parkside), reading from local SQLite and OneDrive shared documents.
+3. **Local Live Mode (`local`)**: The encrypted, private operational sphere bound to verified caregivers and designated physical properties (Sample Household A, Sample Household B), reading from local SQLite and local shared documents.
 
 ---
 
@@ -195,7 +195,7 @@ stateDiagram-v2
          return json_res([])  # Absolute zero data leakage
      ```
 3. **Impersonation & Crossover Prevention**:
-   - In **Local Live Mode**, household queries are strictly pinned to verified caregiver physical residences (41 Elmwood Dr & 22 East Parkside).
+   - In **Local Live Mode**, household queries are strictly pinned to verified caregiver physical residences (Sample Household A & Sample Household B).
    - In **Sample Mode**, household queries map strictly to synthetic household IDs (`HH-101` through `HH-115`).
    - The backend rejects cross-sphere requests: a sample caregiver requesting live documents or a live caregiver accessing synthetic fixtures triggers an immediate `403 Forbidden` error.
 4. **Session Handling & Reset (`LocalStorage`)**:

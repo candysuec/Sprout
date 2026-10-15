@@ -62,7 +62,7 @@ This comprehensive follow-up audit evaluates the entire system surface following
 
 ## 3. Privacy, Boundary & Security Verification
 
-- **Real Family PII Protection**: Candy Chevalier, Robin Davis, Mallory Wheeler, 41 Elmwood Drive, and 22 East Parkside remain strictly shielded behind local SQLite storage.
+- **Real Family PII Protection**: Caregiver profiles, Sample Household A, and Sample Household B remain strictly shielded behind local SQLite storage.
 - **Zero-Query Sandbox Isolation**: Unselected states execute zero database queries.
 - **Sample Mode Protection**: Sandbox mode blocks personal file access with `403 Forbidden` and isolates OneDrive paths.
 - **Audit Ledger Integrity**: SHA-256 cryptographically chained hash block verified across 100% of historical events.

@@ -41,7 +41,7 @@ graph TD
 | Telemetry Metric | Real Data Source | Healthy Threshold | Failure / Warning Condition |
 | :--- | :--- | :---: | :--- |
 | **1. Children In Care** | `SELECT count(*) FROM children` | $\ge 1$ active child | Count = 0 (Displays empty onboarding state) |
-| **2. Caregiver Households** | `SELECT count(*) FROM households` | Exactly 2 live residences (Elmwood + Parkside) | Unexpected households detected in live DB |
+| **2. Caregiver Households** | `SELECT count(*) FROM households` | Exactly 2 live residences (Sample Household A + Sample Household B) | Unexpected households detected in live DB |
 | **3. Parent Participants** | `SELECT count(*) FROM parent_users` | $\ge 1$ linked parent per active reunification goal | Unlinked child with reunification goal |
 
 ---
