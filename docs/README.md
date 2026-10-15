@@ -84,6 +84,7 @@ foster-portal/docs/
 | **[`PHASE_13B_EXECUTION_CONTROL_PLAN.md`](PHASE_13B_EXECUTION_CONTROL_PLAN.md)** | **Phase 13B Execution Control Plan**: Chronological 8-step execution order, Migration 7 runbook, 43-endpoint authorization matrix, and readiness gate. | Execution Control, Safe Implementation | **APPROVED & GO** |
 | **[`PHASE_13B_IMPLEMENTATION_VALIDATION_REPORT.md`](PHASE_13B_IMPLEMENTATION_VALIDATION_REPORT.md)** | **Phase 13B Implementation Validation Report**: Code impact analysis, contradiction resolution, UX walkthroughs, implementation risk ranking, and 12-task backlog. | Validation, QA & Readiness | **VERIFIED & GO** |
 | **[`OWNER_WORKFLOW_VALIDATION_REPORT.md`](OWNER_WORKFLOW_VALIDATION_REPORT.md)** | **Owner Workflow Usability Validation Report**: End-to-end task simulation for Foster, Kinship, Respite, and Parent roles; friction points and P0/P1 ergonomics backlog. | Usability, UX & Ergonomics | **VALIDATED** |
+| **[`SPRINT_13C_USABILITY_EXECUTION_REPORT.md`](SPRINT_13C_USABILITY_EXECUTION_REPORT.md)** | **Sprint 13C Usability Execution Report**: P0-1 Quick Action Dock, P0-2 Two-Step Smart Logger, and P0-3 Dedicated Parent Workspace implementation and multi-persona before/after verification. | UX, Product, Architecture | **EXECUTED & VERIFIED** |
 | **[`CHILD_VOICE_DOMAIN_DISCOVERY.md`](CHILD_VOICE_DOMAIN_DISCOVERY.md)** | **Child Voice Discovery (Future Only)**: Strategic exploration of youth-authored goals, reflections, and Lifebook curation (Deferred to Phase 17+). | Future Horizons, Ethics | **EXPLORATORY** |
 
 ---

@@ -116,6 +116,9 @@ Production specifications, system topologies, privacy audits, training flight si
 - [Frequently Asked Questions (FAQ)](docs/FAQ_AND_COMMON_QUESTIONS.md): Clear answers to common foster care, kinship, legal, and privacy questions.
 
 ### Audits & Validation Reports
+- [Sprint 13C Usability Execution Report](docs/SPRINT_13C_USABILITY_EXECUTION_REPORT.md): Implementation and multi-persona validation of P0-1 Quick Action Dock, P0-2 Two-Step Smart Logger, and P0-3 Dedicated Parent Participant Workspace (Sprint 13C).
+- [Owner Workflow Validation Report](docs/OWNER_WORKFLOW_VALIDATION_REPORT.md): End-to-end task simulation for Foster, Kinship, Respite, and Parent personas identifying friction points and P0/P1 ergonomics recommendations.
+- [Phase 13B Implementation Validation Report](docs/PHASE_13B_IMPLEMENTATION_VALIDATION_REPORT.md): Code impact analysis, contradiction resolution, UX walkthroughs, and 12-task execution plan.
 - [Privacy Hardening Audit Report](docs/PRIVACY_HARDENING_REPORT.md): Enforcement of the Child Reference ID standard, 1-tap Privacy Shield / Blur Mode, metadata scrubbing, and export sanitization (Phase 7).
 - [Caregiver Flight Simulator & Sandbox Excellence Report](docs/QA_PHASE8_SANDBOX_EXCELLENCE.md): Complete documentation for interactive first-run onboarding, role-based personas, scenario simulations, and synthetic document vault (Phase 8).
 - [Real-World Readiness Validation Report](docs/REAL_WORLD_READINESS_VALIDATION.md): End-to-end stress testing across 11 emergency scenarios, accessibility benchmarks, and deployment matrices (Phase 12B).

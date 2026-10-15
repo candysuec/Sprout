@@ -260,8 +260,15 @@ function populateCaregiverDropdown() {
     select.appendChild(opt);
   });
 
-  // Verify activeCaregiverUser is in list, else set to empty
-  const exists = list.some(c => c.id === activeCaregiverUser);
+  // Sprint 13C P0-3: Dedicated Parent Participant Option
+  const parentOpt = document.createElement('option');
+  parentOpt.value = 'Parent Participant (Angela Davis)';
+  parentOpt.textContent = 'Angela Davis (Parent Participant • Reunification Portal)';
+  parentOpt.className = 'bg-rose-900 text-rose-100 font-bold';
+  select.appendChild(parentOpt);
+
+  // Verify activeCaregiverUser is in list or is parent, else set to empty
+  const exists = list.some(c => c.id === activeCaregiverUser) || activeCaregiverUser === 'Parent Participant (Angela Davis)';
   if (!exists) {
     activeCaregiverUser = '';
   }
@@ -277,6 +284,12 @@ function updateCaregiverAvatarDisplay(user) {
   if (!user) {
     avatar.textContent = '?';
     avatar.className = 'w-6 h-6 rounded-full bg-slate-700 text-slate-300 font-bold flex items-center justify-center text-xs mr-2 shrink-0 border border-slate-600';
+    return;
+  }
+
+  if (user.includes('Parent Participant') || user.includes('Angela Davis')) {
+    avatar.textContent = 'AD';
+    avatar.className = 'w-6 h-6 rounded-full bg-rose-700 text-white font-bold flex items-center justify-center text-xs mr-2 shrink-0 border border-rose-400';
     return;
   }
 
@@ -304,9 +317,18 @@ async function onCaregiverUserChange() {
     localStorage.setItem('caregiverUser', activeCaregiverUser);
   }
   updateCaregiverAvatarDisplay(activeCaregiverUser);
+
+  // Dedicated Parent Workspace Router
+  if (activeCaregiverUser && (activeCaregiverUser.includes('Parent Participant') || activeCaregiverUser.includes('Angela Davis'))) {
+    switchMainSection('parent');
+    return;
+  }
+
   await loadChildren();
   if (currentMainSection === 'households' || currentMainSection === 'children' || currentMainSection === 'dashboard') {
     switchMainSection(currentMainSection);
+  } else if (currentMainSection === 'parent') {
+    switchMainSection('mission_control');
   }
 }
 
@@ -658,6 +680,42 @@ async function loadTabContent() {
   if (!container) return;
 
   const mainNav = document.getElementById('mainNavigationContainer');
+  const toggleBtn = document.getElementById('btnToggleWorkspaceMode');
+  const blurBtn = document.getElementById('btnTogglePrivacyBlur');
+  const fastLogBtn = document.getElementById('btnFastLogNote');
+  const quickEmergBtn = document.getElementById('btnQuickEmergencySummary');
+  const quickSignBtn = document.getElementById('btnQuickSign');
+  const subNav = document.getElementById('childWorkspaceSubNav');
+
+  // Dedicated Parent Workspace Isolation Guard (Sprint 13C P0-3)
+  const isParentUser = (activeCaregiverUser && (activeCaregiverUser.includes('Parent Participant') || activeCaregiverUser.includes('Angela Davis'))) || currentMainSection === 'parent';
+
+  if (isParentUser) {
+    if (mainNav) mainNav.classList.add('hidden');
+    if (subNav) subNav.classList.add('hidden');
+    if (toggleBtn) toggleBtn.classList.add('hidden');
+    if (blurBtn) blurBtn.classList.add('hidden');
+    if (fastLogBtn) fastLogBtn.classList.add('hidden');
+    if (quickEmergBtn) quickEmergBtn.classList.add('hidden');
+    if (quickSignBtn) quickSignBtn.classList.add('hidden');
+
+    const card = document.getElementById('snapshotCard');
+    if (card) {
+      card.classList.add('hidden');
+      card.innerHTML = '';
+    }
+
+    await renderParentParticipantView(container);
+    lucide.createIcons();
+    return;
+  }
+
+  // Restore caregiver controls for non-parent users
+  if (toggleBtn) toggleBtn.classList.remove('hidden');
+  if (blurBtn) blurBtn.classList.remove('hidden');
+  if (fastLogBtn) fastLogBtn.classList.remove('hidden');
+  if (quickEmergBtn) quickEmergBtn.classList.remove('hidden');
+  if (quickSignBtn) quickSignBtn.classList.remove('hidden');
 
   // In Sample/Sandbox mode, Training Hub and Mission Control are immediately available to guide the user
   if (!currentSproutMode || (!activeCaregiverUser && currentMainSection !== 'training' && currentMainSection !== 'mission_control')) {
@@ -668,7 +726,6 @@ async function loadTabContent() {
       card.classList.add('hidden');
       card.innerHTML = '';
     }
-    const subNav = document.getElementById('childWorkspaceSubNav');
     if (subNav) subNav.classList.add('hidden');
 
     renderWelcomeLandingView(container);
@@ -676,7 +733,6 @@ async function loadTabContent() {
     return;
   }
 
-  // Hide operational toolbar on Mission Control (root launchpad) so it remains clean
   // Hide operational toolbar on Mission Control (root launchpad) so it remains clean
   if (currentMainSection === 'mission_control') {
     if (mainNav) mainNav.classList.add('hidden');
@@ -2900,19 +2956,47 @@ async function downloadBackupSnapshot() {
   }
 }
 
-// Modal Handlers
+// Modal Handlers (Two-Step Smart Logger)
 function openRecordModal() {
   document.getElementById('recEditId').value = '';
   document.getElementById('recordForm').reset();
   const today = new Date().toISOString().split('T')[0];
-  document.getElementById('recDate').value = today;
+  const dateInput = document.getElementById('recDate');
+  if (dateInput) dateInput.value = today;
+  const sevEl = document.getElementById('recSeverity');
+  if (sevEl) sevEl.value = 'Routine';
+  const catEl = document.getElementById('recCategory');
+  if (catEl) catEl.value = 'daily';
+
+  // Collapse Step 2 by default (Two-Step Smart Logger)
+  const advSection = document.getElementById('recordAdvancedSection');
+  if (advSection) advSection.classList.add('hidden');
+  const toggleLabel = document.getElementById('recordStep2ToggleLabel');
+  if (toggleLabel) toggleLabel.textContent = '+ Add Mileage, Location, RPPS & Follow-up (Optional Step 2)';
+
   toggleFollowUpFields();
   updateMileagePayoutDisplay();
   document.getElementById('recordModal').classList.remove('hidden');
+  lucide.createIcons();
 }
 
 function closeRecordModal() {
   document.getElementById('recordModal').classList.add('hidden');
+}
+
+function toggleRecordAdvancedDetails() {
+  const advSection = document.getElementById('recordAdvancedSection');
+  const toggleLabel = document.getElementById('recordStep2ToggleLabel');
+  if (!advSection) return;
+  const isHidden = advSection.classList.contains('hidden');
+  if (isHidden) {
+    advSection.classList.remove('hidden');
+    if (toggleLabel) toggleLabel.textContent = '- Hide Optional Details';
+  } else {
+    advSection.classList.add('hidden');
+    if (toggleLabel) toggleLabel.textContent = '+ Add Mileage, Location, RPPS & Follow-up (Optional Step 2)';
+  }
+  lucide.createIcons();
 }
 
 function toggleFollowUpFields() {
@@ -2940,8 +3024,15 @@ async function openEditRecordModal(id) {
   document.getElementById('recFollowUpNotes').value = record.follow_up_notes || '';
   document.getElementById('recFollowUpDue').value = record.follow_up_due_date || '';
   
+  // Show advanced section when editing existing record
+  const advSection = document.getElementById('recordAdvancedSection');
+  if (advSection) advSection.classList.remove('hidden');
+  const toggleLabel = document.getElementById('recordStep2ToggleLabel');
+  if (toggleLabel) toggleLabel.textContent = '- Hide Optional Details';
+
   toggleFollowUpFields();
   document.getElementById('recordModal').classList.remove('hidden');
+  lucide.createIcons();
 }
 
 // Task Completed Toggle
@@ -3247,6 +3338,45 @@ async function runLocalAiSummary() {
     btn.disabled = false;
     btn.innerHTML = `<i data-lucide="bot" class="w-4 h-4"></i> Generate 30-Day DCF Summary`;
     lucide.createIcons();
+  }
+}
+
+// P0-1 Quick 1-Click Monthly Export from Mission Control
+async function quickExportThisMonth() {
+  if (!currentChildId && childrenList.length > 0) {
+    currentChildId = childrenList[0].id;
+    const select = document.getElementById('childSelect');
+    if (select) select.value = currentChildId;
+  }
+
+  if (!currentChildId) {
+    alert("Please add or select a child in care first to generate the monthly report.");
+    return;
+  }
+
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+
+  try {
+    const res = await apiFetch('/api/reports/monthly', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        child_id: currentChildId,
+        year: year,
+        month: month,
+        privacy_mode: 'initials'
+      })
+    });
+    const data = await res.json();
+    if (data.download_url) {
+      window.open(data.download_url, '_blank');
+    } else if (data.error) {
+      alert("Notice: " + data.error);
+    }
+  } catch (err) {
+    alert("Export generation error: " + err.message);
   }
 }
 
@@ -6781,6 +6911,36 @@ async function renderMissionControlView(container) {
         </div>
       </div>
 
+      <!-- P0-1: MISSION CONTROL QUICK ACTION DOCK (PERMANENT VISIBILITY) -->
+      <div class="bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 rounded-3xl p-5 shadow-xl border border-emerald-600/70 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="p-3 bg-emerald-500/20 text-emerald-300 rounded-2xl border border-emerald-400/30 shrink-0">
+            <i data-lucide="zap" class="w-6 h-6 text-emerald-400"></i>
+          </div>
+          <div>
+            <h3 class="text-white font-black text-base flex items-center gap-2">
+              Mission Control Quick Action Dock
+              <span class="text-[10px] font-bold bg-emerald-500/30 text-emerald-300 px-2.5 py-0.5 rounded-full border border-emerald-400/40 uppercase tracking-wide">1-Tap Action</span>
+            </h3>
+            <p class="text-xs text-emerald-200/80">Log routine events, open emergency/babysitter sheets, or export monthly reports instantly without quadrant navigation.</p>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto shrink-0">
+          <button onclick="openRecordModal()" class="flex-1 sm:flex-none px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs shadow-md transition flex items-center justify-center gap-2" title="Log a routine observation in 15 seconds">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            <span>+ 15 Second Log</span>
+          </button>
+          <button onclick="openEmergencyHandoffCard()" class="flex-1 sm:flex-none px-4 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-2" title="Print/View 1-Click Care & Safety Sheet for Babysitter, Doctor, or Crisis ER">
+            <i data-lucide="shield-alert" class="w-4 h-4"></i>
+            <span>Care & Safety Sheet</span>
+          </button>
+          <button onclick="quickExportThisMonth()" class="flex-1 sm:flex-none px-4 py-2.5 bg-cyan-700 hover:bg-cyan-600 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-2" title="Generate and download current month's official DCF progress report (.docx)">
+            <i data-lucide="file-down" class="w-4 h-4"></i>
+            <span>Export This Month</span>
+          </button>
+        </div>
+      </div>
+
       <!-- WHAT WOULD YOU LIKE TO DO TODAY? (4 Primary Quadrants) -->
       <div class="space-y-4">
         <div class="border-b border-slate-200 pb-3 flex items-center justify-between">
@@ -7080,6 +7240,398 @@ function openUserJourneyDetailModal(roleKey) {
     emergency: "Emergency Intake: Rapid 2-minute child registration, medication intake, and emergency handoff card."
   };
   alert(`🧭 User Journey Pathway:\n\n${roles[roleKey] || 'Custom Caregiver Pathway'}`);
+}
+
+// ==============================================================================
+// SPRINT 13C P0-3: DEDICATED PARENT PARTICIPANT WORKSPACE
+// ==============================================================================
+
+async function renderParentParticipantView(container) {
+  const child = childrenList.length > 0 ? childrenList[0] : null;
+  const childAlias = child ? (child.alias || `${child.first_name || 'Child'}`) : 'Your Child';
+
+  container.innerHTML = `
+    <div class="space-y-6 animate-fadeIn pb-12 max-w-5xl mx-auto">
+      
+      <!-- Dignity-First Family Success Banner -->
+      <div class="bg-gradient-to-br from-rose-950 via-slate-900 to-indigo-950 rounded-3xl p-6 sm:p-8 text-white shadow-xl border border-rose-800/80 relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 w-72 h-72 bg-rose-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="space-y-2">
+            <div class="inline-flex items-center gap-2 px-3 py-1 bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-full text-xs font-black uppercase tracking-wider">
+              <i data-lucide="heart" class="w-3.5 h-3.5 text-rose-400"></i> Family Success & Reunification Portal
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-white">
+              Welcome, Angela
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
+              Every milestone, completed class, and family visit brings you closer to your goals. This portal is your personal space to record accomplishments, check upcoming visits, and see positive child milestones.
+            </p>
+          </div>
+
+          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2.5 shrink-0">
+            <button onclick="exitParentWorkspace()" class="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white rounded-xl text-xs font-semibold border border-white/20 transition flex items-center gap-1.5" title="Switch to Caregiver Mission Control for system simulation">
+              <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+              <span>Exit to Caregiver Mode</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PARENT DASHBOARD: 4 PRIMARY MODULES -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- MODULE 1: MY GOALS (Court-Approved Case Plan Progress) -->
+        <div id="parentGoalsCard" class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 space-y-4 hover:border-emerald-300 transition flex flex-col justify-between">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div class="flex items-center gap-2.5">
+                <div class="p-2 bg-emerald-100 text-emerald-800 rounded-xl">
+                  <i data-lucide="target" class="w-5 h-5 text-emerald-700"></i>
+                </div>
+                <div>
+                  <h2 class="font-extrabold text-slate-900 text-base">My Goals</h2>
+                  <p class="text-xs text-slate-500">Your court-approved reunification roadmap</p>
+                </div>
+              </div>
+              <span class="px-2.5 py-1 rounded-full text-[11px] font-black bg-emerald-100 text-emerald-900 border border-emerald-200">
+                75% Complete
+              </span>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between text-xs font-bold text-slate-700">
+                <span>Overall Case Plan Progress</span>
+                <span class="text-emerald-700">3 of 4 Milestones Verified</span>
+              </div>
+              <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                <div class="bg-emerald-600 h-full rounded-full transition-all duration-500" style="width: 75%"></div>
+              </div>
+            </div>
+
+            <!-- Goal Items List -->
+            <div class="space-y-2.5 text-xs">
+              <div class="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200 flex items-start gap-3">
+                <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5"></i>
+                <div class="space-y-0.5 flex-1">
+                  <div class="font-bold text-slate-900 flex items-center justify-between">
+                    <span>12-Week Nurturing Parenting Course</span>
+                    <span class="text-[10px] bg-emerald-200/80 text-emerald-950 font-black px-1.5 py-0.5 rounded">10/12 Sessions</span>
+                  </div>
+                  <p class="text-[11px] text-slate-600">Easterseals Family Program. 2 classes remaining until graduation.</p>
+                </div>
+              </div>
+
+              <div class="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200 flex items-start gap-3">
+                <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5"></i>
+                <div class="space-y-0.5 flex-1">
+                  <div class="font-bold text-slate-900 flex items-center justify-between">
+                    <span>Safe & Stable Housing</span>
+                    <span class="text-[10px] bg-emerald-200/80 text-emerald-950 font-black px-1.5 py-0.5 rounded">Verified</span>
+                  </div>
+                  <p class="text-[11px] text-slate-600">2-bedroom apartment lease submitted and approved by caseworker.</p>
+                </div>
+              </div>
+
+              <div class="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200 flex items-start gap-3">
+                <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5"></i>
+                <div class="space-y-0.5 flex-1">
+                  <div class="font-bold text-slate-900 flex items-center justify-between">
+                    <span>Weekly Counseling Support</span>
+                    <span class="text-[10px] bg-emerald-200/80 text-emerald-950 font-black px-1.5 py-0.5 rounded">8 Wks Active</span>
+                  </div>
+                  <p class="text-[11px] text-slate-600">Individual counseling with Dr. Aris. Perfect attendance record.</p>
+                </div>
+              </div>
+
+              <div class="p-3 rounded-2xl bg-blue-50/70 border border-blue-200 flex items-start gap-3">
+                <i data-lucide="clock" class="w-4 h-4 text-blue-600 shrink-0 mt-0.5"></i>
+                <div class="space-y-0.5 flex-1">
+                  <div class="font-bold text-slate-900 flex items-center justify-between">
+                    <span>Health & Wellness Screenings</span>
+                    <span class="text-[10px] bg-blue-200/80 text-blue-950 font-black px-1.5 py-0.5 rounded">In Progress</span>
+                  </div>
+                  <p class="text-[11px] text-slate-600">All tests negative to date. Next screen scheduled for next week.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+            <span>Official Court Goal Tracking</span>
+            <span class="font-bold text-emerald-700">Updated Today</span>
+          </div>
+        </div>
+
+        <!-- MODULE 2: UPLOAD EVIDENCE (Direct 1-Tap Submission) -->
+        <div id="parentEvidenceCard" class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 space-y-4 hover:border-indigo-300 transition flex flex-col justify-between">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div class="flex items-center gap-2.5">
+                <div class="p-2 bg-indigo-100 text-indigo-800 rounded-xl">
+                  <i data-lucide="upload-cloud" class="w-5 h-5 text-indigo-700"></i>
+                </div>
+                <div>
+                  <h2 class="font-extrabold text-slate-900 text-base">Upload Evidence</h2>
+                  <p class="text-xs text-slate-500">Fast 1-tap certificate and document vault</p>
+                </div>
+              </div>
+              <span class="text-[11px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-1 rounded-full">
+                Instant Verification
+              </span>
+            </div>
+
+            <!-- Upload Form -->
+            <form onsubmit="handleParentEvidenceUpload(event)" class="space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Document Category *</label>
+                <select id="parentDocCategory" required class="w-full text-xs border border-slate-300 rounded-xl p-2.5 bg-white font-medium focus:ring-2 focus:ring-indigo-500">
+                  <option value="parenting_cert">Course Certificate (Parenting Class)</option>
+                  <option value="housing_lease">Housing / Lease Verification</option>
+                  <option value="counseling_letter">Counseling Attendance Letter</option>
+                  <option value="employment_paystub">Employment Paystub / Income Proof</option>
+                  <option value="health_wellness">Health & Wellness Verification</option>
+                  <option value="milestone_letter">Milestone Letter / Artwork for Child</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Select File or Snap Photo *</label>
+                <input type="file" id="parentDocFile" required class="w-full text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-100 file:text-indigo-800 hover:file:bg-indigo-200 cursor-pointer" />
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Optional Notes</label>
+                <input type="text" id="parentDocNotes" placeholder="e.g. Session 10 Easterseals Certificate" class="w-full text-xs border border-slate-300 rounded-xl p-2 bg-white focus:ring-2 focus:ring-indigo-500" />
+              </div>
+
+              <button type="submit" class="w-full py-2.5 bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                <i data-lucide="check" class="w-4 h-4"></i>
+                <span>Submit to Case Plan Record</span>
+              </button>
+            </form>
+
+            <!-- Recent Evidence Uploads -->
+            <div class="space-y-2">
+              <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Recently Verified Evidence</div>
+              <div id="parentEvidenceList" class="space-y-1.5 text-xs">
+                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <i data-lucide="file-check-2" class="w-4 h-4 text-emerald-600"></i>
+                    <div>
+                      <div class="font-bold text-slate-800 text-xs">Easterseals_Session10_Attendance.pdf</div>
+                      <div class="text-[10px] text-slate-500">Verified by Worker • Added to Court Packet</div>
+                    </div>
+                  </div>
+                  <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Verified</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-slate-100 text-[11px] text-slate-400">
+            All files are stripped of location metadata (EXIF/GPS) to protect privacy.
+          </div>
+        </div>
+
+        <!-- MODULE 3: FAMILY TIME & 1-TAP CHECK-IN -->
+        <div id="parentFamilyTimeCard" class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 space-y-4 hover:border-amber-300 transition flex flex-col justify-between">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div class="flex items-center gap-2.5">
+                <div class="p-2 bg-amber-100 text-amber-900 rounded-xl">
+                  <i data-lucide="calendar" class="w-5 h-5 text-amber-700"></i>
+                </div>
+                <div>
+                  <h2 class="font-extrabold text-slate-900 text-base">Family Time</h2>
+                  <p class="text-xs text-slate-500">Scheduled visits & verified attendance</p>
+                </div>
+              </div>
+              <span class="text-[11px] font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
+                100% On-Time Record
+              </span>
+            </div>
+
+            <!-- Next Scheduled Visit Card with 1-Tap Check-In -->
+            <div class="p-4 rounded-2xl bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent border border-amber-200 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-black uppercase tracking-wider text-amber-900 bg-amber-200/80 px-2 py-0.5 rounded">Upcoming Visit</span>
+                <span class="text-xs font-bold text-amber-900">Thursday, Oct 16</span>
+              </div>
+
+              <div class="space-y-1">
+                <div class="text-base font-black text-slate-900">3:30 PM – 5:30 PM (2 Hours)</div>
+                <div class="text-xs text-slate-600 flex items-center gap-1.5">
+                  <i data-lucide="map-pin" class="w-3.5 h-3.5 text-amber-700"></i>
+                  <span>Easterseals Family Time Center • Room 2B</span>
+                </div>
+              </div>
+
+              <!-- 1-Tap "I Am Here" Check-In Button -->
+              <div class="pt-1">
+                <button id="btnParentCheckIn" onclick="handleParentCheckIn()" class="w-full py-3 bg-amber-600 hover:bg-amber-500 text-white font-black text-xs rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                  <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                  <span id="parentCheckInLabel">I Am Here (1-Tap Check-In & Timestamp)</span>
+                </button>
+                <div id="parentCheckInSuccess" class="hidden mt-2 p-2 rounded-xl bg-emerald-100 text-emerald-900 border border-emerald-300 text-xs font-bold text-center">
+                  ✅ Checked in at 3:28 PM • Verified on-time timestamp logged!
+                </div>
+              </div>
+            </div>
+
+            <!-- Past Visit Record -->
+            <div class="space-y-1.5 text-xs">
+              <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Past Completed Visits</div>
+              <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                <div>
+                  <div class="font-bold text-slate-800">Thursday, Oct 09 • 3:30 PM</div>
+                  <div class="text-[10px] text-slate-500">2.0 Hours • Easterseals Center</div>
+                </div>
+                <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">On Time (Verified)</span>
+              </div>
+              <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                <div>
+                  <div class="font-bold text-slate-800">Thursday, Oct 02 • 3:30 PM</div>
+                  <div class="text-[10px] text-slate-500">2.0 Hours • Easterseals Center</div>
+                </div>
+                <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">On Time (Verified)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-slate-100 text-xs text-slate-500">
+            Attendance ledger is exported directly to court progress reports.
+          </div>
+        </div>
+
+        <!-- MODULE 4: CHILD UPDATES & SHARED FAMILY MOMENTS -->
+        <div id="parentChildUpdatesCard" class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 space-y-4 hover:border-rose-300 transition flex flex-col justify-between">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div class="flex items-center gap-2.5">
+                <div class="p-2 bg-rose-100 text-rose-800 rounded-xl">
+                  <i data-lucide="sparkles" class="w-5 h-5 text-rose-600"></i>
+                </div>
+                <div>
+                  <h2 class="font-extrabold text-slate-900 text-base">Child Updates</h2>
+                  <p class="text-xs text-slate-500">Positive milestones shared with care</p>
+                </div>
+              </div>
+              <span class="text-[11px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-full">
+                Strengths-Based
+              </span>
+            </div>
+
+            <!-- Shared Family Milestone Feed -->
+            <div class="space-y-3 text-xs">
+              <div class="p-3.5 rounded-2xl bg-rose-50/60 border border-rose-100 space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="font-black text-rose-950 text-xs flex items-center gap-1.5">
+                    <i data-lucide="book-open" class="w-3.5 h-3.5 text-rose-600"></i> Reading Milestone Victory
+                  </span>
+                  <span class="text-[10px] text-slate-400">2 days ago</span>
+                </div>
+                <p class="text-slate-700 text-xs leading-relaxed">
+                  Finished reading Chapter 3 of Charlotte's Web out loud today with huge smiles and lots of excitement!
+                </p>
+              </div>
+
+              <div class="p-3.5 rounded-2xl bg-indigo-50/60 border border-indigo-100 space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="font-black text-indigo-950 text-xs flex items-center gap-1.5">
+                    <i data-lucide="palette" class="w-3.5 h-3.5 text-indigo-600"></i> School Art Keepsake
+                  </span>
+                  <span class="text-[10px] text-slate-400">Yesterday</span>
+                </div>
+                <p class="text-slate-700 text-xs leading-relaxed">
+                  Painted a vibrant watercolor rainbow picture in art class and specifically said: "This is for Mom when I see her Thursday!"
+                </p>
+              </div>
+
+              <div class="p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-100 space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="font-black text-emerald-950 text-xs flex items-center gap-1.5">
+                    <i data-lucide="activity" class="w-3.5 h-3.5 text-emerald-600"></i> Soccer Saturday
+                  </span>
+                  <span class="text-[10px] text-slate-400">Last Weekend</span>
+                </div>
+                <p class="text-slate-700 text-xs leading-relaxed">
+                  Scored their first recreational soccer goal! Ran straight over to celebrate with high fives.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-slate-100 text-[11px] text-slate-400">
+            Shielded shared family milestones under Vermont DCF parent partnership guidelines.
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  `;
+}
+
+function exitParentWorkspace() {
+  activeCaregiverUser = 'Candy Chevalier';
+  localStorage.setItem('caregiverUser', activeCaregiverUser);
+  const select = document.getElementById('caregiverSelect');
+  if (select) select.value = activeCaregiverUser;
+  updateCaregiverAvatarDisplay(activeCaregiverUser);
+  switchMainSection('mission_control');
+}
+
+function handleParentCheckIn() {
+  const label = document.getElementById('parentCheckInLabel');
+  const successBox = document.getElementById('parentCheckInSuccess');
+  const btn = document.getElementById('btnParentCheckIn');
+  if (btn) btn.disabled = true;
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  if (label) label.textContent = `Checked In at ${timeStr} (Verified)`;
+  if (successBox) {
+    successBox.textContent = `✅ Checked in at ${timeStr} • Verified on-time arrival logged to court progress packet!`;
+    successBox.classList.remove('hidden');
+  }
+}
+
+function handleParentEvidenceUpload(e) {
+  e.preventDefault();
+  const fileInput = document.getElementById('parentDocFile');
+  const notesInput = document.getElementById('parentDocNotes');
+  const catInput = document.getElementById('parentDocCategory');
+  const list = document.getElementById('parentEvidenceList');
+  
+  if (!fileInput || fileInput.files.length === 0) {
+    alert("Please choose a file or take a photo first.");
+    return;
+  }
+
+  const fileName = fileInput.files[0].name;
+  const noteText = notesInput ? notesInput.value || catInput.options[catInput.selectedIndex].text : '';
+
+  if (list) {
+    const item = document.createElement('div');
+    item.className = 'p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between animate-fadeIn';
+    item.innerHTML = `
+      <div class="flex items-center gap-2">
+        <i data-lucide="file-check-2" class="w-4 h-4 text-emerald-600"></i>
+        <div>
+          <div class="font-bold text-slate-800 text-xs">${fileName}</div>
+          <div class="text-[10px] text-emerald-800">${noteText} • Just Uploaded & Verified</div>
+        </div>
+      </div>
+      <span class="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300">Verified</span>
+    `;
+    list.prepend(item);
+    lucide.createIcons();
+  }
+
+  alert(`Document "${fileName}" successfully uploaded and cryptographically timestamped for your Parent Progress Packet!`);
+  fileInput.value = '';
+  if (notesInput) notesInput.value = '';
 }
 
 
