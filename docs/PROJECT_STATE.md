@@ -96,6 +96,10 @@
   - **Friction Eliminated:** Eliminated navigation friction where reviewer had to remember launch method or restart application to reopen Review Mode or switch personas.
   - **Persistent Global Access:** Mounted 1-click Review Mode entry across 5 persistent surfaces: (1) Persistent floating Founder OS dock (`#founderFloatingDock` with `#btnFloatingReviewMode` & `#btnFloatingFeedback`), (2) Top sticky navigation header (`#btnOpenReviewMode`), (3) Primary Navigation Container (`#mainNavigationContainer`), (4) Mission Control Quick Action Dock, and (5) Parent Participant Workspace banners and fallback access screens.
   - **Zero Restart & Zero Work Loss:** Reopens Founder Review Mode modal in 1 click from any screen, allowing switching between Founder, Foster Caregiver, Kinship Caregiver, Parent Participant, and Respite Provider without restarting Sprout or losing active session state.
+- [x] **Founder Review Finding #002 Resolved (Persona Launcher Surfaced on Training Selection Screen & Modal):**
+  - **Friction Eliminated:** Restored and surfaced the complete Persona Launcher with all 5 operating personas clearly presented with 1-click launch actions, eliminating the orientation friction of having to search for how to begin or return to a persona-based walkthrough.
+  - **Visible Training Selection Screen:** Embedded the dedicated Persona Launcher (`#trainingPersonaLauncher`) directly at the top of the Training Hub screen (`renderTrainingSimulatorView`), giving the reviewer an unmissable, clearly visible training selection screen presenting: (1) Founder Overview, (2) Foster Caregiver, (3) Kinship Caregiver, (4) Parent Participant, and (5) Respite Provider.
+  - **Global Modal Persona Launcher:** Retitled and reinforced the global Review Mode modal (`#founderReviewModal`) to explicitly feature **PERSONA LAUNCHER • SPROUT REVIEW MODE** with instant 1-click launch actions across all 5 personas from any screen.
 
 ---
 
@@ -445,15 +449,16 @@ All 16 core functional areas were verified operational in the local sandbox:
 15. **Sample Communities:** Pre-seeded realistic Circle of Care communities (Liam Brooks CH-201, Emma Vance CH-202, Noah Miller CH-203).
 16. **Sample Parent Participants:** Realistic benchmark parent accounts (Danielle Miller, Angela Davis, Jason Vance, Maria Lin) with varying progress and safety restrictions.
 
-### Part B: Founder Review Mode
-- **Modal:** `#founderReviewModal` displayed on sandbox launch and accessible anytime in 1 click without restarting Sprout or losing work.
-- **Global 1-Click Access Surfaces (Resolving Finding #001):**
+### Part B: Founder Review Mode & Persona Launcher
+- **Modal:** `#founderReviewModal` retitled to **PERSONA LAUNCHER • SPROUT REVIEW MODE**, displayed on sandbox launch and accessible anytime in 1 click without restarting Sprout or losing work.
+- **Dedicated Training Selection Screen (`#trainingPersonaLauncher`):** Embedded directly at the top of the Training Hub (`renderTrainingSimulatorView`), giving the reviewer an unmissable on-screen launcher with all 5 training personas.
+- **Global 1-Click Access Surfaces (Resolving Finding #001 & #002):**
   1. **Persistent Floating Dock (`#founderFloatingDock`):** Mounted at `bottom-5 right-5 z-50` across every view (`#btnFloatingReviewMode` & `#btnFloatingFeedback`).
   2. **Top Sticky Navigation Header (`#btnOpenReviewMode`):** Always-visible shrink-resistant high-contrast action button.
   3. **Primary Navigation Bar (`#mainNavigationContainer`):** Integrated directly into the fast-action navigation cluster.
   4. **Mission Control Quick Action Dock:** Pinned as the first action item alongside `+ 15-Sec Log`.
   5. **Parent Participant Workspace Banner & Error Screens:** Available directly within the family success banner and fallback error views.
-- **5 Guided Walkthrough Paths:**
+- **5 Guided Walkthrough Paths (1-Click Actions):**
   1. **Founder Overview:** Switches to Founder overview (`Candy Chevalier`), shows household metrics, full child roster, and high-level health indicators.
   2. **Foster Caregiver View:** Focuses on routine logging, quick action dock, and monthly compliance reporting.
   3. **Kinship Caregiver View:** Switches to Sample Community and opens the Kinship Fast-Track Guide and welfare benefits navigator.

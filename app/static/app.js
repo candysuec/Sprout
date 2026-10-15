@@ -5183,6 +5183,10 @@ function renderWelcomeLandingView(container) {
             or explore the interactive sandbox profiles and state resource directory below.
           </p>
           <div class="pt-2 flex flex-wrap items-center gap-3">
+            <button onclick="openFounderReviewModal()" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black rounded-xl text-xs shadow-md transition flex items-center gap-2 cursor-pointer">
+              <i data-lucide="play-circle" class="w-4 h-4 text-slate-950"></i>
+              <span>Open Persona Launcher (5 Guided Views)</span>
+            </button>
             <button id="btnHeroLaunchSarah" onclick="activateSampleCaregiverProfile('Sarah Jenkins')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center gap-2">
               <i data-lucide="play" class="w-4 h-4"></i>
               <span>Launch Sample Sandbox (Sarah Jenkins • Established)</span>
@@ -5980,6 +5984,145 @@ async function renderTrainingSimulatorView(container) {
             </button>
             <button onclick="resetSandboxFactoryData()" class="bg-white/10 hover:bg-white/20 text-white font-semibold text-xs px-3.5 py-2.5 rounded-xl border border-white/20 transition flex items-center gap-1.5">
               <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 text-blue-300"></i> Reset Sandbox
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRIMARY PERSONA LAUNCHER: 5 GUIDED TRAINING & REVIEW PERSONAS -->
+      <div id="trainingPersonaLauncher" class="bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 rounded-3xl p-6 text-white shadow-xl border-2 border-emerald-500/80 space-y-5">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-700 pb-4">
+          <div class="flex items-center gap-3">
+            <div class="p-3 bg-emerald-500/20 text-emerald-400 rounded-2xl border border-emerald-500/40">
+              <i data-lucide="play-circle" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="text-lg sm:text-xl font-black text-white tracking-tight">PERSONA LAUNCHER</h3>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/30 text-emerald-300 border border-emerald-400/50">
+                  5 Guided Review Paths
+                </span>
+              </div>
+              <p class="text-xs text-slate-300">Select any training persona below to immediately launch their complete workflow with 1 click.</p>
+            </div>
+          </div>
+          <button onclick="openFounderReviewModal()" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black rounded-xl text-xs transition shadow-md flex items-center gap-2 shrink-0 cursor-pointer">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+            <span>Quick Launcher Modal</span>
+          </button>
+        </div>
+
+        <!-- 5 Personas Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- 1. Founder Overview -->
+          <div class="bg-slate-800/90 border-2 border-emerald-500/80 rounded-2xl p-4.5 transition flex flex-col justify-between gap-3 shadow-md hover:border-emerald-400">
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                  <i data-lucide="compass" class="w-4 h-4"></i> 1. Founder Overview
+                </span>
+                <span class="text-[10px] font-bold bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full">Primary Home</span>
+              </div>
+              <p class="text-xs text-slate-300 leading-snug">Review high-level system status, children in care, household licensing, and command center priorities.</p>
+              <div class="mt-2.5 flex flex-wrap gap-1.5 text-[11px] text-slate-400">
+                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Project Status</span>
+                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Children</span>
+                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Households</span>
+                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Dashboard</span>
+              </div>
+            </div>
+            <button onclick="launchPersonaReview('founder')" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+              <span>Launch Founder View</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <!-- 2. Foster Caregiver -->
+          <div class="bg-slate-800/90 border border-blue-500/70 rounded-2xl p-4.5 transition flex flex-col justify-between gap-3 shadow-md hover:border-blue-400">
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs font-black uppercase tracking-wider text-blue-400 flex items-center gap-1.5">
+                  <i data-lucide="heart-handshake" class="w-4 h-4"></i> 2. Foster Caregiver
+                </span>
+                <span class="text-[10px] font-bold bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full">Routine Care</span>
+              </div>
+              <p class="text-xs text-slate-300 leading-snug">Experience 5-click late-night intake, 15-second daily routine logging, and 1-click DCF monthly report generation.</p>
+              <div class="mt-2.5 flex flex-wrap gap-1.5 text-[11px] text-slate-400">
+                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Emergency Placement</span>
+                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Daily 15s Log</span>
+                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Export Month</span>
+              </div>
+            </div>
+            <button onclick="launchPersonaReview('foster')" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+              <span>Launch Foster Caregiver View</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <!-- 3. Kinship Caregiver -->
+          <div class="bg-slate-800/90 border border-teal-500/70 rounded-2xl p-4.5 transition flex flex-col justify-between gap-3 shadow-md hover:border-teal-400">
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs font-black uppercase tracking-wider text-teal-400 flex items-center gap-1.5">
+                  <i data-lucide="users-2" class="w-4 h-4"></i> 3. Kinship Caregiver
+                </span>
+                <span class="text-[10px] font-bold bg-teal-500/20 text-teal-300 px-2 py-0.5 rounded-full">Relative Care</span>
+              </div>
+              <p class="text-xs text-slate-300 leading-snug">Plain-English Fast-Track Guide for grandparents/relatives: emergency cash benefits triage, consent paperwork, and jargon decoder.</p>
+              <div class="mt-2.5 flex flex-wrap gap-1.5 text-[11px] text-slate-400">
+                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Fast Track Guide</span>
+                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Cash Benefits</span>
+                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Jargon Decoder</span>
+              </div>
+            </div>
+            <button onclick="launchPersonaReview('kinship')" class="w-full py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+              <span>Launch Kinship View</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <!-- 4. Parent Participant -->
+          <div class="bg-slate-800/90 border border-indigo-500/70 rounded-2xl p-4.5 transition flex flex-col justify-between gap-3 shadow-md hover:border-indigo-400">
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs font-black uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
+                  <i data-lucide="heart" class="w-4 h-4"></i> 4. Parent Participant
+                </span>
+                <span class="text-[10px] font-bold bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full">Reunification</span>
+              </div>
+              <p class="text-xs text-slate-300 leading-snug">Dignity-first Parent Workspace: track case goals, 1-click on-time visit check-in, shared moments feed, and certificates vault.</p>
+              <div class="mt-2.5 flex flex-wrap gap-1.5 text-[11px] text-slate-400">
+                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Action Roadmap</span>
+                <span class="px-2 py-0.5 bg-slate-900 rounded-md">1-Click Check-in</span>
+                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Moments Feed</span>
+                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Evidence Vault</span>
+              </div>
+            </div>
+            <button onclick="launchPersonaReview('parent')" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+              <span>Launch Parent Workspace</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <!-- 5. Respite Provider -->
+          <div class="bg-slate-800/90 border border-rose-500/70 rounded-2xl p-4.5 transition flex flex-col justify-between gap-3 shadow-md hover:border-rose-400 md:col-span-2 lg:col-span-2">
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs font-black uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
+                  <i data-lucide="shield-alert" class="w-4 h-4"></i> 5. Respite Provider
+                </span>
+                <span class="text-[10px] font-bold bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded-full">Weekend Care</span>
+              </div>
+              <p class="text-xs text-slate-300 leading-snug">Concise emergency Care & Safety Sheet with allergy alerts, medication schedules, comforting bedtime routines, and emergency numbers in <30 seconds.</p>
+              <div class="mt-2.5 flex flex-wrap gap-1.5 text-[11px] text-slate-400">
+                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Care & Safety Sheet</span>
+                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Safety Information</span>
+                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Return Summary</span>
+              </div>
+            </div>
+            <button onclick="launchPersonaReview('respite')" class="w-full py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+              <span>Launch Respite Provider View</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
             </button>
           </div>
         </div>

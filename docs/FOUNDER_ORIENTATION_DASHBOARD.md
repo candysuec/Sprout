@@ -29,6 +29,7 @@ You are standing in **Sprout v3.2 Foundation Approved (Development Freeze Active
 - **Founder Acceptance Walkthrough Signed Off:** Candy Chevalier verified all 4 operating journeys. Captured **0 confusion, 0 hesitation, 0 unexpected behavior, 0 missing information**. Development freeze activated.
 - **Founder Sandbox Review Mode Ready:** 16/16 readiness check items verified (100%). Guided review launcher (`#founderReviewModal`) and persistent floating feedback modal (`#founderFeedbackModal`) mounted.
 - **Founder Review Finding #001 Resolved (PASS):** Eliminated navigation friction by mounting 1-click Review Mode entry globally across 5 surfaces (persistent floating dock `#founderFloatingDock`, top sticky header `#btnOpenReviewMode`, main navigation bar, Mission Control dock, and Parent Workspace banner). Review Mode and persona switching are now accessible from every screen in 1 click without application restart or work loss.
+- **Founder Review Finding #002 Resolved (PASS):** Restored and surfaced the complete **Persona Launcher** across both the global modal (`#founderReviewModal`) and directly embedded as the primary section on the Training Hub screen (`#trainingPersonaLauncher`), presenting all 5 personas with 1-click launch actions (Founder Overview, Foster Caregiver, Kinship Caregiver, Parent Participant, Respite Provider).
 
 ---
 
@@ -44,7 +45,7 @@ You are standing in **Sprout v3.2 Foundation Approved (Development Freeze Active
 | **Respite Cognitive Load** | **PASS** | 1-tap Care & Safety Sheet with allergies, meds, comforting, and emergency numbers in <30s. |
 | **Founder Cognitive Load** | **PASS** | Single source-of-truth home (`FOUNDER_ORIENTATION_DASHBOARD.md` & `PROJECT_STATE.md`). 178/178 tests passing. |
 | **Founder Acceptance** | **ACCEPTED** | Candy completed all 4 primary operating journeys without becoming the detective. |
-| **Founder Sandbox Review** | **READY (16/16 Passed, Finding #001 Resolved)** | 5 guided persona launch paths accessible globally in 1 click from every screen. Zero developer assistance needed. |
+| **Founder Sandbox Review** | **READY (16/16 Passed, Findings #001 & #002 Resolved)** | Complete Persona Launcher accessible globally via modal and embedded directly on Training Hub screen. |
 
 ---
 
