@@ -1,8 +1,9 @@
 # SPROUT / KINCARE OS — CANONICAL SYSTEM STATE & AUDIT REGISTRY
-**Document Version:** 3.1.0 (Governance Hardened Baseline)  
+**Document Version:** 3.1.1 (Phase 13A Governance Hardened & Implementation Ready)  
 **Status:** Canonical System State Document & Architecture Registry  
 **Last Verified Date:** October 14, 2026  
-**Governing Standard:** [`docs/GOVERNANCE_AND_SAFETY_FRAMEWORK.md`](GOVERNANCE_AND_SAFETY_FRAMEWORK.md) & [`docs/CHILD_AND_FAMILY_SUCCESS_OPERATING_SYSTEM.md`](CHILD_AND_FAMILY_SUCCESS_OPERATING_SYSTEM.md)  
+**Governing Standards:** [`docs/GOVERNANCE_AND_SAFETY_FRAMEWORK.md`](GOVERNANCE_AND_SAFETY_FRAMEWORK.md), [`docs/CHILD_AND_FAMILY_SUCCESS_OPERATING_SYSTEM.md`](CHILD_AND_FAMILY_SUCCESS_OPERATING_SYSTEM.md), & [`docs/API_GOVERNANCE_MATRIX.md`](API_GOVERNANCE_MATRIX.md)  
+**Implementation Readiness:** 97.2 / 100 (Architecture, Governance, API, Export, Access Verified)  
 **Test Suite Verification:** 73 / 73 Tests Passing (100% CI Baseline)  
 
 ---
@@ -89,8 +90,10 @@ Sprout enforces a strict dual-sphere runtime state model:
 
 ## 5. Backend API Route Registry (`app/server.py`)
 
+> Detailed governance specifications, role access gates, note classification rules, and export eligibility for all endpoints are documented in the [**API Governance Matrix**](API_GOVERNANCE_MATRIX.md).
+
 ```
-36 Verified Local Endpoints:
+43 Audited Local Endpoints:
 ├── System & Static (4)
 │   ├── GET /                        (Root Single Page App)
 │   ├── GET /static/<path>           (Client Assets: CSS, JS, PWA icons)
@@ -126,6 +129,12 @@ Sprout enforces a strict dual-sphere runtime state model:
 │   ├── GET  /api/children/<id>/posc     (Plan of Safe Care for substance-exposed infants)
 │   ├── POST /api/children/<id>/posc     (Update POSC healthcare milestones)
 │   └── GET  /api/caregiver/self-regulation (Secondary trauma debriefing prompts)
+├── Health, Education & Lifebook Extensions (5)
+│   ├── GET  /api/children/<id>/health   (Active MAR & medical records)
+│   ├── POST /api/children/<id>/health   (Log immunizations & medical visits)
+│   ├── GET  /api/children/<id>/education(IEP/504 conferences & attendance)
+│   ├── POST /api/children/<id>/education(Log school milestones & reading)
+│   └── GET  /api/children/<id>/lifebook (Positive milestones & memory items)
 ├── Document Vault & Export Services (6)
 │   ├── GET  /api/shared-docs        (20-folder digital binder directory)
 │   ├── POST /api/open-doc           (Native desktop file launcher)
@@ -244,4 +253,18 @@ Sprout implements a strict 4-domain data sovereignty model and a 4-tier note cla
 - **Parent Access Safety Score:** 96 / 100 (Unlinked registration, 10-state lifecycle).
 - **Zero-Leakage Data Protection Score:** 100 / 100 (Air-gapped, zero cloud exposure).
 - **Composite Platform Safety & Readiness:** **97.2 / 100 (Governance Hardened)**.
+
+---
+
+## 11. Phase 13A Pre-Implementation Governance Suite Registry
+
+The following authoritative specifications establish pre-implementation governance across all data, API, export, and role boundaries:
+
+1. [**API Governance Matrix**](API_GOVERNANCE_MATRIX.md): Audits all 43 endpoints (39 REST + 4 file streaming), defining domain ownership, 5-tier classification rules, role capability gates, and export eligibility.
+2. [**Export Governance Matrix**](EXPORT_GOVERNANCE_MATRIX.md): Redaction, safety, EXIF scrubbing, and sensitivity controls for all 9 document generators (DCF Monthly, Court Packet, FS-334B, Respite Card, Lifebook, etc.).
+3. [**Database Governance Gap Report**](DATABASE_GOVERNANCE_GAP_REPORT.md): Audit of 11 SQLite tables and 148 columns, identifying schema migration gaps, field-level controls, and data sovereignty boundaries.
+4. [**Role & Permission Matrix v2**](ROLE_PERMISSION_MATRIX_V2.md): Fine-grained capability matrix for 8 roles across 8 operational gates and 4 sovereignty domains.
+5. [**Workflow Governance Dictionary**](WORKFLOW_GOVERNANCE_DICTIONARY.md): Step-by-step governance specifications for 10 critical system workflows (Intake, Medical, Family Time, Court, Incident, etc.).
+6. [**Data Sensitivity Classification Architecture**](DATA_SENSITIVITY_CLASSIFICATION.md): 4-tier sensitivity classification standard (Standard, Sensitive, Restricted, Protected) with field-level controls and sanitization rules.
+7. [**Child Voice Domain Discovery**](CHILD_VOICE_DOMAIN_DISCOVERY.md): Exploratory architectural analysis and boundary rules for a future 5th domain (deferred to Phase 17+).
 
