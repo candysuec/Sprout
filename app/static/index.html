@@ -78,7 +78,7 @@
         </a>
 
         <!-- Founder Review Mode Launcher Button -->
-        <button id="btnOpenReviewMode" onclick="openFounderReviewModal()" class="flex items-center bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black rounded-xl px-3 py-1.5 text-xs transition shadow-md gap-1.5 cursor-pointer" title="Open Guided Founder Review Mode">
+        <button id="btnOpenReviewMode" onclick="openFounderReviewModal()" class="flex items-center bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black rounded-xl px-3.5 py-1.5 text-xs transition shadow-md gap-1.5 cursor-pointer shrink-0 border border-emerald-300" title="Open Guided Founder Review Mode & Switch Personas (1-Click)">
           <i data-lucide="play-circle" class="w-3.5 h-3.5 text-slate-950"></i>
           <span>Review Mode</span>
         </button>
@@ -223,6 +223,12 @@
           <button id="btnFastLogNote" onclick="openRecordModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5 shrink-0">
             <i data-lucide="plus" class="w-4 h-4"></i>
             <span>Log Note</span>
+          </button>
+
+          <!-- Founder Review Mode Quick Button in Main Nav -->
+          <button onclick="openFounderReviewModal()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs px-3.5 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5 shrink-0 cursor-pointer" title="Reopen Founder Review Mode to switch personas">
+            <i data-lucide="play-circle" class="w-4 h-4 text-emerald-100"></i>
+            <span>Review Mode</span>
           </button>
         </div>
 
@@ -1534,7 +1540,7 @@
   <!-- ========================================================================= -->
   <!-- FOUNDER REVIEW MODE: GUIDED PERSONA LAUNCHER MODAL -->
   <!-- ========================================================================= -->
-  <div id="founderReviewModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+  <div id="founderReviewModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[60] flex items-center justify-center p-4 hidden">
     <div class="bg-slate-900 border border-emerald-500/60 rounded-3xl max-w-3xl w-full shadow-2xl overflow-hidden animate-fadeIn flex flex-col max-h-[90vh]">
       <!-- Header -->
       <div class="bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 p-6 border-b border-emerald-700/50 flex items-center justify-between shrink-0">
@@ -1683,7 +1689,7 @@
   <!-- ========================================================================= -->
   <!-- FOUNDER FEEDBACK MODAL: CAPTURE REAL OPERATOR INSIGHTS -->
   <!-- ========================================================================= -->
-  <div id="founderFeedbackModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+  <div id="founderFeedbackModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[60] flex items-center justify-center p-4 hidden">
     <div class="bg-slate-900 border border-amber-500/60 rounded-3xl max-w-xl w-full shadow-2xl overflow-hidden animate-fadeIn flex flex-col max-h-[90vh]">
       <!-- Header -->
       <div class="bg-gradient-to-r from-amber-950 via-slate-900 to-amber-950 p-5 border-b border-amber-700/50 flex items-center justify-between shrink-0">
@@ -1760,11 +1766,20 @@
     </div>
   </div>
 
-  <!-- PERSISTENT FLOATING FEEDBACK BUTTON (AVAILABLE ON EVERY PAGE) -->
-  <button id="btnFloatingFeedback" onclick="openFounderFeedbackModal()" class="fixed bottom-5 right-5 z-50 flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-full shadow-2xl border-2 border-amber-300 transition transform hover:scale-105 cursor-pointer" title="Share Founder Review Feedback on this screen">
-    <i data-lucide="message-square-heart" class="w-5 h-5 text-slate-950"></i>
-    <span class="text-xs uppercase tracking-wider font-black">Feedback</span>
-  </button>
+  <!-- PERSISTENT FLOATING FOUNDER OS DOCK (GLOBAL ON EVERY SCREEN) -->
+  <div id="founderFloatingDock" class="fixed bottom-5 right-5 z-50 flex items-center gap-2 bg-slate-950/85 backdrop-blur-md p-1.5 rounded-full border border-slate-700/80 shadow-2xl">
+    <!-- 1-Click Global Review Mode Launcher -->
+    <button id="btnFloatingReviewMode" onclick="openFounderReviewModal()" class="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black rounded-full shadow-md border border-emerald-300 transition transform hover:scale-105 cursor-pointer" title="Switch Personas or Reopen Founder Review Mode (1-Click)">
+      <i data-lucide="play-circle" class="w-4 h-4 text-slate-950"></i>
+      <span class="text-xs uppercase tracking-wider font-black">Review Mode</span>
+    </button>
+
+    <!-- 1-Click Founder Feedback Capture -->
+    <button id="btnFloatingFeedback" onclick="openFounderFeedbackModal()" class="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-full shadow-md border border-amber-300 transition transform hover:scale-105 cursor-pointer" title="Share Founder Review Feedback on this screen">
+      <i data-lucide="message-square-heart" class="w-4 h-4 text-slate-950"></i>
+      <span class="text-xs uppercase tracking-wider font-black">Feedback</span>
+    </button>
+  </div>
 
   <!-- Digital In-App Signature Pad Modal (For Respite, Visits & Transportation) -->
   <div id="signatureModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">

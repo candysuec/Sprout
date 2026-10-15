@@ -6994,6 +6994,10 @@ async function renderMissionControlView(container) {
           </div>
         </div>
         <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto shrink-0">
+          <button onclick="openFounderReviewModal()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer" title="Reopen Founder Review Mode & Switch Personas">
+            <i data-lucide="play-circle" class="w-4 h-4 text-slate-950"></i>
+            <span>Review Mode</span>
+          </button>
           <button onclick="openRecordModal()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5" title="Log a routine observation in 15 seconds">
             <i data-lucide="plus-circle" class="w-4 h-4"></i>
             <span>+ 15-Sec Log</span>
@@ -7356,8 +7360,12 @@ async function renderParentParticipantView(container) {
             Access to child records and case updates is currently inactive under child safety protocols. All records are secured under Legal Hold. Please contact your DCF caseworker for status.
           </p>
         </div>
-        <div>
-          <button onclick="exitParentWorkspace()" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 mx-auto">
+        <div class="flex items-center justify-center gap-2.5">
+          <button onclick="openFounderReviewModal()" class="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black rounded-xl text-xs transition flex items-center gap-2 cursor-pointer shadow-md">
+            <i data-lucide="play-circle" class="w-4 h-4 text-slate-950"></i>
+            <span>Review Mode</span>
+          </button>
+          <button onclick="exitParentWorkspace()" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-2">
             <i data-lucide="log-out" class="w-4 h-4"></i>
             <span>Exit Portal</span>
           </button>
@@ -7381,7 +7389,11 @@ async function renderParentParticipantView(container) {
             This parent account is not currently linked to an active child placement. Zero child records are accessible.
           </p>
         </div>
-        <div>
+        <div class="flex items-center justify-center gap-2.5">
+          <button onclick="openFounderReviewModal()" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer shadow-md">
+            <i data-lucide="play-circle" class="w-3.5 h-3.5 text-slate-950"></i>
+            <span>Review Mode</span>
+          </button>
           <button onclick="exitParentWorkspace()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition">
             Exit
           </button>
@@ -7415,6 +7427,10 @@ async function renderParentParticipantView(container) {
           </div>
 
           <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2.5 shrink-0">
+            <button onclick="openFounderReviewModal()" class="px-3.5 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black rounded-xl text-xs transition flex items-center gap-1.5 shadow-md cursor-pointer" title="Reopen Founder Review Mode to switch personas">
+              <i data-lucide="play-circle" class="w-3.5 h-3.5 text-slate-950"></i>
+              <span>Review Mode</span>
+            </button>
             <button onclick="exitParentWorkspace()" class="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white rounded-xl text-xs font-semibold border border-white/20 transition flex items-center gap-1.5" title="Switch to Caregiver Mission Control for system simulation">
               <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
               <span>Exit to Caregiver Mode</span>

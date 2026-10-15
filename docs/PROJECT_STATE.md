@@ -92,6 +92,10 @@
   - Verified 100% operational readiness across all 16 sandbox areas: Mission Control, Children, Emergency Placement Wizard, Care & Safety Sheet, Quick Action Dock, Parent Workspace, Respite Provider Experience, Kinship Fast Track Guide, Permanency Wizard, Monthly Report Export, DCF Reports, Search, Timeline, Activity Feed, Sample Communities, Sample Parent Participants.
   - Built guided Founder Review Mode launcher (`#founderReviewModal`) welcoming the operator and offering 1-click launch pathways for: (1) Founder Overview, (2) Foster Caregiver View, (3) Kinship View, (4) Parent View, (5) Respite View.
   - Built persistent Founder Feedback capture system (`#founderFeedbackModal` & `#btnFloatingFeedback`) capturing operator reflections across 5 prompts (*What worked?*, *What was confusing?*, *What was missing?*, *What felt unnecessary?*, *What felt amazing?*) and persisting to local SQLite (`POST /api/founder/feedback`) with offline `localStorage` backup without automatic code churn.
+- [x] **Founder Review Finding #001 Resolved (Global 1-Click Review Mode Access):**
+  - **Friction Eliminated:** Eliminated navigation friction where reviewer had to remember launch method or restart application to reopen Review Mode or switch personas.
+  - **Persistent Global Access:** Mounted 1-click Review Mode entry across 5 persistent surfaces: (1) Persistent floating Founder OS dock (`#founderFloatingDock` with `#btnFloatingReviewMode` & `#btnFloatingFeedback`), (2) Top sticky navigation header (`#btnOpenReviewMode`), (3) Primary Navigation Container (`#mainNavigationContainer`), (4) Mission Control Quick Action Dock, and (5) Parent Participant Workspace banners and fallback access screens.
+  - **Zero Restart & Zero Work Loss:** Reopens Founder Review Mode modal in 1 click from any screen, allowing switching between Founder, Foster Caregiver, Kinship Caregiver, Parent Participant, and Respite Provider without restarting Sprout or losing active session state.
 
 ---
 
@@ -442,7 +446,13 @@ All 16 core functional areas were verified operational in the local sandbox:
 16. **Sample Parent Participants:** Realistic benchmark parent accounts (Danielle Miller, Angela Davis, Jason Vance, Maria Lin) with varying progress and safety restrictions.
 
 ### Part B: Founder Review Mode
-- **Modal:** `#founderReviewModal` displayed on sandbox launch and accessible anytime via the `Review Mode` button in the sticky navigation header.
+- **Modal:** `#founderReviewModal` displayed on sandbox launch and accessible anytime in 1 click without restarting Sprout or losing work.
+- **Global 1-Click Access Surfaces (Resolving Finding #001):**
+  1. **Persistent Floating Dock (`#founderFloatingDock`):** Mounted at `bottom-5 right-5 z-50` across every view (`#btnFloatingReviewMode` & `#btnFloatingFeedback`).
+  2. **Top Sticky Navigation Header (`#btnOpenReviewMode`):** Always-visible shrink-resistant high-contrast action button.
+  3. **Primary Navigation Bar (`#mainNavigationContainer`):** Integrated directly into the fast-action navigation cluster.
+  4. **Mission Control Quick Action Dock:** Pinned as the first action item alongside `+ 15-Sec Log`.
+  5. **Parent Participant Workspace Banner & Error Screens:** Available directly within the family success banner and fallback error views.
 - **5 Guided Walkthrough Paths:**
   1. **Founder Overview:** Switches to Founder overview (`Candy Chevalier`), shows household metrics, full child roster, and high-level health indicators.
   2. **Foster Caregiver View:** Focuses on routine logging, quick action dock, and monthly compliance reporting.
