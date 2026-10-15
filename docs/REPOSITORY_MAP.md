@@ -2,7 +2,7 @@
 **Initiative:** Sprout  
 **Project:** Child & Family Success Operating System  
 **Purpose:** Instant Orientation & Cognitive Filter for Founder & Engineers  
-**Target Version:** Sprout v3.2 Foundation Baseline  
+**Target Version:** Sprout v3.2 Foundation Baseline (Freeze Active & Sandbox Review Ready)  
 
 ---
 
@@ -23,7 +23,7 @@ EVIDENCE (Audit Reports, Test Runs, Validation Logs)
 To eliminate cognitive fatigue and prevent Candy from acting as a detective, every document in the repository is placed into one of four distinct categories:
 
 1. **🔥 WHAT MATTERS (Canonical Source of Truth & Active Guides):** Read these to understand current system truth.
-2. **🛠️ ACTIVE WORK & EXECUTION (Implementation Runbooks):** Reference these during active code development.
+2. **🛠️ ACTIVE WORK & EXECUTION (Sandbox & Testing Verification):** Reference these during sandbox review and validation.
 3. **📚 REFERENCE ONLY (Stable Technical & Training Specifications):** Read only when looking up a specific domain or curriculum detail.
 4. **📦 COMPLETED WORK & ARCHIVE CANDIDATES (Historical Evidence):** Safe to completely ignore during daily operations.
 
@@ -45,18 +45,16 @@ To eliminate cognitive fatigue and prevent Candy from acting as a detective, eve
 
 ---
 
-## 3. Category 2: ACTIVE WORK & EXECUTION (Engineering Runbooks)
+## 3. Category 2: ACTIVE WORK & EXECUTION (Sandbox & Validation Fixtures)
 
-*These documents guide the upcoming Phase 13A/13B code implementation and testing fixtures.*
+*Phase 13B and Migration 7 are 100% COMPLETE. Development freeze is active. Current active activities are Founder Sandbox Walkthrough, Real-World User Observation, and Primary Home Alignment.*
 
 | Document | Title & Location | Execution Role |
 | :--- | :--- | :--- |
-| **Execution Control Plan** | [`PHASE_13B_EXECUTION_CONTROL_PLAN.md`](PHASE_13B_EXECUTION_CONTROL_PLAN.md) | Chronological 8-step execution order for Migration 7 and authorization middleware. |
-| **Implementation Design** | [`PHASE_13A_IMPLEMENTATION_DESIGN.md`](PHASE_13A_IMPLEMENTATION_DESIGN.md) | Traceability matrix, middleware pseudo-code, rollback procedures, and test harnesses. |
-| **API Governance** | [`API_GOVERNANCE_MATRIX.md`](API_GOVERNANCE_MATRIX.md) | Ownership, note classifications, and security filters for all 43 local REST endpoints. |
-| **Export Governance** | [`EXPORT_GOVERNANCE_MATRIX.md`](EXPORT_GOVERNANCE_MATRIX.md) | Redaction, classification filtering, and preview requirements for all 9 document generators. |
 | **Testing Ecosystem** | [`SAMPLE_CHILD_COMMUNITY.md`](SAMPLE_CHILD_COMMUNITY.md) | 5 multi-party child community fixtures (caregiver, parent, respite, GAL, DCF worker) for testing. |
 | **Parent Scenarios** | [`PARENT_PARTICIPANT_SCENARIOS.md`](PARENT_PARTICIPANT_SCENARIOS.md) | 5 benchmark parent lifecycle testing profiles (New Case, Active, Restricted, Near Reunification, Reunified). |
+| **API Governance** | [`API_GOVERNANCE_MATRIX.md`](API_GOVERNANCE_MATRIX.md) | Ownership, note classifications, and security filters for all 43 local REST endpoints. |
+| **Export Governance** | [`EXPORT_GOVERNANCE_MATRIX.md`](EXPORT_GOVERNANCE_MATRIX.md) | Redaction, classification filtering, and preview requirements for all 9 document generators. |
 
 ---
 
@@ -88,6 +86,8 @@ To eliminate cognitive fatigue and prevent Candy from acting as a detective, eve
 
 | Document | Type | Historical Context |
 | :--- | :--- | :--- |
+| **[`PHASE_13B_EXECUTION_CONTROL_PLAN.md`](PHASE_13B_EXECUTION_CONTROL_PLAN.md)** | Completed Execution | 8-step execution order for completed Migration 7 and auth middleware. |
+| **[`PHASE_13A_IMPLEMENTATION_DESIGN.md`](PHASE_13A_IMPLEMENTATION_DESIGN.md)** | Completed Design | Pre-implementation design and middleware specifications. |
 | **[`SPRINT_13C_USABILITY_EXECUTION_REPORT.md`](SPRINT_13C_USABILITY_EXECUTION_REPORT.md)** | Sprint Evidence | Record of P0 dock, smart logger, and parent workspace execution. |
 | **[`OWNER_WORKFLOW_VALIDATION_REPORT.md`](OWNER_WORKFLOW_VALIDATION_REPORT.md)** | Audit Evidence | Usability findings across the 4 personas (pre-Sprint 13C). |
 | **[`PHASE_13B_IMPLEMENTATION_VALIDATION_REPORT.md`](PHASE_13B_IMPLEMENTATION_VALIDATION_REPORT.md)** | Audit Evidence | Code impact and contradiction analysis. |
