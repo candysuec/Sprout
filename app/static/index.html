@@ -503,8 +503,8 @@
       <!-- 30-Second Fast Intake Quick Presets -->
       <div class="flex items-center gap-1.5 p-2 bg-slate-100 rounded-xl mb-3 text-xs overflow-x-auto">
         <span class="font-bold text-slate-500 text-[10px] uppercase shrink-0">Quick Presets:</span>
-        <button type="button" onclick="applyIntakePreset('emergency')" class="px-2.5 py-1 bg-rose-100 hover:bg-rose-200 text-rose-900 rounded-lg font-bold shrink-0 flex items-center gap-1">
-          <i data-lucide="alert-triangle" class="w-3 h-3"></i> Emergency Placement
+        <button type="button" onclick="openEmergencyPlacementWizard(); closeNewChildModal();" class="px-2.5 py-1 bg-rose-100 hover:bg-rose-200 text-rose-900 rounded-lg font-bold shrink-0 flex items-center gap-1" title="Launch 5-Step Guided Emergency Placement Wizard">
+          <i data-lucide="alert-triangle" class="w-3 h-3"></i> Emergency Placement Wizard
         </button>
         <button type="button" onclick="applyIntakePreset('respite')" class="px-2.5 py-1 bg-purple-100 hover:bg-purple-200 text-purple-900 rounded-lg font-bold shrink-0 flex items-center gap-1">
           <i data-lucide="sparkles" class="w-3 h-3"></i> Weekend Respite
@@ -594,6 +594,498 @@
           <button type="submit" class="px-4 py-2 text-xs font-bold text-white bg-emerald-700 rounded-lg">Create Profile</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- 1. Emergency Placement Wizard Modal (5 Steps) -->
+  <div id="emergencyPlacementWizardModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-rose-200 my-8 space-y-4">
+      <!-- Wizard Header & Stepper -->
+      <div class="flex items-start justify-between border-b pb-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-rose-100 text-rose-700 flex items-center justify-center font-bold shadow-xs">
+            <i data-lucide="shield-alert" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-black text-slate-900 flex items-center gap-2">
+              <span>Emergency Placement Wizard</span>
+              <span class="text-[10px] bg-rose-50 text-rose-800 border border-rose-200 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Late-Night Intake</span>
+            </h3>
+            <p class="text-xs text-slate-500">Guided 5-step intake: captures basics, active meds, emergency contacts & generates Care Sheet in 1 flow.</p>
+          </div>
+        </div>
+        <button onclick="closeEmergencyPlacementWizard()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Step Indicator Bar -->
+      <div class="grid grid-cols-5 gap-1.5 text-center text-[10px] font-bold">
+        <div id="epwStepTab1" class="py-1 rounded bg-rose-600 text-white">1. Basics</div>
+        <div id="epwStepTab2" class="py-1 rounded bg-slate-100 text-slate-500">2. Meds</div>
+        <div id="epwStepTab3" class="py-1 rounded bg-slate-100 text-slate-500">3. Contacts</div>
+        <div id="epwStepTab4" class="py-1 rounded bg-slate-100 text-slate-500">4. Soothing</div>
+        <div id="epwStepTab5" class="py-1 rounded bg-slate-100 text-slate-500">5. Sheet</div>
+      </div>
+
+      <!-- Step 1: Child Basics -->
+      <div id="epwStepPane1" class="space-y-3">
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-2.5 text-xs text-amber-900 flex items-start gap-2">
+          <i data-lucide="lock" class="w-4 h-4 text-amber-700 mt-0.5 shrink-0"></i>
+          <span>Use <strong>Initials Only</strong> (e.g. <em>"CD"</em>). Full legal names are never stored on device.</span>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1">Child Initials / Alias *</label>
+          <input type="text" id="epwAlias" maxlength="4" placeholder="e.g. CD" class="w-full text-sm border rounded-lg p-2 uppercase font-bold tracking-wider" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold mb-1">Date of Birth</label>
+            <input type="date" id="epwDob" class="w-full text-sm border rounded-lg p-2" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Placement Date</label>
+            <input type="date" id="epwPlacementDate" class="w-full text-sm border rounded-lg p-2" />
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold mb-1">Care Relationship</label>
+            <select id="epwRelationship" class="w-full text-sm border rounded-lg p-2 bg-slate-50 font-semibold">
+              <option value="Emergency Respite">Emergency Respite</option>
+              <option value="Primary Placement">Primary Placement</option>
+              <option value="Kinship Placement">Kinship Placement</option>
+              <option value="Temporary Respite">Temporary Respite</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Permanency Goal</label>
+            <select id="epwGoal" class="w-full text-sm border rounded-lg p-2 bg-slate-50">
+              <option value="Reunification">Reunification</option>
+              <option value="Guardianship">Guardianship</option>
+              <option value="Adoption">Adoption</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Medical & Medication -->
+      <div id="epwStepPane2" class="space-y-3 hidden">
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-2.5 text-xs text-blue-900 flex items-start gap-2">
+          <i data-lucide="pill" class="w-4 h-4 text-blue-700 mt-0.5 shrink-0"></i>
+          <span>Enter any prescription bottles or rescue inhalers brought at handoff.</span>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1">Known Allergies / Medical Alerts</label>
+          <input type="text" id="epwAllergies" placeholder="Peanuts, Penicillin, Asthma, Gluten..." class="w-full text-sm border rounded-lg p-2" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1">Medicaid / Dr. Dynasaur # (if provided on paperwork)</label>
+          <input type="text" id="epwMedicaid" placeholder="e.g. VT-992144 (or leave blank if unknown)" class="w-full text-sm border rounded-lg p-2" />
+        </div>
+        <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 space-y-2">
+          <span class="text-xs font-bold text-slate-800 block">Active Medication / Prescription (if handed over)</span>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] font-medium text-slate-600">Medication Name</label>
+              <input type="text" id="epwMedName" placeholder="e.g. Albuterol, Amoxicillin" class="w-full text-xs border rounded p-1.5 bg-white" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-medium text-slate-600">Dosage & Frequency</label>
+              <input type="text" id="epwMedDose" placeholder="e.g. 5mg twice daily, 2 puffs PRN" class="w-full text-xs border rounded p-1.5 bg-white" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-[11px] font-medium text-slate-600">Prescribing Doctor or Pharmacy</label>
+            <input type="text" id="epwMedDoctor" placeholder="e.g. Dr. Porter / Walgreens Rutland" class="w-full text-xs border rounded p-1.5 bg-white" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Emergency Contacts -->
+      <div id="epwStepPane3" class="space-y-3 hidden">
+        <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-2.5 text-xs text-indigo-900 flex items-start gap-2">
+          <i data-lucide="phone-call" class="w-4 h-4 text-indigo-700 mt-0.5 shrink-0"></i>
+          <span>Save worker and medical phone numbers so they appear instantly on the Care Sheet.</span>
+        </div>
+        <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 space-y-2">
+          <span class="text-xs font-bold text-slate-800 block">DCF Emergency / After-Hours Worker</span>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] font-medium text-slate-600">Worker Full Name *</label>
+              <input type="text" id="epwWorkerName" placeholder="e.g. Sarah Jenkins (DCF Emergency)" class="w-full text-xs border rounded p-1.5 bg-white" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-medium text-slate-600">Emergency Cell / Pager *</label>
+              <input type="text" id="epwWorkerPhone" placeholder="e.g. (802) 555-0199" class="w-full text-xs border rounded p-1.5 bg-white" />
+            </div>
+          </div>
+        </div>
+        <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 space-y-2">
+          <span class="text-xs font-bold text-slate-800 block">Primary Clinic / Pediatrician</span>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] font-medium text-slate-600">Doctor / Practice Name</label>
+              <input type="text" id="epwPedName" placeholder="e.g. Dr. Emily Porter (Middlebury Peds)" class="w-full text-xs border rounded p-1.5 bg-white" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-medium text-slate-600">Clinic Phone</label>
+              <input type="text" id="epwPedPhone" placeholder="e.g. (802) 555-0144" class="w-full text-xs border rounded p-1.5 bg-white" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: Comfort & Regulation -->
+      <div id="epwStepPane4" class="space-y-3 hidden">
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-2.5 text-xs text-amber-900 flex items-start gap-2">
+          <i data-lucide="heart" class="w-4 h-4 text-amber-700 mt-0.5 shrink-0"></i>
+          <span>Trauma-informed calming essentials for the child's first night in your home.</span>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1">Comfort Items & Transitional Objects</label>
+          <input type="text" id="epwComfort" placeholder="Stuffed animal, special blanket, night light, white noise" class="w-full text-sm border rounded-lg p-2" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1">Food Preferences & Calming Foods</label>
+          <input type="text" id="epwFood" placeholder="Warm milk, mac & cheese, favorite snacks, texture aversions" class="w-full text-sm border rounded-lg p-2" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1">Soothing Routines & Bedtime Calm-Down Plan</label>
+          <input type="text" id="epwSoothing" placeholder="Bedtime story, back rub, quiet space when overwhelmed, sensory tools" class="w-full text-sm border rounded-lg p-2" />
+        </div>
+      </div>
+
+      <!-- Step 5: Summary & Sheet Generation -->
+      <div id="epwStepPane5" class="space-y-3 hidden">
+        <div class="bg-emerald-50 border border-emerald-300 rounded-xl p-3 text-xs text-emerald-950 space-y-2">
+          <div class="font-bold flex items-center gap-1.5 text-emerald-900">
+            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i> Intake Summary Review
+          </div>
+          <div id="epwSummaryReview" class="text-[11px] text-slate-700 space-y-1 bg-white p-2.5 rounded-lg border border-emerald-200">
+            <!-- Populated dynamically by app.js -->
+          </div>
+          <p class="text-[11px] text-emerald-800">Clicking below will save the child profile, log the active medication record, register emergency contacts, and automatically generate the 1-click Care & Safety Sheet.</p>
+        </div>
+      </div>
+
+      <!-- Navigation & Action Buttons -->
+      <div class="flex items-center justify-between pt-3 border-t">
+        <button type="button" id="epwPrevBtn" onclick="prevEpwStep()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 hidden">
+          ← Back
+        </button>
+        <div class="flex items-center gap-2 ml-auto">
+          <button type="button" onclick="closeEmergencyPlacementWizard()" class="px-4 py-2 text-xs font-medium text-slate-500">
+            Cancel
+          </button>
+          <button type="button" id="epwNextBtn" onclick="nextEpwStep()" class="px-5 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl shadow">
+            Next: Medical →
+          </button>
+          <button type="button" id="epwSaveBtn" onclick="finishEmergencyPlacementWizard()" class="px-5 py-2 text-xs font-black text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow hidden flex items-center gap-1.5">
+            <i data-lucide="file-check" class="w-4 h-4"></i> Save & Generate Care Sheet
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Permanency & Handover Wizard Modal (5 Steps) -->
+  <div id="permanencyHandoverWizardModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-indigo-200 my-8 space-y-4">
+      <!-- Wizard Header & Stepper -->
+      <div class="flex items-start justify-between border-b pb-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold shadow-xs">
+            <i data-lucide="flag" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-black text-slate-900 flex items-center gap-2">
+              <span>Permanency & Handover Wizard</span>
+              <span class="text-[10px] bg-indigo-50 text-indigo-800 border border-indigo-200 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Case Closure</span>
+            </h3>
+            <p class="text-xs text-slate-500">Guided case transition: Lifebook keepsake, parent access graduation, placement closure, and zero-data-loss archive.</p>
+          </div>
+        </div>
+        <button onclick="closePermanencyHandoverWizard()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Step Indicator Bar -->
+      <div class="grid grid-cols-5 gap-1.5 text-center text-[10px] font-bold">
+        <div id="phwStepTab1" class="py-1 rounded bg-indigo-600 text-white">1. Lifebook</div>
+        <div id="phwStepTab2" class="py-1 rounded bg-slate-100 text-slate-500">2. Parent</div>
+        <div id="phwStepTab3" class="py-1 rounded bg-slate-100 text-slate-500">3. Closure</div>
+        <div id="phwStepTab4" class="py-1 rounded bg-slate-100 text-slate-500">4. Archive</div>
+        <div id="phwStepTab5" class="py-1 rounded bg-slate-100 text-slate-500">5. Summary</div>
+      </div>
+
+      <!-- Step 1: Export Child Lifebook -->
+      <div id="phwStepPane1" class="space-y-3">
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900 space-y-1.5">
+          <div class="font-bold flex items-center gap-1.5 text-amber-950">
+            <i data-lucide="book-open" class="w-4 h-4 text-amber-700"></i> Step 1: Preserving Child Lifebook Keepsake
+          </div>
+          <p class="text-[11px] text-amber-800">Before a child transitions to family or permanent placement, export their Child Lifebook story packet (.docx) containing positive memories, proudest achievements, and developmental milestones.</p>
+        </div>
+        <div class="border border-slate-200 rounded-xl p-4 bg-slate-50 flex items-center justify-between">
+          <div>
+            <h4 class="font-bold text-slate-900 text-xs">Child Keepsake & Storybook Packet</h4>
+            <p class="text-[11px] text-slate-500 mt-0.5">Includes shared family milestones, photos, and growth record.</p>
+          </div>
+          <button type="button" onclick="downloadLifebookForClosure()" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow flex items-center gap-1.5">
+            <i data-lucide="download" class="w-4 h-4"></i> Download Lifebook (.docx)
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2: Review Parent Access Status -->
+      <div id="phwStepPane2" class="space-y-3 hidden">
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-900 space-y-1.5">
+          <div class="font-bold flex items-center gap-1.5 text-blue-950">
+            <i data-lucide="users" class="w-4 h-4 text-blue-700"></i> Step 2: Parent Participant Access Review
+          </div>
+          <p class="text-[11px] text-blue-800">Determine how the linked parent portal should transition upon placement closure.</p>
+        </div>
+        <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 space-y-2 text-xs">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-800">Current Parent Portal Status:</span>
+            <span id="phwParentStatusBadge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Active / Linked</span>
+          </div>
+          <div class="space-y-2 pt-2 border-t border-slate-200">
+            <label class="flex items-start gap-2 cursor-pointer">
+              <input type="radio" name="phwParentAction" value="graduate" checked class="mt-1" />
+              <div>
+                <span class="font-bold text-slate-900 block">Graduate to Read-Only Lifebook (Recommended)</span>
+                <span class="text-[11px] text-slate-600 block">Parent retains permanent read-only access to historical memories and milestones; active daily updates lock.</span>
+              </div>
+            </label>
+            <label class="flex items-start gap-2 cursor-pointer">
+              <input type="radio" name="phwParentAction" value="revoke" class="mt-1" />
+              <div>
+                <span class="font-bold text-slate-900 block">Revoke Portal Access & Seal Under Legal Hold</span>
+                <span class="text-[11px] text-slate-600 block">Immediately terminates parent access; records sealed under Legal Hold for court review.</span>
+              </div>
+            </label>
+            <label class="flex items-start gap-2 cursor-pointer">
+              <input type="radio" name="phwParentAction" value="keep" class="mt-1" />
+              <div>
+                <span class="font-bold text-slate-900 block">Preserve Current Status</span>
+                <span class="text-[11px] text-slate-600 block">Leave parent portal access unchanged.</span>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Review Placement Closure -->
+      <div id="phwStepPane3" class="space-y-3 hidden">
+        <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-3 text-xs text-indigo-900 space-y-1.5">
+          <div class="font-bold flex items-center gap-1.5 text-indigo-950">
+            <i data-lucide="calendar" class="w-4 h-4 text-indigo-700"></i> Step 3: Placement Episode Closure
+          </div>
+          <p class="text-[11px] text-indigo-800">Record final episode end date, permanency outcome, and court transition notes.</p>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold mb-1">Episode End Date *</label>
+            <input type="date" id="phwEndDate" class="w-full text-sm border rounded-lg p-2" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Permanency Outcome *</label>
+            <select id="phwOutcome" class="w-full text-sm border rounded-lg p-2 bg-slate-50 font-bold">
+              <option value="Reunified">Reunification with Family</option>
+              <option value="Guardianship">Permanent Guardianship</option>
+              <option value="Adoption">Finalized Adoption</option>
+              <option value="Independent Living">Independent Living</option>
+              <option value="Other">Other Planned Arrangement</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1">Transition Summary Notes</label>
+          <textarea id="phwNotes" rows="3" placeholder="Summary of court order, final handoff, and care continuity plan..." class="w-full text-xs border rounded-lg p-2"></textarea>
+        </div>
+      </div>
+
+      <!-- Step 4: Archive Placement -->
+      <div id="phwStepPane4" class="space-y-3 hidden">
+        <div class="bg-emerald-50 border-2 border-emerald-400 rounded-xl p-4 text-xs text-emerald-950 space-y-2">
+          <div class="font-black text-sm text-emerald-900 flex items-center gap-2">
+            <i data-lucide="shield-check" class="w-5 h-5 text-emerald-600"></i> Zero Data Loss Guarantee
+          </div>
+          <p class="text-[11px] text-emerald-900 leading-relaxed">
+            Marking this child placement as Former/Archived <strong>never deletes any records</strong>. All daily logs, pediatric appointments, court packets, and immutable SHA-256 blockchain audit logs remain safely archived in your local offline SQLite database under soft-tombstone retention (<code>retention_state = 'Archived'</code>).
+          </p>
+          <div class="text-[11px] text-emerald-800 font-semibold pt-1 border-t border-emerald-300">
+            ✓ Historical records remain searchable anytime via the Care Binder Archive.
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5: Summary -->
+      <div id="phwStepPane5" class="space-y-3 hidden">
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs space-y-2">
+          <div class="font-bold text-slate-900 flex items-center gap-1.5">
+            <i data-lucide="check-circle" class="w-4 h-4 text-indigo-600"></i> Case Closure Ready for Final Confirmation
+          </div>
+          <div id="phwSummaryReview" class="text-[11px] text-slate-700 space-y-1 bg-white p-2.5 rounded-lg border border-slate-200">
+            <!-- Populated dynamically -->
+          </div>
+          <p class="text-[11px] text-slate-500">Click below to seal the placement transition, update episode records, and archive history safely.</p>
+        </div>
+      </div>
+
+      <!-- Navigation & Action Buttons -->
+      <div class="flex items-center justify-between pt-3 border-t">
+        <button type="button" id="phwPrevBtn" onclick="prevPhwStep()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 hidden">
+          ← Back
+        </button>
+        <div class="flex items-center gap-2 ml-auto">
+          <button type="button" onclick="closePermanencyHandoverWizard()" class="px-4 py-2 text-xs font-medium text-slate-500">
+            Cancel
+          </button>
+          <button type="button" id="phwNextBtn" onclick="nextPhwStep()" class="px-5 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow">
+            Next: Parent Access →
+          </button>
+          <button type="button" id="phwSaveBtn" onclick="finishPermanencyHandoverWizard()" class="px-5 py-2 text-xs font-black text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow hidden flex items-center gap-1.5">
+            <i data-lucide="archive" class="w-4 h-4"></i> Seal & Complete Case Closure
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Kinship Fast-Track Guide Modal -->
+  <div id="kinshipFastTrackModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-teal-200 my-8 space-y-4">
+      <!-- Modal Header -->
+      <div class="flex items-start justify-between border-b pb-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-teal-100 text-teal-800 flex items-center justify-center font-bold shadow-xs">
+            <i data-lucide="zap" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-black text-slate-900 flex items-center gap-2">
+              <span>Vermont Kinship Fast-Track Guide</span>
+              <span class="text-[10px] bg-teal-50 text-teal-900 border border-teal-200 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Plain-English Survival Guide</span>
+            </h3>
+            <p class="text-xs text-slate-500">Demystifies welfare bureaucracy: immediate triage, financial benefits, urgent paperwork, and what can wait.</p>
+          </div>
+        </div>
+        <button onclick="closeKinshipFastTrackModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Quick Nav Tabs -->
+      <div class="flex items-center gap-1.5 p-1.5 bg-slate-100 rounded-xl text-xs overflow-x-auto">
+        <button type="button" onclick="switchKftTab('first')" id="kftTabBtn-first" class="px-3 py-1.5 rounded-lg font-bold bg-white text-teal-900 shadow-xs">1. What To Do First</button>
+        <button type="button" onclick="switchKftTab('benefits')" id="kftTabBtn-benefits" class="px-3 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900">2. Benefits & Cash</button>
+        <button type="button" onclick="switchKftTab('paperwork')" id="kftTabBtn-paperwork" class="px-3 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900">3. Urgent Paperwork</button>
+        <button type="button" onclick="switchKftTab('wait')" id="kftTabBtn-wait" class="px-3 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900">4. What Can Wait</button>
+        <button type="button" onclick="switchKftTab('decoder')" id="kftTabBtn-decoder" class="px-3 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900">5. Jargon Decoder</button>
+      </div>
+
+      <!-- Content Panes -->
+      <div class="text-xs space-y-3">
+        <!-- Pane 1: What to do first -->
+        <div id="kftPane-first" class="space-y-2">
+          <div class="bg-teal-50 border border-teal-200 rounded-xl p-3 text-teal-950 space-y-1.5">
+            <span class="font-bold text-xs uppercase tracking-wider text-teal-900 block">Days 1 – 3 Triage Essentials:</span>
+            <ul class="space-y-1.5 list-disc list-inside text-teal-900">
+              <li><strong>Medical Authorization Form:</strong> Ask the DCF caseworker for the signed medical consent form right away so you can take the child to urgent care or fill prescriptions without delay.</li>
+              <li><strong>School Placement Letter:</strong> Obtain DCF educational placement documentation so the child remains in their current school or enrolls immediately without residency issues.</li>
+              <li><strong>Safe Sleep & Predictable Meals:</strong> Ensure the child has their own safe bed and establish consistent meal and sleep rhythms to stabilize stress.</li>
+              <li><strong>Log Everything in Sprout:</strong> Use the <em>+ 15 Second Log</em> to jot down arrival condition, medication times, and caseworker promises.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Pane 2: Benefits & Cash -->
+        <div id="kftPane-benefits" class="space-y-2 hidden">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div class="border border-emerald-200 bg-emerald-50/70 p-3 rounded-xl space-y-1">
+              <div class="font-bold text-emerald-950 text-xs">Reach Up (Child-Only Cash Grant)</div>
+              <p class="text-[11px] text-emerald-900">Monthly cash grant (~$350–$550/mo per child) paid directly to relative kin. Does <em>not</em> count your caregiver income—based solely on the child's status.</p>
+            </div>
+            <div class="border border-blue-200 bg-blue-50/70 p-3 rounded-xl space-y-1">
+              <div class="font-bold text-blue-950 text-xs">Dr. Dynasaur (Medicaid)</div>
+              <p class="text-[11px] text-blue-900">100% free healthcare, dental, vision, mental health, and prescription coverage for all children in foster or kinship care in Vermont.</p>
+            </div>
+            <div class="border border-purple-200 bg-purple-50/70 p-3 rounded-xl space-y-1">
+              <div class="font-bold text-purple-950 text-xs">Child Care Subsidy (CCFAP)</div>
+              <p class="text-[11px] text-purple-900">State financial assistance covering up to 100% of licensed daycare and afterschool program costs for working kinship caregivers.</p>
+            </div>
+            <div class="border border-amber-200 bg-amber-50/70 p-3 rounded-xl space-y-1">
+              <div class="font-bold text-amber-950 text-xs">Family Support Fund ($350/yr)</div>
+              <p class="text-[11px] text-amber-900">Annual state flexible grant for clothes, winter gear, school supplies, or sports fees. Reimbursed through your DCF family services worker.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pane 3: Urgent Paperwork -->
+        <div id="kftPane-paperwork" class="space-y-2 hidden">
+          <div class="space-y-2">
+            <div class="border-l-4 border-rose-500 bg-rose-50 p-2.5 rounded-r-xl text-[11px] text-rose-950">
+              <strong>🔴 Urgent (Within 48 Hours):</strong> DCF Medical Consent Form, Emergency Placement Agreement, emergency worker cell phone number.
+            </div>
+            <div class="border-l-4 border-amber-500 bg-amber-50 p-2.5 rounded-r-xl text-[11px] text-amber-950">
+              <strong>🟡 Important (Within 14 Days):</strong> Reach Up child-only application to Economic Services, School residency notification, scheduling the 30-day EPSDT health screening.
+            </div>
+            <div class="border-l-4 border-emerald-500 bg-emerald-50 p-2.5 rounded-r-xl text-[11px] text-emerald-950">
+              <strong>🟢 Ongoing (Within 30 Days):</strong> Fingerprint background check, FS-221A Home Safety Walkthrough with licensing worker.
+            </div>
+          </div>
+        </div>
+
+        <!-- Pane 4: What Can Wait -->
+        <div id="kftPane-wait" class="space-y-2 hidden">
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 space-y-1.5 text-[11px]">
+            <span class="font-bold text-xs text-slate-900 block">De-Escalate Pressure (You Do NOT Need To Worry About These Today):</span>
+            <ul class="space-y-1 list-disc list-inside text-slate-700">
+              <li><strong>You do NOT need to decide on permanent adoption or guardianship right now.</strong> Focus only on today's safety and comfort. Permanency planning unfolds over months.</li>
+              <li><strong>You do NOT need to complete 30 hours of foster training immediately.</strong> Kinship caregivers have extended grace periods for classes.</li>
+              <li><strong>You do NOT need all brand new bedroom sets.</strong> A safe bed, dresser space, and clean bedding are all that the safety walkthrough requires.</li>
+              <li><strong>You do NOT need to hire private lawyers for DCF court.</strong> The child has an appointed attorney (GAL / Public Defender) who handles formal motions.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Pane 5: Jargon Decoder -->
+        <div id="kftPane-decoder" class="space-y-2 hidden">
+          <div class="space-y-1.5 text-[11px]">
+            <div class="p-2 bg-slate-50 border rounded-lg">
+              <span class="font-bold text-slate-900">CHINS ("Children in Need of Care or Supervision"):</span>
+              <p class="text-slate-600 mt-0.5">The official Vermont court case opened to ensure child safety and connect the family with support services.</p>
+            </div>
+            <div class="p-2 bg-slate-50 border rounded-lg">
+              <span class="font-bold text-slate-900">EPSDT ("Early & Periodic Screening, Diagnostic, & Treatment"):</span>
+              <p class="text-slate-600 mt-0.5">Vermont's free comprehensive 30-day well-child medical exam covering physical, dental, vision, hearing, and mental health checkups.</p>
+            </div>
+            <div class="p-2 bg-slate-50 border rounded-lg">
+              <span class="font-bold text-slate-900">RPPS ("Reasonable and Prudent Parent Standard"):</span>
+              <p class="text-slate-600 mt-0.5">Vermont state law empowering you as a caregiver to say "yes" to normal childhood activities (field trips, sports, sleepovers) without asking DCF for permission.</p>
+            </div>
+            <div class="p-2 bg-slate-50 border rounded-lg">
+              <span class="font-bold text-slate-900">Reach Up:</span>
+              <p class="text-slate-600 mt-0.5">Vermont's cash assistance program providing monthly child-only financial grants to relative caregivers.</p>
+            </div>
+            <div class="p-2 bg-slate-50 border rounded-lg">
+              <span class="font-bold text-slate-900">Dr. Dynasaur:</span>
+              <p class="text-slate-600 mt-0.5">Vermont's 100% free comprehensive Medicaid coverage for all children in foster and kinship care.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex items-center justify-between pt-3 border-t">
+        <span class="text-[11px] text-slate-400 italic">Vermont DCF Kinship Support Standard • 100% Offline</span>
+        <button type="button" onclick="closeKinshipFastTrackModal()" class="px-4 py-2 bg-teal-800 hover:bg-teal-900 text-white font-bold text-xs rounded-xl shadow">
+          Close Guide
+        </button>
+      </div>
     </div>
   </div>
 

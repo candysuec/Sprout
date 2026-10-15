@@ -625,10 +625,47 @@ def add_child():
         ))
         new_id = c.lastrowid
         c.execute("UPDATE children SET child_code = ? WHERE id = ?", (f"CCC-{new_id:06d}", new_id))
+
+        # Support atomic medication entries from Emergency Placement Wizard
+        medications = data.get('medications') or []
+        if isinstance(medications, dict):
+            medications = [medications]
+        for med in medications:
+            if isinstance(med, dict) and (med.get('name') or med.get('title')):
+                med_name = med.get('name') or med.get('title')
+                dosage = med.get('dosage') or med.get('dose') or 'As prescribed'
+                freq = med.get('frequency') or ''
+                prescriber = med.get('prescriber') or med.get('doctor') or 'Prescribed'
+                summary = f"Prescription: {dosage} {freq}. Provider/Clinic: {prescriber}."
+                c.execute("""
+                INSERT INTO timeline_records (
+                    child_id, category, sub_type, title, event_date, summary,
+                    classification, domain, sensitivity_level, retention_state
+                ) VALUES (?, 'medical', 'medication', ?, ?, ?, 'official', 'child', 'sensitive', 'Active')
+                """, (new_id, f"Active Medication: {med_name}", data.get('placement_date') or datetime.date.today().isoformat(), summary))
+
+        # Support atomic emergency contact entries from Emergency Placement Wizard
+        contacts_list = data.get('emergency_contacts') or []
+        if isinstance(contacts_list, dict):
+            contacts_list = [contacts_list]
+        for ct in contacts_list:
+            if isinstance(ct, dict) and ct.get('full_name'):
+                role_t = ct.get('role_type') or 'Emergency Contact'
+                c.execute("""
+                INSERT INTO contacts (child_id, role_type, full_name, phone, email, organization, is_emergency, notes)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    new_id, role_t, ct.get('full_name'), ct.get('phone', ''),
+                    ct.get('email', ''), ct.get('organization', ''),
+                    1 if ct.get('is_emergency', True) else 0, ct.get('notes', 'Added via Emergency Placement Wizard')
+                ))
+
         audit(conn, _actor(data), 'create', 'child', new_id, new_id, {
             "alias": alias,
             "relationship_type": data.get('relationship_type', 'Primary Placement'),
-            "episode_status": data.get('episode_status', 'Active')
+            "episode_status": data.get('episode_status', 'Active'),
+            "medications_count": len(medications),
+            "emergency_contacts_count": len(contacts_list)
         })
         conn.commit()
     finally:
@@ -1386,6 +1423,96 @@ def create_parent_packet():
         "filename": filename,
         "message": "Parent keepsake packet generated"
     })
+
+
+@app.route('/api/reports/lifebook', method=['POST', 'GET'])
+def create_lifebook_report():
+    data = request.json or {}
+    child_id = data.get('child_id') or request.query.get('child_id')
+    if child_id:
+        child_id = int(child_id)
+    filename = generate_parent_packet_docx(child_id)
+    if not filename:
+        return json_res({"error": "Failed to generate child lifebook keepsake packet"}, 400)
+    return json_res({
+        "download_url": f"/exports/{filename}",
+        "filename": filename,
+        "message": "Child lifebook keepsake packet generated successfully"
+    })
+
+
+@app.route('/api/children/<child_id:int>/permanency-archive', method=['POST'])
+def archive_child_placement(child_id):
+    actor, role = resolve_actor_and_role(request)
+    if role not in (ROLE_PC, ROLE_SA):
+        return json_res({"error": "Only Primary Caregiver or System Administrator can archive placements"}, 403)
+    data = request.json or {}
+    closure_date = data.get('episode_end_date') or datetime.date.today().isoformat()
+    outcome = data.get('permanency_outcome') or 'Reunified'
+    parent_action = data.get('parent_action') or 'graduate'  # 'graduate', 'revoke', or 'keep'
+    notes = data.get('notes') or f"Placement closed with outcome: {outcome}"
+
+    conn = get_connection()
+    try:
+        child = conn.execute("SELECT * FROM children WHERE id = ?", (child_id,)).fetchone()
+        if not child:
+            return json_res({"error": "Child not found"}, 404)
+        child = dict(child)
+
+        # 1. Update child record to Former / Reunified
+        conn.execute("""
+            UPDATE children 
+            SET status = ?, episode_status = 'Former', episode_end_date = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        """, (outcome, closure_date, child_id))
+
+        # 2. Handle parent access transition
+        parent_status_change = "Preserved"
+        if parent_action == 'graduate':
+            conn.execute("UPDATE parent_users SET state = 'GRADUATED' WHERE child_id = ?", (child_id,))
+            parent_status_change = "Parent access transitioned to Graduated (Read-Only Keepsake)"
+        elif parent_action == 'revoke':
+            conn.execute("UPDATE parent_users SET state = 'REVOKED' WHERE child_id = ?", (child_id,))
+            conn.execute("""
+                UPDATE timeline_records SET retention_state = 'Legal Hold', updated_at = CURRENT_TIMESTAMP
+                WHERE child_id = ? AND domain = 'parent' AND classification = 'shared_family'
+            """, (child_id,))
+            parent_status_change = "Parent access revoked and sealed under Legal Hold"
+
+        # 3. Soft archive records under retention_state = 'Archived' (Zero data loss)
+        conn.execute("""
+            UPDATE timeline_records 
+            SET retention_state = 'Archived', updated_at = CURRENT_TIMESTAMP
+            WHERE child_id = ? AND (retention_state IS NULL OR retention_state = 'Active')
+        """, (child_id,))
+
+        # 4. Insert permanent case closure record (also marked Archived to seal history)
+        conn.execute("""
+            INSERT INTO timeline_records (
+                child_id, category, sub_type, title, event_date, summary,
+                classification, domain, sensitivity_level, retention_state
+            ) VALUES (?, 'legal', 'closure', ?, ?, ?, 'official', 'case', 'restricted', 'Archived')
+        """, (child_id, f"Case Closure: {outcome}", closure_date, notes))
+
+        audit(conn, actor, 'permanency_archive', 'child', child_id, child_id, {
+            "outcome": outcome,
+            "closure_date": closure_date,
+            "parent_action": parent_action
+        })
+        conn.commit()
+    finally:
+        conn.close()
+
+    return json_res({
+        "success": True,
+        "child_id": child_id,
+        "permanency_outcome": outcome,
+        "episode_end_date": closure_date,
+        "parent_action": parent_status_change,
+        "message": "Placement successfully closed and archived. Zero records deleted.",
+        "lifebook_url": f"/exports/Parent_Keepsake_{child.get('alias') or 'Child'}.docx"
+    })
+
 
 
 # --- PARENT PARTICIPANT WORKSPACE API ---

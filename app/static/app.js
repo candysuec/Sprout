@@ -4053,6 +4053,47 @@ async function renderKinshipPathwaysView(container, child) {
 
   container.innerHTML = `
     <div class="space-y-6">
+      <!-- WATCH ITEM 3: KINSHIP FAST-TRACK GUIDE (PLAIN ENGLISH SURVIVAL GUIDE) -->
+      <div class="bg-gradient-to-r from-teal-900 to-emerald-950 text-white rounded-2xl p-5 shadow-sm space-y-3 border border-teal-500/50">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="p-2.5 bg-teal-500/20 text-teal-300 rounded-xl border border-teal-400/30">
+              <i data-lucide="zap" class="w-5 h-5 text-teal-400"></i>
+            </div>
+            <div>
+              <h3 class="font-black text-white text-base flex items-center gap-2">
+                <span>Kinship Fast-Track Guide</span>
+                <span class="text-[10px] bg-teal-400/20 text-teal-300 border border-teal-400/30 px-2 py-0.5 rounded-full font-bold uppercase">Plain English</span>
+              </h3>
+              <p class="text-xs text-teal-200/80">Translate welfare bureaucracy into plain English: what to do first, benefits available, and urgent paperwork.</p>
+            </div>
+          </div>
+          <button onclick="openKinshipFastTrackModal()" class="px-3.5 py-2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-black rounded-xl text-xs shadow-md transition flex items-center gap-1.5 shrink-0">
+            <i data-lucide="book-open" class="w-4 h-4"></i>
+            <span>Open Interactive Guide</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs pt-1">
+          <div class="bg-white/10 rounded-xl p-3 border border-white/10 space-y-1">
+            <span class="font-bold text-teal-300 uppercase tracking-wider text-[10px] block">1. What To Do First</span>
+            <p class="text-[11px] text-slate-200">Get signed DCF Medical Authorization form, request school placement letter, establish bedtime comfort.</p>
+          </div>
+          <div class="bg-white/10 rounded-xl p-3 border border-white/10 space-y-1">
+            <span class="font-bold text-emerald-300 uppercase tracking-wider text-[10px] block">2. Benefits & Cash</span>
+            <p class="text-[11px] text-slate-200">Reach Up child-only grant (~$350-$550/mo), Dr. Dynasaur Medicaid, CCFAP daycare subsidy, $350 Family Support Fund.</p>
+          </div>
+          <div class="bg-white/10 rounded-xl p-3 border border-white/10 space-y-1">
+            <span class="font-bold text-amber-300 uppercase tracking-wider text-[10px] block">3. Urgent Paperwork</span>
+            <p class="text-[11px] text-slate-200">🔴 48h: Medical consent & worker cell. 🟡 14d: Reach Up application & 30-day EPSDT exam. 🟢 30d: FS-221A walkthrough.</p>
+          </div>
+          <div class="bg-white/10 rounded-xl p-3 border border-white/10 space-y-1">
+            <span class="font-bold text-cyan-300 uppercase tracking-wider text-[10px] block">4. What Can Wait</span>
+            <p class="text-[11px] text-slate-200">No need to decide on permanent adoption today. No need to buy brand new furniture. Classes have grace periods.</p>
+          </div>
+        </div>
+      </div>
+
       <!-- First 30 Days Kinship Onboarding Wizard -->
       <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
         <div class="flex items-center justify-between pb-3 border-b border-slate-100">
@@ -6855,12 +6896,30 @@ function openNewMilestoneModal() {
   }, 150);
 }
 
-function generateChildLifebookPdf() {
-  alert("📖 Compiling Child Lifebook Keepsake (.docx):\n\nPreserving personal history, favorite activities, achievements, certificates, and developmental victories under strict privacy shielding.");
+async function generateChildLifebookPdf() {
+  if (!currentChildId) {
+    alert("Please select a child profile first.");
+    return;
+  }
+  try {
+    const res = await apiFetch('/api/reports/lifebook', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ child_id: currentChildId })
+    });
+    const data = await res.json();
+    if (data.download_url) {
+      window.open(data.download_url, '_blank');
+    } else {
+      alert("Notice: " + (data.error || "Lifebook generated."));
+    }
+  } catch (err) {
+    alert("Lifebook generation error: " + err.message);
+  }
 }
 
 function generateTransitionPacket() {
-  alert("📦 Generating Positive Care Transition Packet (.docx):\n\nCreating a strengths-based handoff packet for reunification, guardianship, or adoptive placement ensuring care continuity and zero lost history.");
+  openPermanencyHandoverWizard();
 }
 
 // ==============================================================================
@@ -6922,21 +6981,33 @@ async function renderMissionControlView(container) {
               Mission Control Quick Action Dock
               <span class="text-[10px] font-bold bg-emerald-500/30 text-emerald-300 px-2.5 py-0.5 rounded-full border border-emerald-400/40 uppercase tracking-wide">1-Tap Action</span>
             </h3>
-            <p class="text-xs text-emerald-200/80">Log routine events, open emergency/babysitter sheets, or export monthly reports instantly without quadrant navigation.</p>
+            <p class="text-xs text-emerald-200/80">Log routine events, launch emergency placement intake, open babysitter sheets, access kinship guides, or close placements.</p>
           </div>
         </div>
-        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto shrink-0">
-          <button onclick="openRecordModal()" class="flex-1 sm:flex-none px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs shadow-md transition flex items-center justify-center gap-2" title="Log a routine observation in 15 seconds">
+        <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto shrink-0">
+          <button onclick="openRecordModal()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5" title="Log a routine observation in 15 seconds">
             <i data-lucide="plus-circle" class="w-4 h-4"></i>
-            <span>+ 15 Second Log</span>
+            <span>+ 15-Sec Log</span>
           </button>
-          <button onclick="openEmergencyHandoffCard()" class="flex-1 sm:flex-none px-4 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-2" title="Print/View 1-Click Care & Safety Sheet for Babysitter, Doctor, or Crisis ER">
+          <button onclick="openEmergencyPlacementWizard()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-rose-700 hover:bg-rose-600 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5" title="Launch 5-Step Guided Emergency Placement Wizard (Basics, Meds, Contacts, Soothing, Care Sheet)">
+            <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-300"></i>
+            <span>Emergency Intake</span>
+          </button>
+          <button onclick="openEmergencyHandoffCard()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5" title="Print/View 1-Click Care & Safety Sheet for Babysitter, Doctor, or Crisis ER">
             <i data-lucide="shield-alert" class="w-4 h-4"></i>
-            <span>Care & Safety Sheet</span>
+            <span>Care Sheet</span>
           </button>
-          <button onclick="quickExportThisMonth()" class="flex-1 sm:flex-none px-4 py-2.5 bg-cyan-700 hover:bg-cyan-600 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-2" title="Generate and download current month's official DCF progress report (.docx)">
+          <button onclick="openKinshipFastTrackModal()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-teal-800 hover:bg-teal-700 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5" title="Open Plain-English Kinship Fast-Track Guide (Benefits, Paperwork, Jargon Decoder)">
+            <i data-lucide="compass" class="w-4 h-4 text-teal-300"></i>
+            <span>Kinship Guide</span>
+          </button>
+          <button onclick="openPermanencyHandoverWizard()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-indigo-700 hover:bg-indigo-600 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5" title="Launch 5-Step Permanency & Handover Wizard (Lifebook, Parent Access, Placement Closure, Zero-Data-Loss Archive)">
+            <i data-lucide="flag" class="w-4 h-4 text-indigo-300"></i>
+            <span>Case Closure</span>
+          </button>
+          <button onclick="quickExportThisMonth()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-cyan-700 hover:bg-cyan-600 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5" title="Generate and download current month's official DCF progress report (.docx)">
             <i data-lucide="file-down" class="w-4 h-4"></i>
-            <span>Export This Month</span>
+            <span>Export Month</span>
           </button>
         </div>
       </div>
@@ -7771,6 +7842,463 @@ async function handleParentEvidenceUpload(e) {
   fileInput.value = '';
   if (notesInput) notesInput.value = '';
 }
+
+// ==============================================================================
+// WATCH ITEM 1: EMERGENCY PLACEMENT WIZARD (5 STEPS)
+// ==============================================================================
+let epwCurrentStep = 1;
+
+function openEmergencyPlacementWizard() {
+  epwCurrentStep = 1;
+  const modal = document.getElementById('emergencyPlacementWizardModal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+
+  const today = new Date().toISOString().split('T')[0];
+  const dateInput = document.getElementById('epwPlacementDate');
+  if (dateInput && !dateInput.value) dateInput.value = today;
+
+  updateEpwUI();
+  if (window.lucide) lucide.createIcons();
+}
+
+function closeEmergencyPlacementWizard() {
+  const modal = document.getElementById('emergencyPlacementWizardModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function updateEpwUI() {
+  for (let i = 1; i <= 5; i++) {
+    const pane = document.getElementById(`epwStepPane${i}`);
+    const tab = document.getElementById(`epwStepTab${i}`);
+    if (pane) {
+      if (i === epwCurrentStep) pane.classList.remove('hidden');
+      else pane.classList.add('hidden');
+    }
+    if (tab) {
+      if (i === epwCurrentStep) {
+        tab.className = "py-1 rounded bg-rose-600 text-white font-bold shadow-xs";
+      } else if (i < epwCurrentStep) {
+        tab.className = "py-1 rounded bg-emerald-100 text-emerald-800 font-bold border border-emerald-300";
+      } else {
+        tab.className = "py-1 rounded bg-slate-100 text-slate-500 font-bold";
+      }
+    }
+  }
+
+  const prevBtn = document.getElementById('epwPrevBtn');
+  const nextBtn = document.getElementById('epwNextBtn');
+  const saveBtn = document.getElementById('epwSaveBtn');
+
+  if (prevBtn) {
+    if (epwCurrentStep > 1) prevBtn.classList.remove('hidden');
+    else prevBtn.classList.add('hidden');
+  }
+
+  if (epwCurrentStep === 5) {
+    if (nextBtn) nextBtn.classList.add('hidden');
+    if (saveBtn) saveBtn.classList.remove('hidden');
+    renderEpwSummary();
+  } else {
+    if (nextBtn) {
+      nextBtn.classList.remove('hidden');
+      const stepNames = ['', 'Medical →', 'Contacts →', 'Soothing →', 'Review →'];
+      nextBtn.textContent = `Next: ${stepNames[epwCurrentStep] || 'Next →'}`;
+    }
+    if (saveBtn) saveBtn.classList.add('hidden');
+  }
+}
+
+function nextEpwStep() {
+  if (epwCurrentStep === 1) {
+    const alias = (document.getElementById('epwAlias')?.value || '').trim();
+    if (!alias) {
+      alert("Please enter Child Initials / Alias (e.g. CD).");
+      return;
+    }
+  }
+  if (epwCurrentStep < 5) {
+    epwCurrentStep++;
+    updateEpwUI();
+  }
+}
+
+function prevEpwStep() {
+  if (epwCurrentStep > 1) {
+    epwCurrentStep--;
+    updateEpwUI();
+  }
+}
+
+function renderEpwSummary() {
+  const container = document.getElementById('epwSummaryReview');
+  if (!container) return;
+
+  const alias = (document.getElementById('epwAlias')?.value || 'CD').toUpperCase();
+  const dob = document.getElementById('epwDob')?.value || 'Not set';
+  const placement = document.getElementById('epwPlacementDate')?.value || 'Today';
+  const rel = document.getElementById('epwRelationship')?.value || 'Emergency Respite';
+  const allergies = document.getElementById('epwAllergies')?.value || 'None logged';
+  const medicaid = document.getElementById('epwMedicaid')?.value || 'Pending DCF';
+  const medName = document.getElementById('epwMedName')?.value || 'None';
+  const medDose = document.getElementById('epwMedDose')?.value || '';
+  const workerName = document.getElementById('epwWorkerName')?.value || 'DCF After-Hours';
+  const workerPhone = document.getElementById('epwWorkerPhone')?.value || 'Pending';
+  const comfort = document.getElementById('epwComfort')?.value || 'Standard soothing lovey';
+  const soothing = document.getElementById('epwSoothing')?.value || 'Quiet routine';
+
+  container.innerHTML = `
+    <div class="grid grid-cols-2 gap-2 text-[11px]">
+      <div><strong>Child:</strong> ${alias} (DOB: ${dob})</div>
+      <div><strong>Placement:</strong> ${placement} (${rel})</div>
+      <div><strong>Allergies:</strong> <span class="text-rose-700 font-semibold">${allergies}</span></div>
+      <div><strong>Medicaid / VT ID:</strong> ${medicaid}</div>
+      <div><strong>Active Meds:</strong> ${medName} ${medDose ? `(${medDose})` : ''}</div>
+      <div><strong>Worker Cell:</strong> ${workerName} - ${workerPhone}</div>
+      <div class="col-span-2"><strong>Comfort & Routine:</strong> ${comfort}. ${soothing}</div>
+    </div>
+  `;
+}
+
+async function finishEmergencyPlacementWizard() {
+  const saveBtn = document.getElementById('epwSaveBtn');
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Saving & Generating Care Sheet...";
+  }
+
+  const alias = (document.getElementById('epwAlias')?.value || 'CD').trim().toUpperCase();
+  const dob = document.getElementById('epwDob')?.value || '';
+  const placementDate = document.getElementById('epwPlacementDate')?.value || new Date().toISOString().split('T')[0];
+  const rel = document.getElementById('epwRelationship')?.value || 'Emergency Respite';
+  const goal = document.getElementById('epwGoal')?.value || 'Reunification';
+  const allergies = document.getElementById('epwAllergies')?.value || '';
+  const medicaid = document.getElementById('epwMedicaid')?.value || '';
+  const comfort = document.getElementById('epwComfort')?.value || '';
+  const food = document.getElementById('epwFood')?.value || '';
+  const soothing = document.getElementById('epwSoothing')?.value || '';
+
+  const medName = (document.getElementById('epwMedName')?.value || '').trim();
+  const medDose = document.getElementById('epwMedDose')?.value || '';
+  const medDoctor = document.getElementById('epwMedDoctor')?.value || '';
+
+  const workerName = (document.getElementById('epwWorkerName')?.value || '').trim();
+  const workerPhone = document.getElementById('epwWorkerPhone')?.value || '';
+  const pedName = (document.getElementById('epwPedName')?.value || '').trim();
+  const pedPhone = document.getElementById('epwPedPhone')?.value || '';
+
+  const medications = [];
+  if (medName) {
+    medications.push({
+      name: medName,
+      dosage: medDose || 'As prescribed',
+      prescriber: medDoctor || 'Middlebury Pediatrics'
+    });
+  }
+
+  const emergencyContacts = [];
+  if (workerName) {
+    emergencyContacts.push({
+      role_type: 'DCF Worker',
+      full_name: workerName,
+      phone: workerPhone,
+      is_emergency: 1,
+      notes: 'Emergency after-hours caseworker'
+    });
+  }
+  if (pedName) {
+    emergencyContacts.push({
+      role_type: 'Doctor',
+      full_name: pedName,
+      phone: pedPhone,
+      is_emergency: 0,
+      notes: 'Primary pediatrician'
+    });
+  }
+
+  const payload = {
+    alias: alias,
+    dob: dob,
+    placement_date: placementDate,
+    relationship_type: rel,
+    permanency_goal: goal,
+    episode_status: 'Active',
+    episode_start_date: placementDate,
+    allergies: allergies,
+    medicaid_number: medicaid,
+    comfort_items: comfort,
+    food_preferences: food,
+    behavioral_supports: soothing,
+    emergency_notes: allergies ? `Known Alerts: ${allergies}` : '',
+    medications: medications,
+    emergency_contacts: emergencyContacts
+  };
+
+  try {
+    const res = await apiFetch('/api/children', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.error || 'Failed to create child profile.');
+      return;
+    }
+
+    const newChildId = data.id;
+    closeEmergencyPlacementWizard();
+
+    await loadChildren();
+    if (newChildId) {
+      currentChildId = newChildId;
+      const select = document.getElementById('childSelect');
+      if (select) select.value = newChildId;
+      await renderChildSnapshot();
+      openEmergencyHandoffCard();
+    }
+  } catch (err) {
+    alert("Error creating emergency intake: " + err.message);
+  } finally {
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.textContent = "Save & Generate Care Sheet";
+    }
+  }
+}
+
+// ==============================================================================
+// WATCH ITEM 2: PERMANENCY & HANDOVER WIZARD (5 STEPS)
+// ==============================================================================
+let phwCurrentStep = 1;
+
+async function openPermanencyHandoverWizard() {
+  const child = childrenList.find(c => c.id === currentChildId);
+  if (!child) {
+    alert("Please select a child profile first.");
+    return;
+  }
+
+  phwCurrentStep = 1;
+  const modal = document.getElementById('permanencyHandoverWizardModal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+
+  const today = new Date().toISOString().split('T')[0];
+  const dateInput = document.getElementById('phwEndDate');
+  if (dateInput && !dateInput.value) dateInput.value = today;
+
+  try {
+    const pRes = await apiFetch(`/api/parent/status?child_id=${currentChildId}`);
+    const pData = await pRes.json().catch(() => ({}));
+    const badge = document.getElementById('phwParentStatusBadge');
+    if (badge) {
+      badge.textContent = pData.state || 'UNLINKED / NONE';
+      if (pData.state === 'ACTIVE_ENGAGED') {
+        badge.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800';
+      } else if (pData.state === 'REVOKED') {
+        badge.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800';
+      } else {
+        badge.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800';
+      }
+    }
+  } catch (_) {}
+
+  updatePhwUI();
+  if (window.lucide) lucide.createIcons();
+}
+
+function closePermanencyHandoverWizard() {
+  const modal = document.getElementById('permanencyHandoverWizardModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function updatePhwUI() {
+  for (let i = 1; i <= 5; i++) {
+    const pane = document.getElementById(`phwStepPane${i}`);
+    const tab = document.getElementById(`phwStepTab${i}`);
+    if (pane) {
+      if (i === phwCurrentStep) pane.classList.remove('hidden');
+      else pane.classList.add('hidden');
+    }
+    if (tab) {
+      if (i === phwCurrentStep) {
+        tab.className = "py-1 rounded bg-indigo-600 text-white font-bold shadow-xs";
+      } else if (i < phwCurrentStep) {
+        tab.className = "py-1 rounded bg-emerald-100 text-emerald-800 font-bold border border-emerald-300";
+      } else {
+        tab.className = "py-1 rounded bg-slate-100 text-slate-500 font-bold";
+      }
+    }
+  }
+
+  const prevBtn = document.getElementById('phwPrevBtn');
+  const nextBtn = document.getElementById('phwNextBtn');
+  const saveBtn = document.getElementById('phwSaveBtn');
+
+  if (prevBtn) {
+    if (phwCurrentStep > 1) prevBtn.classList.remove('hidden');
+    else prevBtn.classList.add('hidden');
+  }
+
+  if (phwCurrentStep === 5) {
+    if (nextBtn) nextBtn.classList.add('hidden');
+    if (saveBtn) saveBtn.classList.remove('hidden');
+    renderPhwSummary();
+  } else {
+    if (nextBtn) {
+      nextBtn.classList.remove('hidden');
+      const stepNames = ['', 'Parent Access →', 'Closure Details →', 'Archive Review →', 'Final Review →'];
+      nextBtn.textContent = `Next: ${stepNames[phwCurrentStep] || 'Next →'}`;
+    }
+    if (saveBtn) saveBtn.classList.add('hidden');
+  }
+}
+
+function nextPhwStep() {
+  if (phwCurrentStep < 5) {
+    phwCurrentStep++;
+    updatePhwUI();
+  }
+}
+
+function prevPhwStep() {
+  if (phwCurrentStep > 1) {
+    phwCurrentStep--;
+    updatePhwUI();
+  }
+}
+
+async function downloadLifebookForClosure() {
+  try {
+    const res = await apiFetch('/api/reports/lifebook', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ child_id: currentChildId })
+    });
+    const data = await res.json();
+    if (data.download_url) {
+      window.open(data.download_url, '_blank');
+    } else {
+      alert("Notice: " + (data.error || "Lifebook generated."));
+    }
+  } catch (err) {
+    alert("Lifebook generation error: " + err.message);
+  }
+}
+
+function renderPhwSummary() {
+  const container = document.getElementById('phwSummaryReview');
+  if (!container) return;
+
+  const child = childrenList.find(c => c.id === currentChildId);
+  const alias = child ? child.alias : 'Child';
+  const endDate = document.getElementById('phwEndDate')?.value || 'Today';
+  const outcome = document.getElementById('phwOutcome')?.value || 'Reunified';
+  const parentActionElem = document.querySelector('input[name="phwParentAction"]:checked');
+  const parentAction = parentActionElem ? parentActionElem.value : 'graduate';
+
+  let parentActionLabel = 'Graduate to Read-Only Lifebook';
+  if (parentAction === 'revoke') parentActionLabel = 'Revoke & Legal Hold';
+  else if (parentAction === 'keep') parentActionLabel = 'Keep Unchanged';
+
+  container.innerHTML = `
+    <div class="space-y-1.5 text-[11px]">
+      <div><strong>Child:</strong> ${alias} (Ref: ${child?.child_code || 'CCC-001'})</div>
+      <div><strong>Permanency Outcome:</strong> <span class="font-bold text-indigo-700">${outcome}</span></div>
+      <div><strong>Episode End Date:</strong> ${endDate}</div>
+      <div><strong>Parent Access Action:</strong> ${parentActionLabel}</div>
+      <div class="pt-1 border-t text-emerald-800 font-semibold">
+        ✓ 100% Data Preservation Verified: Records will be safely sealed under soft-tombstone retention (retention_state = 'Archived'). Zero rows deleted.
+      </div>
+    </div>
+  `;
+}
+
+async function finishPermanencyHandoverWizard() {
+  const saveBtn = document.getElementById('phwSaveBtn');
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Archiving Placement & Sealing Records...";
+  }
+
+  const endDate = document.getElementById('phwEndDate')?.value || new Date().toISOString().split('T')[0];
+  const outcome = document.getElementById('phwOutcome')?.value || 'Reunified';
+  const notes = document.getElementById('phwNotes')?.value || `Placement concluded with permanency outcome: ${outcome}.`;
+  const parentActionElem = document.querySelector('input[name="phwParentAction"]:checked');
+  const parentAction = parentActionElem ? parentActionElem.value : 'graduate';
+
+  try {
+    const res = await apiFetch(`/api/children/${currentChildId}/permanency-archive`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        episode_end_date: endDate,
+        permanency_outcome: outcome,
+        parent_action: parentAction,
+        notes: notes
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.error || 'Failed to archive placement.');
+      return;
+    }
+
+    alert(`✅ Placement Closure Complete!\n\nChild Outcome: ${data.permanency_outcome}\nClosure Date: ${data.episode_end_date}\nParent Access: ${data.parent_action}\n\n${data.message}`);
+    closePermanencyHandoverWizard();
+    await loadChildren();
+    if (currentMainSection === 'mission_control') {
+      await renderMissionControlView(document.getElementById('mainContent'));
+    } else {
+      await renderChildSnapshot();
+    }
+  } catch (err) {
+    alert("Error completing case closure: " + err.message);
+  } finally {
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.textContent = "Seal & Complete Case Closure";
+    }
+  }
+}
+
+// ==============================================================================
+// WATCH ITEM 3: KINSHIP FAST-TRACK GUIDE (PLAIN-ENGLISH SURVIVAL GUIDE)
+// ==============================================================================
+function openKinshipFastTrackModal() {
+  const modal = document.getElementById('kinshipFastTrackModal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    switchKftTab('first');
+    if (window.lucide) lucide.createIcons();
+  }
+}
+
+function closeKinshipFastTrackModal() {
+  const modal = document.getElementById('kinshipFastTrackModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function switchKftTab(tabKey) {
+  const tabs = ['first', 'benefits', 'paperwork', 'wait', 'decoder'];
+  tabs.forEach(t => {
+    const pane = document.getElementById(`kftPane-${t}`);
+    const btn = document.getElementById(`kftTabBtn-${t}`);
+    if (pane) {
+      if (t === tabKey) pane.classList.remove('hidden');
+      else pane.classList.add('hidden');
+    }
+    if (btn) {
+      if (t === tabKey) {
+        btn.className = "px-3 py-1.5 rounded-lg font-bold bg-white text-teal-900 shadow-xs";
+      } else {
+        btn.className = "px-3 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900";
+      }
+    }
+  });
+}
+
 
 
 

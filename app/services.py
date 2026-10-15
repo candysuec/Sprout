@@ -672,6 +672,7 @@ def generate_parent_packet_docx(child_id):
     if not child:
         conn.close()
         return None
+    child = dict(child)
     alias = child.get('alias') or child.get('first_name') or 'Child'
 
     c.execute("""
