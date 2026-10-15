@@ -70,7 +70,21 @@ foster-portal/docs/
 
 ---
 
-## 2. Core Architecture Specifications
+## 2. Phase 13A Pre-Implementation Governance Specifications
+
+| Document | Focus Area | Governance Scope | Status |
+| :--- | :--- | :--- | :---: |
+| **[`API_GOVERNANCE_MATRIX.md`](API_GOVERNANCE_MATRIX.md)** | **Complete API Governance**: Scoping, ownership, classification filters, and output eligibility across all 43 local endpoints. | API, Security, Gateway | **VERIFIED** |
+| **[`EXPORT_GOVERNANCE_MATRIX.md`](EXPORT_GOVERNANCE_MATRIX.md)** | **Export & Output Governance**: Pre-release preview, classification gating, redaction, watermarking, and sign-off pipeline across all 9 generators. | Export, Compliance, Legal | **VERIFIED** |
+| **[`DATABASE_GOVERNANCE_GAP_REPORT.md`](DATABASE_GOVERNANCE_GAP_REPORT.md)** | **Database Gap Analysis**: Cross-reference of 11 tables and 148 fields against v3.1 data dictionary; Phase 13A prerequisites. | DB Schema, Migrations | **ACTIONABLE** |
+| **[`ROLE_PERMISSION_MATRIX_V2.md`](ROLE_PERMISSION_MATRIX_V2.md)** | **Role Permissions v2.0**: Read, write, export, archive, share, approve, invite, and revoke matrix across all 8 roles. | Access Control, Security | **VERIFIED** |
+| **[`WORKFLOW_GOVERNANCE_DICTIONARY.md`](WORKFLOW_GOVERNANCE_DICTIONARY.md)** | **Workflow Governance**: 10 critical operational workflows, checkpoints, classification rules, human approval gates, and audit trails. | Business Logic, Workflows | **VERIFIED** |
+| **[`DATA_SENSITIVITY_CLASSIFICATION.md`](DATA_SENSITIVITY_CLASSIFICATION.md)** | **Data Sensitivity Tiers**: Standard, Sensitive, Restricted, and Protected data architectures; High-Conflict masking rules. | Privacy, Data Protection | **VERIFIED** |
+| **[`CHILD_VOICE_DOMAIN_DISCOVERY.md`](CHILD_VOICE_DOMAIN_DISCOVERY.md)** | **Child Voice Discovery (Future Only)**: Strategic exploration of youth-authored goals, reflections, and Lifebook curation (Deferred to Phase 17+). | Future Horizons, Ethics | **EXPLORATORY** |
+
+---
+
+## 3. Core Architecture Specifications
 
 | Document | Focus Area | Key Features Covered |
 | :--- | :--- | :--- |
@@ -82,7 +96,7 @@ foster-portal/docs/
 
 ---
 
-## 3. Training Hub, Flight Simulator & Video Guides
+## 4. Training Hub, Flight Simulator & Video Guides
 
 | Document | Focus Area | Format / Delivery |
 | :--- | :--- | :--- |
@@ -95,7 +109,7 @@ foster-portal/docs/
 
 ---
 
-## 4. Privacy, Security & Usability Audits
+## 5. Privacy, Security & Usability Audits
 
 | Document | Scope | Audit Result |
 | :--- | :--- | :---: |
@@ -107,7 +121,7 @@ foster-portal/docs/
 
 ---
 
-## 5. Workflows, Blueprints & Quickstarts
+## 6. Workflows, Blueprints & Quickstarts
 
 - **[`NEW_USER_QUICKSTART.md`](NEW_USER_QUICKSTART.md)**: 3-step startup guide for first-time caregivers.
 - **[`USER_JOURNEY_GUIDE.md`](USER_JOURNEY_GUIDE.md)**: Role-specific journey maps (foster parent, kinship aunt, respite host).

@@ -84,6 +84,14 @@ Sprout normalizes caregiver management across real-world dimensions:
 Production specifications, system topologies, privacy audits, training flight simulators, and instructor guides are maintained in the [`docs/`](docs/) directory. Consult the [**Master Documentation Catalog**](docs/README.md) for the full categorized index:
 
 ### 🌟 Master Strategic State & Governance
+- [**Phase 13A Pre-Implementation Governance Suite**](docs/README.md#2-phase-13a-pre-implementation-governance-specifications):
+  - [**API Governance Matrix**](docs/API_GOVERNANCE_MATRIX.md): Exhaustive governance specifications for all 43 endpoints (39 REST APIs + 4 file routes), defining domain ownership, 5-tier note classifications, and 8-role permissions.
+  - [**Export Governance Matrix**](docs/EXPORT_GOVERNANCE_MATRIX.md): Redaction, sanitization, and output boundary controls for all 9 document generators (DCF Monthly, Court Packet, FS-334B, Respite Card, Lifebook, etc.).
+  - [**Database Governance Gap Report**](docs/DATABASE_GOVERNANCE_GAP_REPORT.md): Audit of 11 SQLite tables and 148 columns, identifying migration gaps, sovereignty domains, and field-level controls.
+  - [**Role & Permission Matrix v2**](docs/ROLE_PERMISSION_MATRIX_V2.md): Fine-grained capability matrix for 8 roles across 8 operational gates and 4 data sovereignty domains.
+  - [**Workflow Governance Dictionary**](docs/WORKFLOW_GOVERNANCE_DICTIONARY.md): Step-by-step governance specifications for 10 critical system workflows.
+  - [**Data Sensitivity Classification Architecture**](docs/DATA_SENSITIVITY_CLASSIFICATION.md): 4-tier sensitivity classification standard (Standard, Sensitive, Restricted, Protected) with field-level controls.
+  - [**Child Voice Domain Discovery**](docs/CHILD_VOICE_DOMAIN_DISCOVERY.md): Exploratory architectural analysis for a future 5th domain (deferred to Phase 17+).
 - [**Master Governance, Safety & Security Framework**](docs/GOVERNANCE_AND_SAFETY_FRAMEWORK.md): **Engineering & Governance Specification (v3.1)** establishing precise legal disclaimers, tamper-evident record keeping, 5-state retention lifecycles, unlinked parent registration, 10-state access lifecycle, and the 5-gate sharing hierarchy.
 - [**Child & Family Success Operating System Architecture**](docs/CHILD_AND_FAMILY_SUCCESS_OPERATING_SYSTEM.md): **The Foundational Strategic Constitution** establishing non-negotiable principles, DCF output integration, homepage attention philosophy, 4 data sovereignty domains, 4-tier note classifications, and the 8-role permission matrix.
 - [**Parent Participant Workspace Specification**](docs/PARENT_PARTICIPANT_WORKSPACE_SPECIFICATION.md): Dedicated specification for dignity-first parent goal tracking, evidence portfolios, and the anti-conflict Structured Family Engagement Feed.
