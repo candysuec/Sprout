@@ -437,6 +437,105 @@ def _migration_6_vermont_policy_suite(c):
             """, (ch_id, stage, timeline, h_date, stat, r_due, notes))
 
 
+def _migration_7_classification_foundation(c):
+    """
+    Phase 13B: Adds classification, domain, sensitivity_level, and retention_state
+    to timeline_records. Enforces 4-domain data sovereignty and 5-tier classification.
+    Adds high-conflict safety flags and parent participant workspace tables.
+    """
+    # 1. Add governance columns with safe defaults
+    _add_column(c, "timeline_records", "classification",
+                "TEXT NOT NULL DEFAULT 'legacy_unreviewed' CHECK(classification IN ('legacy_unreviewed', 'private', 'working', 'official', 'shared_family'))")
+    _add_column(c, "timeline_records", "domain",
+                "TEXT NOT NULL DEFAULT 'case' CHECK(domain IN ('child', 'case', 'caregiver', 'parent'))")
+    _add_column(c, "timeline_records", "sensitivity_level",
+                "TEXT NOT NULL DEFAULT 'sensitive' CHECK(sensitivity_level IN ('standard', 'sensitive', 'restricted', 'protected'))")
+    _add_column(c, "timeline_records", "retention_state",
+                "TEXT NOT NULL DEFAULT 'Active' CHECK(retention_state IN ('Active', 'Archived', 'Legal Hold', 'Transfer Pending', 'Disposition Review'))")
+
+    # 2. Add high conflict flag to households and children
+    _add_column(c, "households", "high_conflict_mode", "INTEGER DEFAULT 0")
+    _add_column(c, "children", "high_conflict_mode", "INTEGER DEFAULT 0")
+
+    # 3. Parent participant tables
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS parent_users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        child_id INTEGER NOT NULL,
+        email TEXT NOT NULL,
+        display_name TEXT NOT NULL,
+        auth_token_hash TEXT NOT NULL,
+        state TEXT NOT NULL DEFAULT 'PROVISIONAL_ACCESS',
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(child_id) REFERENCES children(id) ON DELETE CASCADE
+    )
+    """)
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS parent_goals (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        parent_id INTEGER NOT NULL,
+        child_id INTEGER NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT,
+        status TEXT DEFAULT 'In Progress',
+        target_date TEXT,
+        completed_date TEXT,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(parent_id) REFERENCES parent_users(id) ON DELETE CASCADE,
+        FOREIGN KEY(child_id) REFERENCES children(id) ON DELETE CASCADE
+    )
+    """)
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS parent_evidence (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        parent_id INTEGER NOT NULL,
+        goal_id INTEGER,
+        file_path TEXT,
+        file_name TEXT NOT NULL,
+        category TEXT NOT NULL,
+        notes TEXT,
+        verified INTEGER DEFAULT 0,
+        uploaded_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(parent_id) REFERENCES parent_users(id) ON DELETE CASCADE,
+        FOREIGN KEY(goal_id) REFERENCES parent_goals(id) ON DELETE SET NULL
+    )
+    """)
+
+    # 4. Intelligent backfill for domain based on existing functional category
+    c.execute("""
+        UPDATE timeline_records SET domain = 'child' 
+        WHERE category IN ('life_book', 'belongings', 'teen', 'early_childhood')
+    """)
+    c.execute("""
+        UPDATE timeline_records SET domain = 'case' 
+        WHERE category IN ('legal', 'medical', 'education', 'incident', 'financial', 'posc')
+    """)
+    c.execute("""
+        UPDATE timeline_records SET domain = 'caregiver' 
+        WHERE category IN ('daily', 'communication', 'emergency')
+    """)
+    c.execute("""
+        UPDATE timeline_records SET domain = 'parent' 
+        WHERE category = 'family_time'
+    """)
+
+    # 5. Mandatory Safety Invariant: Pre-existing records strictly remain 'legacy_unreviewed'
+    c.execute("""
+        UPDATE timeline_records SET 
+            classification = 'legacy_unreviewed',
+            sensitivity_level = 'sensitive',
+            retention_state = 'Active'
+        WHERE classification IS NULL OR classification = ''
+    """)
+
+    # 6. Composite Performance & Governance Indexes
+    c.execute("CREATE INDEX IF NOT EXISTS idx_timeline_governance ON timeline_records(child_id, domain, classification, retention_state)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_timeline_sensitivity ON timeline_records(child_id, sensitivity_level)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_timeline_export_gate ON timeline_records(child_id, event_date, classification) WHERE classification = 'official'")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_parent_users_token ON parent_users(auth_token_hash)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_parent_goals_child ON parent_goals(child_id, parent_id)")
+
+
 MIGRATIONS = [
     (1, _migration_1_baseline),
     (2, _migration_2_foundation),
@@ -444,18 +543,67 @@ MIGRATIONS = [
     (4, _migration_4_households_candy),
     (5, _migration_5_caregiver_enhancements),
     (6, _migration_6_vermont_policy_suite),
+    (7, _migration_7_classification_foundation),
 ]
 
 
-def _backup_before_migration(conn, from_version):
+def verify_backup_integrity(backup_path):
+    """Runs PRAGMA integrity_check on the specified database backup."""
+    if not os.path.exists(backup_path):
+        return False
+    check_conn = sqlite3.connect(backup_path)
+    try:
+        res = check_conn.execute("PRAGMA integrity_check").fetchone()
+        return bool(res and res[0] == "ok")
+    finally:
+        check_conn.close()
+
+
+def create_pre_migration_backup(conn, from_version=None):
+    """
+    Creates an atomic, consistent physical snapshot before a migration runs.
+    Verifies integrity with PRAGMA integrity_check.
+    """
+    if from_version is None:
+        try:
+            from_version = conn.execute("PRAGMA user_version").fetchone()[0]
+        except Exception:
+            from_version = "unknown"
     stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     dest_path = os.path.join(BACKUP_DIR, f"foster_binder_pre-v{from_version}_{stamp}.db")
     dest = sqlite3.connect(dest_path)
     try:
-        conn.backup(dest)
+        conn.backup(dest, pages=100)
     finally:
         dest.close()
+
+    if not verify_backup_integrity(dest_path):
+        raise RuntimeError(f"Backup integrity verification failed for {dest_path}")
     return dest_path
+
+
+def restore_backup(backup_path, target_path=DB_PATH):
+    """Restores database from verified backup file."""
+    if not verify_backup_integrity(backup_path):
+        raise ValueError(f"Cannot restore: backup {backup_path} is corrupted or missing.")
+    import shutil
+    shutil.copy2(backup_path, target_path)
+    return True
+
+
+def get_latest_backup_path(prefix="foster_binder_pre-v"):
+    """Finds the most recent backup in BACKUP_DIR."""
+    if not os.path.exists(BACKUP_DIR):
+        return None
+    files = [os.path.join(BACKUP_DIR, f) for f in os.listdir(BACKUP_DIR) if f.startswith(prefix) and f.endswith(".db")]
+    if not files:
+        return None
+    files.sort(key=os.path.getmtime, reverse=True)
+    return files[0]
+
+
+def _backup_before_migration(conn, from_version):
+    return create_pre_migration_backup(conn, from_version)
 
 
 def init_db():

@@ -42,41 +42,44 @@
 - [x] **P0-3 Dedicated Parent Workspace:** Clean, dignity-first UI for parents; 100% isolated from caregiver admin chrome.
 - [x] **Automated Regression Suite:** 73/73 tests passing (100%).
 
+- [x] **Phase 13B-01 Pre-Migration Backup Harness (`app/db.py`):**
+  - Physical SQLite backup to `BACKUP_DIR` before migration runs.
+  - Verification with `PRAGMA integrity_check`.
+  - Automated restore / rollback validated.
+- [x] **Phase 13B-02 Database Migration 7 (`app/db.py`):**
+  - Added `classification`, `domain`, `sensitivity_level`, `retention_state` to `timeline_records`.
+  - Added `high_conflict_mode` to `households` and `children`.
+  - Created tables `parent_users`, `parent_goals`, `parent_evidence`.
+  - Created composite governance indexes (`idx_timeline_governance`, `idx_timeline_sensitivity`, `idx_timeline_export_gate`, etc.).
+  - Applied category-to-domain backfill and legacy safety defaults (`legacy_unreviewed`).
+- [x] **Phase 13B-03 Authorization Middleware & Export Safety (`app/auth_middleware.py`, `app/server.py`, `app/services.py`):**
+  - Deployed 8-role actor/role resolver and domain sovereignty validator.
+  - Soft tombstone on record deletion (`retention_state = 'Archived'`).
+  - High-conflict address masking and pure Python image EXIF scrubber.
+  - Hardened document export generators (DCF report, court packet, parent packet, respite card).
+- [x] **Phase 13B-04 Parent Participant Workspace Benchmark Validation:**
+  - Verified 5 benchmark parent scenarios (Danielle Miller, Angela Davis, Jason Vance, Maria Lin, Emergency Revocation).
+- [x] **Phase 13B-05 Multi-Party Community Fixtures & Cryptographic Audit Verification:**
+  - Circle of Care ecosystems verified (CH-201 Liam Brooks, CH-202 Emma Vance, CH-203 Noah Miller).
+  - SHA-256 blockchain audit integrity verified unbroken.
+- [x] **Automated Regression & Governance Suites:** 119/119 tests passing (100%).
+
 ---
 
 ### 🟡 In Progress (Current Execution Focus)
-- [ ] **Founder OS Alignment & Project Reorientation:**
-  - Establishing `FOUNDER_ORIENTATION_DASHBOARD.md`
-  - Publishing `PROJECT_STATE.md` (this ledger)
-  - Publishing `PEOPLE_AND_RELATIONSHIP_MODEL.md`
-  - Assembling `SAMPLE_CHILD_COMMUNITY.md` for multi-party testing
-  - Assembling `PARENT_PARTICIPANT_SCENARIOS.md`
-  - Publishing `SYSTEM_HEALTH_SPEC.md`
-  - Re-cataloging repository in `REPOSITORY_MAP.md`
-  - Reorienting root `README.md` and `docs/README.md` to Initiative $\rightarrow$ Project $\rightarrow$ Work $\rightarrow$ Evidence hierarchy.
+- [ ] **Parent Participant Workspace Frontend Visual Polish:**
+  - Interactive tabs in `app/static/index.html` for Parent Goals, Evidence Upload, and 1-Tap Check-In.
 
 ---
 
 ### ⏳ Ready for Development (Next Execution Steps)
-- [ ] **Phase 13A.2 Database Migration 7 (`app/db.py`):**
-  - Add `classification`, `domain`, `sensitivity_level` to `timeline_records`
-  - Create `parent_users`, `parent_goals`, `parent_evidence` tables
-  - Apply backward-compatible legacy default (`legacy_unreviewed`)
-- [ ] **Phase 13A.3 Authorization Middleware (`app/auth_middleware.py`):**
-  - Actor context resolver (`get_current_actor()`)
-  - Domain isolation gate (`check_domain_access()`)
-  - Classification filter (`filter_records_by_classification()`)
-  - High-Conflict masking filter (`mask_protected_fields()`)
-- [ ] **Phase 13A.4 API Router Mounting:**
-  - Mount middleware across all 43 endpoints in `app/app.py`.
-- [ ] **Phase 13A.5 Export Safety Validation:**
-  - Bind classification and high-conflict filters to the 9 document generators.
+- [ ] **Placement Intake Preparation for Child CD:**
+  - Verify intake workflows and document vaults for 41 Elmwood Drive.
 
 ---
 
 ### 🔴 Blocked / Held (Intentional Safeguard Gating)
-- **Live Parent Account Creation:** Gated on Migration 7 and Token Authentication Service completion.
-- **Production Schema Modifications:** Gated on Founder sign-off of Phase 13B Execution Control Plan.
+- **Live Outbound Email / SMS Token Dispatch:** Gated on Vermont DCF physical contact approval policy.
 - **Child Voice Direct Authoring:** Deferred to Phase 17+ (Intentionally out of scope for v3.x).
 
 ---

@@ -44,12 +44,23 @@ def generate_monthly_report_docx(child_id, year, month, privacy_mode="initials")
         
     date_prefix = f"{year:04d}-{month:02d}"
     
-    # Fetch records for that month
-    c.execute("""
-    SELECT * FROM timeline_records 
-    WHERE child_id = ? AND event_date LIKE ? 
-    ORDER BY event_date ASC
-    """, (child_id, f"{date_prefix}%"))
+    # Fetch records for that month with governance filtering
+    if privacy_mode == "legal":
+        c.execute("""
+        SELECT * FROM timeline_records 
+        WHERE child_id = ? AND event_date LIKE ?
+          AND (retention_state IS NULL OR retention_state = 'Active')
+        ORDER BY event_date ASC
+        """, (child_id, f"{date_prefix}%"))
+    else:
+        c.execute("""
+        SELECT * FROM timeline_records 
+        WHERE child_id = ? AND event_date LIKE ? 
+          AND classification = 'official'
+          AND domain IN ('child', 'case')
+          AND (retention_state IS NULL OR retention_state = 'Active')
+        ORDER BY event_date ASC
+        """, (child_id, f"{date_prefix}%"))
     records = c.fetchall()
     
     # Fetch contacts
@@ -193,11 +204,14 @@ def generate_respite_handoff_card_docx(child_id):
     c.execute("SELECT * FROM contacts WHERE child_id = ? ORDER BY is_emergency DESC, role_type ASC", (child_id,))
     contacts = [dict(r) for r in c.fetchall()]
 
-    # Fetch recent medical and daily routine entries
+    # Fetch recent medical and daily routine entries with governance filtering
     c.execute("""
     SELECT category, title, event_date, summary 
     FROM timeline_records 
     WHERE child_id = ? AND category IN ('medical', 'daily') 
+      AND (domain IS NULL OR domain = 'child')
+      AND (classification IS NULL OR classification IN ('official', 'working'))
+      AND (retention_state IS NULL OR retention_state = 'Active')
     ORDER BY event_date DESC LIMIT 10
     """, (child_id,))
     recent_notes = [dict(r) for r in c.fetchall()]
@@ -496,6 +510,9 @@ def generate_dcf_reimbursement_claim_docx(child_id, year, month, claim_type="FS-
     c.execute("""
     SELECT * FROM timeline_records 
     WHERE child_id = ? AND event_date LIKE ? 
+      AND (classification IS NULL OR classification = 'official')
+      AND (domain IS NULL OR domain IN ('case', 'caregiver'))
+      AND (retention_state IS NULL OR retention_state = 'Active')
     ORDER BY event_date ASC
     """, (child_id, f"{date_prefix}%"))
     records = c.fetchall()
@@ -598,6 +615,90 @@ def generate_dcf_reimbursement_claim_docx(child_id, year, month, claim_type="FS-
     filename = f"DCF_{claim_type}_{alias}_{year:04d}_{month:02d}.docx"
     file_path = os.path.join(EXPORT_DIR, filename)
     doc.save(file_path)
+    return filename
+
+
+def generate_court_packet_docx(child_id):
+    """
+    Generates Family Court Summary Packet (.docx).
+    Strictly filters for classification = 'official', domain IN ('child', 'case'), retention_state = 'Active'.
+    """
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute("SELECT * FROM children WHERE id = ?", (child_id,))
+    child = c.fetchone()
+    if not child:
+        conn.close()
+        return None
+    alias = child.get('alias') or child.get('first_name') or 'Child'
+
+    c.execute("""
+    SELECT * FROM timeline_records 
+    WHERE child_id = ? 
+      AND classification = 'official'
+      AND domain IN ('child', 'case')
+      AND (retention_state IS NULL OR retention_state = 'Active')
+    ORDER BY event_date ASC
+    """, (child_id,))
+    records = c.fetchall()
+    conn.close()
+
+    doc = docx.Document()
+    title = doc.add_heading(f"Vermont Family Court Chronology Packet: {alias}", level=0)
+    title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    doc.add_paragraph("OFFICIAL FAMILY COURT CHRONOLOGY — PRIVILEGED & CONFIDENTIAL")
+
+    for r in records:
+        p = doc.add_paragraph()
+        p.add_run(f"[{r['event_date']}] {r['title']} ({r['category'].upper()}):\n").bold = True
+        p.add_run(r['summary'] or '')
+
+    doc = scrub_docx_metadata(doc, title=f"Family Court Packet - {alias}")
+    filename = f"Court_Packet_{alias}.docx"
+    filepath = os.path.join(EXPORT_DIR, filename)
+    doc.save(filepath)
+    return filename
+
+
+def generate_parent_packet_docx(child_id):
+    """
+    Generates Parent Participant Structured Keepsake Packet (.docx).
+    Strictly filters for classification = 'shared_family', domain IN ('child', 'parent'), retention_state = 'Active'.
+    """
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute("SELECT * FROM children WHERE id = ?", (child_id,))
+    child = c.fetchone()
+    if not child:
+        conn.close()
+        return None
+    alias = child.get('alias') or child.get('first_name') or 'Child'
+
+    c.execute("""
+    SELECT * FROM timeline_records 
+    WHERE child_id = ? 
+      AND domain IN ('child', 'parent')
+      AND classification = 'shared_family'
+      AND (retention_state IS NULL OR retention_state = 'Active')
+    ORDER BY event_date DESC
+    """, (child_id,))
+    records = c.fetchall()
+    conn.close()
+
+    doc = docx.Document()
+    title = doc.add_heading(f"Parent Keepsake & Family Milestones: {alias}", level=0)
+    title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    doc.add_paragraph("SHARED FAMILY UPDATES & MEMORIES")
+
+    for r in records:
+        p = doc.add_paragraph()
+        p.add_run(f"[{str(r['event_date'])[:10]}] {r['title']}:\n").bold = True
+        p.add_run(r['summary'] or '')
+
+    doc = scrub_docx_metadata(doc, title=f"Parent Keepsake - {alias}")
+    filename = f"Parent_Keepsake_{alias}.docx"
+    filepath = os.path.join(EXPORT_DIR, filename)
+    doc.save(filepath)
     return filename
 
 
