@@ -60,7 +60,7 @@ These are the only active workstreams currently in motion:
 
 | Workstream | Scope | Target File(s) | Status |
 | :--- | :--- | :--- | :---: |
-| **Founder Acceptance Walkthrough** | 4-journey evaluation by Candy Chevalier; development freeze activated across all domains. | `docs/FOUNDER_ORIENTATION_DASHBOARD.md`, `docs/PROJECT_STATE.md` | **ACCEPTED & FROZEN** |
+| **Real-World Validation (Observation Mode)** | Support Founder demos; observe real users (Foster, Kinship, Parent, Respite); capture friction only. | `docs/FOUNDER_ORIENTATION_DASHBOARD.md`, `docs/PROJECT_STATE.md` | **ACTIVE & OBSERVING** |
 | **Founder Home Alignment** | Single source-of-truth project maintenance across state ledgers. | `docs/FOUNDER_ORIENTATION_DASHBOARD.md`, `docs/PROJECT_STATE.md` | **ACTIVE & SYNCHRONIZED (178/178 Tests)** |
 
 ---
@@ -78,8 +78,9 @@ The following are **INTENTIONALLY HELD (GATED)**:
 
 ## ⏩ WHAT IS NEXT?
 
-1. **Production Intake Readiness:** Review and prepare intake workflows and document vaults for Sample Child CH-201 at Sample Household A.
-2. **Continuous Maintenance:** Maintain single source of truth in `FOUNDER_ORIENTATION_DASHBOARD.md` and `PROJECT_STATE.md`.
+1. **Real-World User Observation:** Observe Foster Caregiver, Kinship Caregiver, Parent Participant, Respite Provider; document findings only (no code fixes without Founder approval).
+2. **Production Intake Readiness:** Review and prepare intake workflows and document vaults for Sample Child CH-201 at Sample Household A.
+3. **Continuous Maintenance:** Maintain single source of truth in `FOUNDER_ORIENTATION_DASHBOARD.md` and `PROJECT_STATE.md`.
 
 ---
 
