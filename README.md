@@ -84,6 +84,7 @@ Sprout normalizes caregiver management across real-world dimensions:
 Production specifications, system topologies, privacy audits, training flight simulators, and instructor guides are maintained in the [`docs/`](docs/) directory. Consult the [**Master Documentation Catalog**](docs/README.md) for the full categorized index:
 
 ### 🌟 Master Strategic State & Governance
+- [**Master Governance, Safety & Security Framework**](docs/GOVERNANCE_AND_SAFETY_FRAMEWORK.md): **Engineering & Governance Specification (v3.1)** establishing precise legal disclaimers, tamper-evident record keeping, 5-state retention lifecycles, unlinked parent registration, 10-state access lifecycle, and the 5-gate sharing hierarchy.
 - [**Child & Family Success Operating System Architecture**](docs/CHILD_AND_FAMILY_SUCCESS_OPERATING_SYSTEM.md): **The Foundational Strategic Constitution** establishing non-negotiable principles, DCF output integration, homepage attention philosophy, 4 data sovereignty domains, 4-tier note classifications, and the 8-role permission matrix.
 - [**Parent Participant Workspace Specification**](docs/PARENT_PARTICIPANT_WORKSPACE_SPECIFICATION.md): Dedicated specification for dignity-first parent goal tracking, evidence portfolios, and the anti-conflict Structured Family Engagement Feed.
 - [**Sprout Canonical System State & Audit Registry**](docs/SPROUT_SYSTEM_STATE.md): **The authoritative single source of truth** covering all 36 API endpoints, 12 primary view renderers, 10 modal dialogs, 6 SQLite tables, dual-sphere isolation matrix, and readiness scores.
