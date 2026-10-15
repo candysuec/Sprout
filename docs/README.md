@@ -81,6 +81,7 @@ foster-portal/docs/
 | **[`WORKFLOW_GOVERNANCE_DICTIONARY.md`](WORKFLOW_GOVERNANCE_DICTIONARY.md)** | **Workflow Governance**: 10 critical operational workflows, checkpoints, classification rules, human approval gates, and audit trails. | Business Logic, Workflows | **VERIFIED** |
 | **[`DATA_SENSITIVITY_CLASSIFICATION.md`](DATA_SENSITIVITY_CLASSIFICATION.md)** | **Data Sensitivity Tiers**: Standard, Sensitive, Restricted, and Protected data architectures; High-Conflict masking rules. | Privacy, Data Protection | **VERIFIED** |
 | **[`PHASE_13A_IMPLEMENTATION_DESIGN.md`](PHASE_13A_IMPLEMENTATION_DESIGN.md)** | **Implementation Readiness Design Package**: Master Traceability Matrix, Schema Migration 7, 43-Endpoint Middleware, Export Filters, High-Conflict Mode, and Test Plan. | Architecture Lock, Implementation Plan | **LOCKED & READY** |
+| **[`PHASE_13B_EXECUTION_CONTROL_PLAN.md`](PHASE_13B_EXECUTION_CONTROL_PLAN.md)** | **Phase 13B Execution Control Plan**: Chronological 8-step execution order, Migration 7 runbook, 43-endpoint authorization matrix, and readiness gate. | Execution Control, Safe Implementation | **APPROVED & GO** |
 | **[`CHILD_VOICE_DOMAIN_DISCOVERY.md`](CHILD_VOICE_DOMAIN_DISCOVERY.md)** | **Child Voice Discovery (Future Only)**: Strategic exploration of youth-authored goals, reflections, and Lifebook curation (Deferred to Phase 17+). | Future Horizons, Ethics | **EXPLORATORY** |
 
 ---
