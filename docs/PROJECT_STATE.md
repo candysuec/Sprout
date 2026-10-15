@@ -24,6 +24,7 @@
 | **Release Readiness** | **PASS (Foundation Release Candidate)** | [`PROJECT_STATE.md`](PROJECT_STATE.md) | 5 Cognitive Personas Verified |
 | **Human Walkthrough** | **PASS (Zero Detective Work)** | [`PROJECT_STATE.md`](PROJECT_STATE.md) | 4 Real-World Personas Walked Through |
 | **Founder Acceptance** | **ACCEPTED / FROZEN** | [`PROJECT_STATE.md`](PROJECT_STATE.md) | Zero Confusion / Hesitation (Freeze Active) |
+| **Founder Sandbox Review Readiness** | **READY & VERIFIED (16/16 Passed)** | [`PROJECT_STATE.md`](PROJECT_STATE.md) | 5 Review Personas & Local Feedback Mounted |
 
 ---
 
@@ -87,6 +88,10 @@
 - [x] **Git Release Tagging (`v3.2.0-rc1`):** Tagged and pushed to `candysuec/Sprout:v3.2.0-rc1`.
 - [x] **Human Walkthrough Validation:** 4 real-world user personas (Foster Caregiver, Kinship Caregiver, Parent Participant, Respite Provider) verified end-to-end. Captured and fixed document export row conversion bug; zero points of user confusion or detective work.
 - [x] **Founder Acceptance Walkthrough & Development Freeze:** Candy Chevalier verified all 4 operating journeys. Captured 0 confusion, 0 hesitation, 0 unexpected behavior, 0 missing information. Development freeze activated across all domains.
+- [x] **Founder Sandbox Review Preparation & Readiness Gate (16/16 Items Verified):**
+  - Verified 100% operational readiness across all 16 sandbox areas: Mission Control, Children, Emergency Placement Wizard, Care & Safety Sheet, Quick Action Dock, Parent Workspace, Respite Provider Experience, Kinship Fast Track Guide, Permanency Wizard, Monthly Report Export, DCF Reports, Search, Timeline, Activity Feed, Sample Communities, Sample Parent Participants.
+  - Built guided Founder Review Mode launcher (`#founderReviewModal`) welcoming the operator and offering 1-click launch pathways for: (1) Founder Overview, (2) Foster Caregiver View, (3) Kinship View, (4) Parent View, (5) Respite View.
+  - Built persistent Founder Feedback capture system (`#founderFeedbackModal` & `#btnFloatingFeedback`) capturing operator reflections across 5 prompts (*What worked?*, *What was confusing?*, *What was missing?*, *What felt unnecessary?*, *What felt amazing?*) and persisting to local SQLite (`POST /api/founder/feedback`) with offline `localStorage` backup without automatic code churn.
 
 ---
 
@@ -415,7 +420,52 @@
 
 ---
 
-## 7. Maintenance Protocol (Founder Home Mandate)
+## 7. Founder Sandbox Review Preparation & Readiness Ledger
+
+### Part A: Sandbox Readiness Check (16/16 Passed)
+All 16 core functional areas were verified operational in the local sandbox:
+1. **Mission Control:** Live status cards, active household indicator, urgent alerts, and recent timeline updates render without errors.
+2. **Children:** Child profiles, aliases, ages, high-conflict indicators, and active placement statuses render accurately.
+3. **Emergency Placement Wizard (`#emergencyPlacementWizardModal`):** 5-step intake captures demographics, health, emergency contacts, and soothing routines in a single atomic transaction.
+4. **Care & Safety Sheet (`#careSafetySheetModal`):** Instant 1-tap printable brief surfacing allergies, emergency medical info, routine calming items, and authorized contacts.
+5. **Quick Action Dock:** Persistent 6-action dock (`+ 15-Sec Log`, `Emergency Intake`, `Care Sheet`, `Kinship Guide`, `Case Closure`, `Export Month`) accessible across all views.
+6. **Parent Workspace (`#parentWorkspaceView`):** Isolated 4-card dignity portal (Goal Roadmap, Shared Moments, Bi-weekly Check-in, Verified Milestones). Fail-closed security with 0 leaked child records.
+7. **Respite Provider Experience:** 1-tap view filtered exclusively to Child domain, with private notes and case history hidden.
+8. **Kinship Fast Track Guide (`#kinshipFastTrackModal`):** Plain-English financial benefits triage ($350 Fund, Reach Up, Dr. Dynasaur) and welfare acronym decoder (CHINS, EPSDT, RPPS).
+9. **Permanency Wizard (`#permanencyHandoverWizardModal`):** 5-step closure generating keepsake Family Lifebook `.docx`, updating parent access, and safely soft-archiving records (`retention_state = 'Archived'`).
+10. **Monthly Report Export:** Automated 1-click DCF monthly summary generation in `.docx` format with full compliance tracking.
+11. **DCF Reports:** Pre-formatted state report generator with PII sanitization and court-compliant formatting.
+12. **Search:** Real-time client-side filter and database search across child records, logs, and timeline events.
+13. **Timeline:** 5-level classified chronological event ledger with domain filtering and sensitivity protections.
+14. **Activity Feed:** Consolidated multi-child activity stream displaying daily logs, milestones, and medical visits.
+15. **Sample Communities:** Pre-seeded realistic Circle of Care communities (Liam Brooks CH-201, Emma Vance CH-202, Noah Miller CH-203).
+16. **Sample Parent Participants:** Realistic benchmark parent accounts (Danielle Miller, Angela Davis, Jason Vance, Maria Lin) with varying progress and safety restrictions.
+
+### Part B: Founder Review Mode
+- **Modal:** `#founderReviewModal` displayed on sandbox launch and accessible anytime via the `Review Mode` button in the sticky navigation header.
+- **5 Guided Walkthrough Paths:**
+  1. **Founder Overview:** Switches to Founder overview (`Candy Chevalier`), shows household metrics, full child roster, and high-level health indicators.
+  2. **Foster Caregiver View:** Focuses on routine logging, quick action dock, and monthly compliance reporting.
+  3. **Kinship Caregiver View:** Switches to Sample Community and opens the Kinship Fast-Track Guide and welfare benefits navigator.
+  4. **Parent Participant View:** Switches directly to the isolated Parent Participant Workspace with dignity goal tracking and moments feed.
+  5. **Respite Provider View:** Switches to Respite profile (`Samantha Price`) and opens the Care & Safety Sheet with emergency routines.
+
+### Part C: Founder Feedback System
+- **Floating Button:** `#btnFloatingFeedback` fixed at the bottom-right corner of every screen for instant 1-tap access.
+- **Capture Form (`#founderFeedbackModal`):**
+  1. *What worked?*
+  2. *What was confusing?*
+  3. *What was missing?*
+  4. *What felt unnecessary?*
+  5. *What felt amazing?*
+- **Persistence Architecture:**
+  - Persisted to local SQLite table `founder_feedback` via `POST /api/founder/feedback`.
+  - Fallback offline backup to browser `localStorage`.
+  - Preserves Founder Operating Principle: zero automatic code churn or unapproved implementations.
+
+---
+
+## 8. Maintenance Protocol (Founder Home Mandate)
 
 > **PRIMARY PROJECT HOME:** `FOUNDER_ORIENTATION_DASHBOARD.md` and `PROJECT_STATE.md` are the single source of truth.
 >

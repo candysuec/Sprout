@@ -1942,6 +1942,70 @@ def post_parent_checkin():
         conn.close()
     return json_res({"status": "Checked In", "message": "Family Time Check-In verified and logged."})
 
+@app.route('/api/founder/feedback', method=['POST'])
+def save_founder_feedback():
+    data = request.json or {}
+    conn = get_connection()
+    try:
+        conn.execute("""
+        CREATE TABLE IF NOT EXISTS founder_feedback (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            created_at TEXT NOT NULL,
+            persona TEXT,
+            page_context TEXT,
+            what_worked TEXT,
+            what_confusing TEXT,
+            what_missing TEXT,
+            what_unnecessary TEXT,
+            what_amazing TEXT,
+            notes TEXT
+        )
+        """)
+        now_iso = datetime.datetime.now().isoformat()
+        cur = conn.execute("""
+        INSERT INTO founder_feedback (created_at, persona, page_context, what_worked, what_confusing, what_missing, what_unnecessary, what_amazing, notes)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            now_iso,
+            data.get('persona', ''),
+            data.get('page_context', ''),
+            data.get('what_worked', ''),
+            data.get('what_confusing', ''),
+            data.get('what_missing', ''),
+            data.get('what_unnecessary', ''),
+            data.get('what_amazing', ''),
+            data.get('notes', '')
+        ))
+        fb_id = cur.lastrowid
+        conn.commit()
+    finally:
+        conn.close()
+    return json_res({"status": "success", "id": fb_id, "message": "Feedback safely stored in local database"})
+
+
+@app.route('/api/founder/feedback', method=['GET'])
+def list_founder_feedback():
+    conn = get_connection()
+    try:
+        conn.execute("""
+        CREATE TABLE IF NOT EXISTS founder_feedback (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            created_at TEXT NOT NULL,
+            persona TEXT,
+            page_context TEXT,
+            what_worked TEXT,
+            what_confusing TEXT,
+            what_missing TEXT,
+            what_unnecessary TEXT,
+            what_amazing TEXT,
+            notes TEXT
+        )
+        """)
+        rows = [dict(r) for r in conn.execute("SELECT * FROM founder_feedback ORDER BY id DESC").fetchall()]
+    finally:
+        conn.close()
+    return json_res(rows)
+
 
 if __name__ == "__main__":
     init_db()

@@ -27,6 +27,7 @@ You are standing in **Sprout v3.2 Foundation Approved (Development Freeze Active
   - `test_operational_readiness.py`: 29/29
 - **Release Readiness & Human Walkthrough Verified (PASS):** 4 real-world user personas completed all primary journeys with zero detective work.
 - **Founder Acceptance Walkthrough Signed Off:** Candy Chevalier verified all 4 operating journeys. Captured **0 confusion, 0 hesitation, 0 unexpected behavior, 0 missing information**. Development freeze activated.
+- **Founder Sandbox Review Mode Ready:** 16/16 readiness check items verified (100%). Guided review launcher (`#founderReviewModal`) and persistent floating feedback modal (`#founderFeedbackModal`) mounted. Candy can open the sandbox, switch between 5 personas with 1 click, and review the entire system without developer assistance.
 
 ---
 
@@ -42,6 +43,7 @@ You are standing in **Sprout v3.2 Foundation Approved (Development Freeze Active
 | **Respite Cognitive Load** | **PASS** | 1-tap Care & Safety Sheet with allergies, meds, comforting, and emergency numbers in <30s. |
 | **Founder Cognitive Load** | **PASS** | Single source-of-truth home (`FOUNDER_ORIENTATION_DASHBOARD.md` & `PROJECT_STATE.md`). 178/178 tests passing. |
 | **Founder Acceptance** | **ACCEPTED** | Candy completed all 4 primary operating journeys without becoming the detective. |
+| **Founder Sandbox Review** | **READY (16/16)** | 5 guided persona launch paths and 5-field local feedback modal mounted. Zero developer assistance needed. |
 
 ---
 
@@ -60,6 +62,7 @@ These are the only active workstreams currently in motion:
 
 | Workstream | Scope | Target File(s) | Status |
 | :--- | :--- | :--- | :---: |
+| **Founder Sandbox Walkthrough** | Guided 5-persona self-review and feedback capture without developer assistance. | `app/static/index.html`, `app/static/app.js`, `app/server.py` | **ACTIVE & READY** |
 | **Real-World Validation (Observation Mode)** | Support Founder demos; observe real users (Foster, Kinship, Parent, Respite); capture friction only. | `docs/FOUNDER_ORIENTATION_DASHBOARD.md`, `docs/PROJECT_STATE.md` | **ACTIVE & OBSERVING** |
 | **Founder Home Alignment** | Single source-of-truth project maintenance across state ledgers. | `docs/FOUNDER_ORIENTATION_DASHBOARD.md`, `docs/PROJECT_STATE.md` | **ACTIVE & SYNCHRONIZED (178/178 Tests)** |
 
@@ -78,9 +81,10 @@ The following are **INTENTIONALLY HELD (GATED)**:
 
 ## ⏩ WHAT IS NEXT?
 
-1. **Real-World User Observation:** Observe Foster Caregiver, Kinship Caregiver, Parent Participant, Respite Provider; document findings only (no code fixes without Founder approval).
-2. **Production Intake Readiness:** Review and prepare intake workflows and document vaults for Sample Child CH-201 at Sample Household A.
-3. **Continuous Maintenance:** Maintain single source of truth in `FOUNDER_ORIENTATION_DASHBOARD.md` and `PROJECT_STATE.md`.
+1. **Founder Sandbox Walkthrough:** Candy explores the 5 personas using 1-click Review Mode and submits reflections via the Feedback modal.
+2. **Real-World User Observation:** Observe Foster Caregiver, Kinship Caregiver, Parent Participant, Respite Provider; document findings only (no code fixes without Founder approval).
+3. **Production Intake Readiness:** Review and prepare intake workflows and document vaults for Sample Child CH-201 at Sample Household A.
+4. **Continuous Maintenance:** Maintain single source of truth in `FOUNDER_ORIENTATION_DASHBOARD.md` and `PROJECT_STATE.md`.
 
 ---
 

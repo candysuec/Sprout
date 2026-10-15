@@ -63,6 +63,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       navigator.serviceWorker.register('/static/sw.js').catch(() => {});
     });
   }
+
+  // Auto-prompt Founder Review Modal when in sandbox mode on session launch
+  const hasSeenReviewPrompt = sessionStorage.getItem('hasSeenReviewPrompt');
+  if (!hasSeenReviewPrompt && currentSproutMode === 'sample') {
+    setTimeout(() => {
+      openFounderReviewModal();
+      sessionStorage.setItem('hasSeenReviewPrompt', 'true');
+    }, 450);
+  }
 });
 
 function togglePrivacyBlurMode() {
@@ -8297,6 +8306,157 @@ function switchKftTab(tabKey) {
       }
     }
   });
+}
+
+// ==============================================================================
+// FOUNDER REVIEW MODE & FEEDBACK CAPTURE HANDLERS
+// ==============================================================================
+
+function openFounderReviewModal() {
+  const modal = document.getElementById('founderReviewModal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    if (window.lucide) lucide.createIcons();
+  }
+}
+
+function closeFounderReviewModal() {
+  const modal = document.getElementById('founderReviewModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function launchPersonaReview(persona) {
+  closeFounderReviewModal();
+
+  if (persona === 'founder') {
+    // 1. Founder Overview
+    currentSproutMode = 'local';
+    activeCaregiverUser = 'Candy Chevalier';
+    localStorage.setItem('sproutMode', 'local');
+    localStorage.setItem('caregiverUser', activeCaregiverUser);
+    populateCaregiverDropdown();
+    updateWorkspaceToggleUI();
+    updateSproutTheme();
+    loadChildren();
+    switchMainSection('dashboard');
+  } else if (persona === 'foster') {
+    // 2. Foster Caregiver View
+    currentSproutMode = 'sample';
+    activeCaregiverUser = 'Sample Caregiver (Sarah Jenkins)';
+    localStorage.setItem('sproutMode', 'sample');
+    localStorage.setItem('caregiverUser', activeCaregiverUser);
+    populateCaregiverDropdown();
+    updateWorkspaceToggleUI();
+    updateSproutTheme();
+    loadChildren();
+    switchMainSection('mission_control');
+  } else if (persona === 'kinship') {
+    // 3. Kinship Caregiver View
+    currentSproutMode = 'sample';
+    activeCaregiverUser = 'Sample Caregiver (Eleanor & Arthur Vance)';
+    localStorage.setItem('sproutMode', 'sample');
+    localStorage.setItem('caregiverUser', activeCaregiverUser);
+    populateCaregiverDropdown();
+    updateWorkspaceToggleUI();
+    updateSproutTheme();
+    loadChildren();
+    switchMainSection('mission_control');
+    setTimeout(() => openKinshipFastTrackModal(), 300);
+  } else if (persona === 'parent') {
+    // 4. Parent Participant View
+    currentSproutMode = 'sample';
+    activeCaregiverUser = 'Angela Davis (Parent Participant)';
+    localStorage.setItem('sproutMode', 'sample');
+    localStorage.setItem('caregiverUser', activeCaregiverUser);
+    populateCaregiverDropdown();
+    updateWorkspaceToggleUI();
+    updateSproutTheme();
+    switchMainSection('parent');
+  } else if (persona === 'respite') {
+    // 5. Respite Provider View
+    currentSproutMode = 'sample';
+    activeCaregiverUser = 'Sample Caregiver (Samantha Price)';
+    localStorage.setItem('sproutMode', 'sample');
+    localStorage.setItem('caregiverUser', activeCaregiverUser);
+    populateCaregiverDropdown();
+    updateWorkspaceToggleUI();
+    updateSproutTheme();
+    loadChildren();
+    switchMainSection('mission_control');
+    setTimeout(() => openEmergencyHandoffCard(), 300);
+  }
+  if (window.lucide) lucide.createIcons();
+}
+
+function openFounderFeedbackModal() {
+  const modal = document.getElementById('founderFeedbackModal');
+  const label = document.getElementById('feedbackContextLabel');
+  if (label) {
+    const sectionName = currentMainSection ? currentMainSection.toUpperCase().replace('_', ' ') : 'MAIN';
+    const actor = getActiveCaregiver() || 'Founder';
+    label.textContent = `Screen: ${sectionName} • Actor: ${actor}`;
+  }
+  if (modal) {
+    modal.classList.remove('hidden');
+    if (window.lucide) lucide.createIcons();
+  }
+}
+
+function closeFounderFeedbackModal() {
+  const modal = document.getElementById('founderFeedbackModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+async function submitFounderFeedback(e) {
+  if (e) e.preventDefault();
+  const whatWorked = (document.getElementById('fbWhatWorked')?.value || '').trim();
+  const whatConfusing = (document.getElementById('fbWhatConfusing')?.value || '').trim();
+  const whatMissing = (document.getElementById('fbWhatMissing')?.value || '').trim();
+  const whatUnnecessary = (document.getElementById('fbWhatUnnecessary')?.value || '').trim();
+  const whatAmazing = (document.getElementById('fbWhatAmazing')?.value || '').trim();
+
+  if (!whatWorked && !whatConfusing && !whatMissing && !whatUnnecessary && !whatAmazing) {
+    alert("Please enter your thoughts in at least one feedback field.");
+    return;
+  }
+
+  const payload = {
+    persona: getActiveCaregiver() || 'Founder',
+    page_context: currentMainSection || 'main',
+    what_worked: whatWorked,
+    what_confusing: whatConfusing,
+    what_missing: whatMissing,
+    what_unnecessary: whatUnnecessary,
+    what_amazing: whatAmazing
+  };
+
+  try {
+    const res = await apiFetch('/api/founder/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    
+    // Backup to localStorage
+    const stored = JSON.parse(localStorage.getItem('founder_feedback') || '[]');
+    stored.push({ ...payload, timestamp: new Date().toISOString() });
+    localStorage.setItem('founder_feedback', JSON.stringify(stored));
+
+    // Reset form and close
+    document.getElementById('founderFeedbackForm')?.reset();
+    closeFounderFeedbackModal();
+    alert("Review feedback successfully saved! It is stored safely in your local database and will never be automatically implemented without your direction.");
+  } catch (err) {
+    console.error("Failed to save feedback:", err);
+    // Offline backup fallback
+    const stored = JSON.parse(localStorage.getItem('founder_feedback') || '[]');
+    stored.push({ ...payload, timestamp: new Date().toISOString() });
+    localStorage.setItem('founder_feedback', JSON.stringify(stored));
+    document.getElementById('founderFeedbackForm')?.reset();
+    closeFounderFeedbackModal();
+    alert("Review feedback saved to local storage! (Offline backup).");
+  }
 }
 
 
