@@ -1,19 +1,37 @@
-# Sprout — Vermont Foster & Kinship Caregiver Operating System
+# Sprout — Child & Family Success Operating System
 
-> **A 100% Local, Offline-First Caregiver Command Center & Caregiver Journey Model**
+> **A 100% Local, Offline-First Child & Family Success Operating System**
 
-Sprout is a dedicated digital binder and documentation management platform designed specifically for foster parents, kinship caregivers, respite providers, and fictive kin navigating the Vermont Department for Children and Families (DCF) child welfare system.
+Sprout exists to:
+- **Protect children.**
+- **Reduce caregiver burden.**
+- **Support family engagement.**
+- **Support reunification when appropriate.**
+- **Make the next step obvious.**
+
+Sprout is **NOT** a DCF case management system, state database, court management platform, or electronic binder. It is an operating system that equips caregivers and families with clear, self-guiding tools.
+
+---
+
+## 🧭 Founder & Developer Cockpit (Orientation)
+
+If you are orienting to the project, start with these operational guides:
+- [**Founder Orientation Dashboard**](docs/FOUNDER_ORIENTATION_DASHBOARD.md): *Where am I? What matters? What is active? What is blocked? What is next? What can I ignore?*
+- [**Current Project State Ledger**](docs/PROJECT_STATE.md): Single source of truth for work status, complete milestones, and active dependencies.
+- [**Repository Map & Knowledge Directory**](docs/REPOSITORY_MAP.md): Cognitive filter categorizing all documents into *What Matters*, *Active Work*, *Reference*, and *Ignore*.
+- [**System Health Specification**](docs/SYSTEM_HEALTH_SPEC.md): Zero-investigation telemetry for children, caregivers, parent access, overdue tasks, and test health.
 
 ---
 
 ## 🌟 Key Capabilities
 
 - **Strict Zero-Leakage Architecture**: Seamless dual-sphere operation between a complete **Practice Sandbox** (preloaded with 15 synthetic household models) and a **Real Family Workspace** with 100% offline local SQLite storage.
-- **Mission Control Launchpad**: Clean root landing cockpit with 4 operational quadrants (**TRAIN**, **CARE**, **DCF**, **SYSTEM**) and 7 guided caregiver pathways.
+- **Mission Control Launchpad**: Clean root landing cockpit with permanent Quick Action Dock (`+ 15-Sec Log`, `Care & Safety Sheet`, `Export This Month`), 4 operational quadrants (**TRAIN**, **CARE**, **DCF**, **SYSTEM**), and guided caregiver pathways.
+- **Dedicated Parent Participant Workspace**: Isolated, dignity-first parent portal for court-approved goal tracking, 1-tap evidence upload, visitation check-in, and strengths-based child milestones.
 - **Caregiver Journey Model**: Multi-dimensional modeling of caregiver households across 8 lifecycle stages, 8 household structures, and 9 approved caregiving pathways.
 - **Circles of Care & Relationship Center**: 4 concentric support tiers (Core DCF Team, Legal & Advocacy, Health & School, Extended Village/Mentors) with communication logs and zero-leakage privacy boundary controls.
 - **Life Journey & Milestone Center**: Trauma-informed child keepsake and achievement catalog preserving positive childhood milestones, artwork, reading progress, and portable care transition packets.
-- **15-Second Fast Logging**: High-speed journal, pediatric medical visit, school IEP conference, and family time visitation logging with automatic notification drafting for DCF Family Services Workers and Guardians ad Litem (GAL).
+- **Two-Step Smart Logger**: High-speed journal, pediatric medical visit, school IEP conference, and family time visitation logging completed in under 15 seconds.
 - **Vermont Compliance (FS-221A & CHINS Stepper)**: Built-in milestone tracker for provisional home studies, annual safety drills, 90-day fingerprint deadlines, and Title 33 CHINS court hearing milestones.
 - **VCWTP Training & Mileage Tracking**: Real-time logging of Vermont Child Welfare Training Partnership hours and automated State Form FS-334B travel reimbursement generation at the official standard rate ($0.67/mi).
 
