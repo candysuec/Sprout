@@ -81,9 +81,19 @@
 
 ---
 
-## 3. Maintenance Protocol
+## 3. Maintenance Protocol (Founder Home Mandate)
 
-This document is the **Single Source of Project State**. When completing any task:
-1. Update checkboxes in Section 2.
-2. Advance Current Milestone / Phase if applicable.
+> **PRIMARY PROJECT HOME:** `FOUNDER_ORIENTATION_DASHBOARD.md` and `PROJECT_STATE.md` are the single source of truth.
+>
+> **Future Sprint Rule:** All future sprint reports must directly update:
+> - **Active Work**
+> - **Blocked Work**
+> - **Next Work**
+> - **Ignore List**
+>
+> **Do NOT create additional status documents, side-car trackers, or redundant progress files.**
+
+When completing any sprint or task:
+1. Update checkboxes in Section 2 (Complete, In Progress, Blocked).
+2. Update the corresponding sections in [`FOUNDER_ORIENTATION_DASHBOARD.md`](FOUNDER_ORIENTATION_DASHBOARD.md).
 3. Commit with prefix `chore(state): update project state ledger`.

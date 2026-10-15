@@ -74,3 +74,18 @@ You do **NOT** need to think about, review, or touch any of the following:
 - **Child Voice Authoring:** Youth-authored Lifebook accounts and reflections are deferred to Phase 17+ ([`CHILD_VOICE_DOMAIN_DISCOVERY.md`](file:///c:/Users/candy/OneDrive/Documents/01_PERSONAL_&_FAMILY/Davis%20&%20VTDCF%20Shared%20Folder/foster-portal/docs/CHILD_VOICE_DOMAIN_DISCOVERY.md)).
 - **State IT / SACWIS / CCWIS Integration:** Sprout outputs formatted `.docx` and `.pdf` documents for DCF workers. We do not integrate with state mainframe databases.
 - **Complex Cloud Infrastructure:** Sprout remains 100% local and offline-first. Zero cloud deployment overhead.
+
+---
+
+## 📌 PRIMARY PROJECT HOME & MAINTENANCE PROTOCOL
+
+> **Mandate:** `FOUNDER_ORIENTATION_DASHBOARD.md` and `PROJECT_STATE.md` are the **primary project home**.
+>
+> **Future Sprint Rule:** All future sprint reports and deliverables MUST directly update:
+> - **WHAT IS ACTIVE?**
+> - **WHAT IS BLOCKED?**
+> - **WHAT IS NEXT?**
+> - **WHAT CAN I IGNORE?**
+>
+> **Do NOT create additional status documents, side-car trackers, or redundant progress files.**
+
