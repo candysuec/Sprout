@@ -19,6 +19,7 @@ You are standing in **Sprout v3.2 Foundation Execution Complete**.
 - **Parent Participant Workspace Wired & Operational:** Existing 4 modules dynamically wired to persistent backend endpoints with fail-closed gates, location masking, and date quantization.
 - **Repository Documentation PII Sanitized:** Live addresses and personal caregiver identifiers replaced with synthetic placeholders in Git-tracked documentation.
 - **The Entire System Is 100% Tested:** Automated test suites pass 149/149 tests (73 E2E flow tests + 46 Phase 13B governance/security tests + 30 Parent Workspace integration tests).
+- **Operational Reality Validated Across 7 Core Workflows:** Audited Foster Caregiver, Kinship Caregiver, Parent Participant, and Respite Provider scenarios (4 PASS, 3 WATCH, 0 FAIL) without creating competing status documents or architectural churn.
 
 ---
 
@@ -39,6 +40,7 @@ These are the only active workstreams currently in motion:
 | :--- | :--- | :--- | :---: |
 | **Phase 13B Governance Execution** | Pre-migration backup, Migration 7, authorization middleware, parent tables, export hardening. | `app/db.py`, `app/server.py`, `app/services.py`, `app/auth_middleware.py` | **100% COMPLETED (46/46 Tests)** |
 | **Parent Workspace Frontend Integration** | 4 modules dynamically wired to backend endpoints, fail-closed security, 5 benchmark scenarios verified. | `app/static/app.js`, `app/server.py`, `test_parent_workspace_integration.py` | **100% COMPLETED (30/30 Tests)** |
+| **Operational Reality Validation** | End-to-end reality audit across 7 workflows (Foster, Kinship, Respite, Parent). | `docs/PROJECT_STATE.md`, `docs/FOUNDER_ORIENTATION_DASHBOARD.md` | **100% COMPLETED (4 PASS, 3 WATCH, 0 FAIL)** |
 | **Founder Home Alignment** | Single source-of-truth project maintenance. | `docs/FOUNDER_ORIENTATION_DASHBOARD.md`, `docs/PROJECT_STATE.md` | **ACTIVE & SYNCHRONIZED (149/149 Tests)** |
 
 ---
@@ -56,8 +58,21 @@ The following are **INTENTIONALLY HELD (GATED)**:
 
 ## ⏩ WHAT IS NEXT?
 
-1. **Caregiver Intake Readiness:** Review and prepare intake workflows and document vaults for Sample Child CH-201 at Sample Household A.
-2. **Continuous Maintenance:** Maintain single source of truth in `FOUNDER_ORIENTATION_DASHBOARD.md` and `PROJECT_STATE.md`.
+1. **Targeted Usability Refinements (No Architecture Redesigns):**
+   - **Emergency Intake (Workflow 1 - WATCH):** Embed medication entry and emergency worker contact fields directly inside `#newChildModal` so late-night intake requires zero post-modal tab hunting.
+   - **Permanency Transition (Workflow 6 - WATCH):** Add a guided 1-click "Permanency Transition Wizard" to export family lifebooks, seal parent credentials gracefully, and archive records under soft-tombstone.
+   - **Kinship Fast Track (Workflow 7 - WATCH):** Add an interactive checklist card for kinship placements highlighting immediate cash benefits (Reach Up, Dr. Dynasaur, $350 Family Support Fund) and consent-to-treat paperwork.
+2. **Caregiver Intake Readiness:** Review and prepare intake workflows and document vaults for Sample Child CH-201 at Sample Household A.
+3. **Continuous Maintenance:** Maintain single source of truth in `FOUNDER_ORIENTATION_DASHBOARD.md` and `PROJECT_STATE.md`.
+
+---
+
+### 🛡️ OPERATIONAL REALITY VERDICT: CAN REAL USERS OPERATE SPROUT WITHOUT BECOMING THE DETECTIVE?
+
+- **Routine Daily Operations (Logging, Health, Exports, Respite Cards, Parent Sharing):** **YES.**  
+  Caregivers and parents accomplish primary tasks in <15 seconds or 1 click without hunting across quadrants or debugging state.
+- **High-Stress Boundary Transitions (Late-Night Intake, Kinship Onboarding, Permanency Closure):** **NOT YET EFFORTLESS.**  
+  Users are still forced to remember a multi-tab sequence or decipher welfare bureaucracy. The 3 targeted usability refinements above will eliminate this cognitive overhead without redesigning architecture or governance.
 
 ---
 

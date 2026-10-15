@@ -20,6 +20,7 @@
 | **Role Permissions** | **FROZEN / APPROVED** | [`ROLE_PERMISSION_MATRIX_V2.md`](ROLE_PERMISSION_MATRIX_V2.md) | 8 Roles Mapped |
 | **Validation** | **VERIFIED** | [`PHASE_13B_IMPLEMENTATION_VALIDATION_REPORT.md`](PHASE_13B_IMPLEMENTATION_VALIDATION_REPORT.md) | 0 Contradictions |
 | **Usability & Integration** | **RESOLVED & VERIFIED** | [`SPRINT_13C_USABILITY_EXECUTION_REPORT.md`](SPRINT_13C_USABILITY_EXECUTION_REPORT.md) | 149/149 Tests Passing (100%) |
+| **Operational Reality** | **VALIDATED (4 PASS, 3 WATCH, 0 FAIL)** | [`PROJECT_STATE.md`](PROJECT_STATE.md) | Real-world Personas Audited |
 
 ---
 
@@ -67,17 +68,20 @@
 - [x] **Repository Documentation PII Sanitization:**
   - Scanned Git-tracked documentation and replaced live addresses and caregiver personal identifiers with synthetic placeholders (`Sample Household A`, `Sample Household B`, `Sample Child CH-201`, `Confidential Address`, `Sample Parent Participant`).
 - [x] **Automated Regression, Governance & Integration Suites:** 149/149 tests passing (100% across E2E flows, Phase 13B governance, and Parent Workspace integration suites).
+- [x] **Operational Reality Validation (7 Core Workflows Audited):**
+  - Evaluated real-world operational readiness across Foster, Kinship, Respite, and Parent Participant workflows without creating redundant architectures.
 
 ---
 
 ### 🟡 In Progress (Current Execution Focus)
-- [x] **Canonical Truth Correction & Parent Workspace Integration Sprint:** Completed (149/149 tests verified).
+- [x] **Operational Reality Validation Sprint:** Complete across all 7 workflows (4 PASS, 3 WATCH, 0 FAIL).
 
 ---
 
-### ⏳ Ready for Development (Next Execution Steps)
-- [ ] **Intake Workflow Preparation for Sample Child CH-201:**
-  - Verify intake workflows and document vaults for Sample Household A.
+### ⏳ Ready for Development (Next Usability Refinements)
+- [ ] **Workflow 1 Usability Refinement (Emergency Placement):** Embed immediate medication capture and emergency contact input directly into `#newChildModal` so late-night intake requires zero post-modal tab hunting.
+- [ ] **Workflow 6 Usability Refinement (Permanency & Reunification):** Add guided 1-click "Permanency Transition / Case Closure" workflow to package lifebooks, seal caregiver notes safely under archive retention, and transition parent access gracefully.
+- [ ] **Workflow 7 Usability Refinement (Kinship Onboarding):** Add an interactive "Kinship Fast-Track Guide" prioritizing immediate financial benefits (Reach Up, Dr. Dynasaur, $350 Family Support Fund) and consent-to-treat paperwork.
 
 ---
 
@@ -87,7 +91,103 @@
 
 ---
 
-## 3. Maintenance Protocol (Founder Home Mandate)
+---
+
+## 3. Operational Reality Validation Ledger (7 Core Workflows)
+
+**Validation Date:** 2026-10-14  
+**Operating Persona Evaluated:** Foster Caregiver, Kinship Caregiver, Parent Participant, Respite Provider  
+**Overall Score:** 4 PASS, 3 WATCH, 0 FAIL  
+
+### Core Success Evaluation: Can Real Users Operate Sprout Without Becoming the Detective?
+- **Day-to-Day Operations (Routine Logging, Health Tracking, Monthly DCF Reporting, Respite Handoff, Parent Engagement):** **YES.** Routine actions take <15 seconds or 1 click from the Mission Control Quick Action Dock. Data isolation and export gates operate automatically with zero user oversight required.
+- **Boundary Transitions (Midnight Emergency Intake, Kinship Jargon Onboarding, Final Permanency Closure):** **PARTIALLY.** In high-stress or infrequent lifecycle transitions, users must still remember to navigate multiple screens or manually assemble parts of a procedure. The usability refinements below directly resolve these residual points of friction.
+
+---
+
+### Workflow 1: Emergency Placement (Friday Night, 11:00 PM)
+* **Status:** `WATCH`
+* **Scenario:** Exhausted caregiver receives an unplanned placement at 11:00 PM with limited paperwork and active medication bottles.
+* **Friction Found:** Child record creation via `#newChildModal` (`applyIntakePreset('emergency')`) captures demographics, allergies, soothing routines, and comfort items in ~30 seconds. However, active medications and emergency worker contacts cannot be entered directly within the intake modal; the user must exit the modal, open the Medical subtab or Fast Log, and create separate records.
+* **Duplicate Entry Found:** Child initials/code and placement start date entered in the modal must be re-referenced when logging initial med notes.
+* **Cognitive Load Found:** Caregiver must mentally track that intake is a 3-step sequence (Intake Modal -> Med Note -> Contacts) when cognitive reserves are at their lowest.
+* **Missing Visibility:** No unified "Emergency Intake Checklist" that visually confirms emergency contacts, active meds, and initial safety sheets are complete.
+* **Recommended Improvement (Usability Only):** Add an optional "Immediate Medications & Emergency Worker Phone" card directly inside the Emergency Intake preset of `#newChildModal`.
+
+---
+
+### Workflow 2: Medical Appointment (Routine Pediatric Visit)
+* **Status:** `PASS`
+* **Scenario:** Routine 6-month well-child visit requiring physician documentation, vitals, mileage tracking, and follow-up scheduling.
+* **Friction Found:** Minimal. The Two-Step Smart Logger (`+ 15-Sec Log`) captures appointment category (`medical`), clinic, vitals, and provider in Step 1 (<15s). Step 2 allows mileage entry and follow-up flagging.
+* **Duplicate Entry Found:** None. Logged mileage automatically flows into the FS-334B travel reimbursement generator.
+* **Cognitive Load Found:** Very low. Caregiver only needs to open Child Overview or Care & Safety Sheet to provide the Medicaid/Dr. Dynasaur number to the front desk.
+* **Missing Visibility:** None. Medical timeline filter immediately surfaces past immunizations and growth history.
+* **Recommended Improvement (Usability Only):** Pin Medicaid ID and Pediatrician phone as a persistent chip at the top of the Medical subtab.
+
+---
+
+### Workflow 3: Parent Participation (All Existing Parent Scenarios)
+* **Status:** `PASS`
+* **Scenario:** Parent accessing the Parent Workspace under 5 benchmark lifecycle scenarios (provisional, active engagement, restricted/high-conflict, near-reunification, emergency revocation).
+* **Friction Found:** Zero. Caregiver chrome, state claims, licensing tabs, and judicial notes are 100% removed.
+* **Data Isolation & Leakage Check:**
+  * `/api/parent/feed` strictly filters to `classification = 'shared_family'` with date-only timestamps (`YYYY-MM-DD`).
+  * High-conflict mode automatically masks physical addresses to `"Supervised Family Center / Confidential Site"`.
+  * Image EXIF scrubber automatically strips GPS coordinates from uploaded family photos.
+  * Revocation endpoint `/api/parent/access/revoke` instantly terminates access and returns `403 Forbidden` across all parent endpoints.
+* **Duplicate Entry Found:** None. Parent milestone check-ins seamlessly link to goals without duplicate forms.
+* **Cognitive Load Found:** Zero cognitive burden on parent. Dignity-first interface focuses exclusively on family time, shared milestones, and self-directed goals.
+* **Missing Visibility:** None.
+
+---
+
+### Workflow 4: Respite Transfer (Weekend Respite Placement)
+* **Status:** `PASS`
+* **Scenario:** Primary caregiver handing off child to approved respite provider (Samantha Price, RC) for 48 hours.
+* **Friction Found:** Zero for handoff generation. 1 click on `Care & Safety Sheet` on the Mission Control dock generates an emergency printable card with vital routines, allergies, comfort items, pediatrician, and worker contacts.
+* **Role Isolation Check:** Respite provider login receives strictly `domain = 'child'` and `classification IN ('official', 'working')`. Private caregiver journal notes and case court history return `403 Forbidden`.
+* **Duplicate Entry Found:** None.
+* **Cognitive Load Found:** Low.
+* **Missing Visibility:** When respite provider returns the child, logging the weekend debrief requires creating a regular journal note; there is no dedicated "Respite Return Debrief" template.
+* **Recommended Improvement (Usability Only):** Add a 1-click "Respite Return Debrief" quick-log template to capture sleeping, eating, and emotional updates upon handback.
+
+---
+
+### Workflow 5: Monthly Reporting (Busy Caregiver DCF Monthly Report)
+* **Status:** `PASS`
+* **Scenario:** End-of-month reporting required by DCF family services worker, aggregating appointments, school attendance, family time, and developmental progress.
+* **Friction Found:** Zero. 1 click on `[Export This Month]` in the Quick Action Dock generates official `.docx` and `.pdf` reports via `/api/export/dcf-monthly`.
+* **Governance Integrity:** All `private` and `working` notes are automatically excluded by backend query filters. Only `official` classification notes appear in state-facing outputs.
+* **Duplicate Entry Found:** None. Routine daily logs automatically populate the report sections.
+* **Cognitive Load Found:** Lowest in the system (1 click replaces 2-3 hours of manual monthly typing).
+* **Missing Visibility:** None.
+
+---
+
+### Workflow 6: Reunification (Permanency & Case Closure)
+* **Status:** `WATCH`
+* **Scenario:** Court orders full reunification; child returns home with biological parents, case closes.
+* **Friction Found:** Transitioning child status to `Reunified` or `Former Placement` is supported via `PUT /api/children/<id>`, but requires the caregiver to manually revoke parent portal credentials, manually export archival records, and manually check that lifebook photos are shared.
+* **Duplicate Entry Found:** Caregiver must manually select records for graduation vs. archive.
+* **Cognitive Load Found:** Moderate to high. Caregiver worries that marking a child "Former" might erase records; reassurance that records are archived under soft-tombstone (`retention_state = 'Archived'`) is not prominently visible in the UI.
+* **Missing Visibility:** Absence of a guided "Permanency Transition Wizard" that packages the child lifebook, transitions parent access gracefully, and archives case records in a single flow.
+* **Recommended Improvement (Usability Only):** Create a 3-step "Permanency & Handover Wizard" (1: Export Lifebook for Family, 2: Transition/Seal Parent Portal, 3: Soft-Archive Placement Record).
+
+---
+
+### Workflow 7: Kinship Caregiver (Grandparent Placement)
+* **Status:** `WATCH`
+* **Scenario:** Older grandparents (Eleanor & Arthur Vance) taking emergency custody of grandchild without prior foster care experience.
+* **Friction Found:** Navigating statutory state terminology (CHINS, EPSDT, RPPS) causes confusion. Key kinship-specific entitlements (Reach Up child-only grant, Dr. Dynasaur Medicaid, and the $350/yr Family Support Fund) exist in statewide reference tables, but are not front-and-center as an immediate step-by-step checklist.
+* **Duplicate Entry Found:** Financial forms require re-entering child dates and household composition.
+* **Cognitive Load Found:** High initial cognitive load due to unfamiliar legal and financial bureaucracy.
+* **Missing Visibility:** No dedicated "Kinship Fast Track" card on initial login highlighting immediate cash assistance, consent-to-treat forms, and school enrollment letters.
+* **Recommended Improvement (Usability Only):** Add an interactive "Kinship Fast Track" widget for kinship placements that organizes the first 14 days around Benefits, School, and Healthcare consent.
+
+---
+
+## 4. Maintenance Protocol (Founder Home Mandate)
 
 > **PRIMARY PROJECT HOME:** `FOUNDER_ORIENTATION_DASHBOARD.md` and `PROJECT_STATE.md` are the single source of truth.
 >
