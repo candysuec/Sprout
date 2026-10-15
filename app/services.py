@@ -41,6 +41,7 @@ def generate_monthly_report_docx(child_id, year, month, privacy_mode="initials")
     if not child:
         conn.close()
         return None
+    child = dict(child)
         
     date_prefix = f"{year:04d}-{month:02d}"
     
@@ -200,6 +201,7 @@ def generate_respite_handoff_card_docx(child_id):
     if not child:
         conn.close()
         return None
+    child = dict(child)
 
     c.execute("SELECT * FROM contacts WHERE child_id = ? ORDER BY is_emergency DESC, role_type ASC", (child_id,))
     contacts = [dict(r) for r in c.fetchall()]
@@ -505,6 +507,7 @@ def generate_dcf_reimbursement_claim_docx(child_id, year, month, claim_type="FS-
     if not child:
         conn.close()
         return None
+    child = dict(child)
 
     date_prefix = f"{year:04d}-{month:02d}"
     c.execute("""
@@ -630,6 +633,7 @@ def generate_court_packet_docx(child_id):
     if not child:
         conn.close()
         return None
+    child = dict(child)
     alias = child.get('alias') or child.get('first_name') or 'Child'
 
     c.execute("""
