@@ -26,7 +26,8 @@ You are standing in **Sprout v3.2 Mental Model Enforced (Sprint Complete)**.
 - **Founder Acceptance Walkthrough Signed Off:** Candy Chevalier verified all 4 operating journeys. Captured **0 confusion, 0 hesitation, 0 unexpected behavior, 0 missing information**.
 - **Role-Based Training Validation Completed (PASS):** Executed comprehensive cognitive understanding walkthrough across **10 key roles** across all 12 core domains (9.34/10 ease-of-use).
 - **Sandbox Mental Model Decision Canonical Standard Enforced:** All 5 layers (Review Mode, Sandbox Gateway, Persona Launcher, Mission Control, Training Hub) are rigorously separated in UI and behavior.
-- **Concept Governance Register Established (Authoritative Semantic Standard):** Created [`CONCEPT_GOVERNANCE_REGISTER.md`](CONCEPT_GOVERNANCE_REGISTER.md) defining the 7 canonical categories (ROLE, AUDIENCE, TOOL, WORKSPACE, WORKFLOW, PURPOSE, STATE). Enforced the permanent Category-Assignment Rule (Audience ≠ Role, Role ≠ Tool, Tool ≠ Workspace, Workspace ≠ Purpose, Workflow ≠ Role) and cataloged 10 critical concept drift findings.
+- **Concept Governance Register Established (Authoritative Semantic Standard):** Created [`CONCEPT_GOVERNANCE_REGISTER.md`](CONCEPT_GOVERNANCE_REGISTER.md) defining canonical categories.
+- **Drift Accountability Review Completed (Authoritative Foundation Truth):** Created [`DRIFT_ACCOUNTABILITY_REPORT.md`](DRIFT_ACCOUNTABILITY_REPORT.md) answering *"Why are we having the same conversation repeatedly?"*. Pruned taxonomy down to 3 real software decisions (ROLE, WORKSPACE, STATE), retired AUDIENCE, PURPOSE, and WORKFLOW from software governance, confirmed the reality of the 7 figures, and locked **The 10 Things Every Future AI Must Never Forget**.
 
 ---
 
@@ -44,6 +45,7 @@ You are standing in **Sprout v3.2 Mental Model Enforced (Sprint Complete)**.
 | **Founder Acceptance** | **ACCEPTED** | Candy completed all 4 primary operating journeys without becoming the detective. |
 | **Mental Model Enforcement** | **ENFORCED & PASS (MME-01 through MME-04)** | Review Mode vs Persona Launcher split; Founder quarantined from training roles; Gateway Airlock & 3 Doors mounted; Active Child permanently anchored in sticky header. |
 | **Concept Governance** | **ESTABLISHED & AUTHORITATIVE (7 Categories)** | Master semantic register locked in `CONCEPT_GOVERNANCE_REGISTER.md`. Permanent rule: Audience ≠ Role, Role ≠ Tool, Tool ≠ Workspace, Workspace ≠ Purpose, Workflow ≠ Role. |
+| **Drift Accountability** | **PRUNED & IMMUTABLE (3 Core Truths, 10 Commandments)** | Root cause of repeated drift solved in `DRIFT_ACCOUNTABILITY_REPORT.md`. Spectators retired from software; child restored as undeniable center. |
 | **Test Verification Baseline** | **178/178 PASSING (100%)** | 4 full verification suites passing with zero failures. |
 
 ---
