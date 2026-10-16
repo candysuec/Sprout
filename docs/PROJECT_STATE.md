@@ -28,6 +28,7 @@
 | **Role-Based Training Validation** | **PASS (10/10 Roles Scored, 0 P0s)** | [`TRAINING_VALIDATION_REPORT.md`](TRAINING_VALIDATION_REPORT.md) | 10 Archetypes / 12 Domains Audited |
 | **Sandbox Orientation Review** | **CONDITIONAL PASS (P0 Backlog Prioritized)** | [`SANDBOX_ORIENTATION_REPORT.md`](SANDBOX_ORIENTATION_REPORT.md) | 4 Special Items & 11 Backlog Items Audited |
 | **Sandbox Journey Mapping** | **PASS (8/8 Roles Mapped, Taxonomy Defined)** | [`SANDBOX_JOURNEY_MAP.md`](SANDBOX_JOURNEY_MAP.md) | 3-Step Sequence & 6 Archetypes |
+| **Sandbox Mental Model Decision** | **RESOLVED & ALIGNED (Meta vs Practice)** | [`SANDBOX_MENTAL_MODEL_DECISION.md`](SANDBOX_MENTAL_MODEL_DECISION.md) | Founder Removed from Personas |
 
 ---
 
@@ -106,6 +107,7 @@
 - [x] **Role-Based Training Validation Across 10 Personas (`docs/TRAINING_VALIDATION_REPORT.md`):** Complete day-in-the-life walkthrough for Candy (Founder), Foster Parent, Kinship Caregiver, Respite Provider, Adoptive Family, DCF Caseworker, DCF Supervisor, Trainer, New User, and Demo/Evaluator across all 12 system domains. Confirmed 0 critical cognitive blockers (0 P0), 9.28/10 average orientation, 9.54/10 average confidence, and 9.34/10 average ease-of-use.
 - [x] **Sandbox Orientation Review Across Entry Surfaces (`docs/SANDBOX_ORIENTATION_REPORT.md`):** Evaluated sandbox entry, Persona Launcher, Training Hub, and Mission Control through Candy's eyes. Analyzed 4 Special Review Items: (1) Founder separated from training personas, (2) Active child promoted to permanent sticky header, (3) Training Hub organized into 4 sequential curriculum tabs, and (4) Mission Control entry provided with explicit synthetic sandbox welcome and single "Start Here" hero action. Prioritized 3 P0, 5 P1, and 3 P2 backlog items.
 - [x] **Sandbox Journey Mapping Across 8 Roles (`docs/SANDBOX_JOURNEY_MAP.md`):** Complete intended experience design defining the 3-step cognitive onboarding sequence (Grounding, Anchoring, Proof), detailed 8-role journey blueprints (Trainer, Evaluator, Legislator, New Caregiver, Kinship Caregiver, Respite Provider, DCF Worker, Candy), and 6-screen taxonomy (Orientation, Launch, Training, Validation, Review, Administrative). Development freeze strictly preserved.
+- [x] **Sandbox Mental Model Decision (`docs/SANDBOX_MENTAL_MODEL_DECISION.md`):** Authoritatively resolved conceptual contradiction. Established Candy as Evaluator/Demonstrator (Meta-Layer); classified Founder Overview as an Evaluation Tool & Demonstration Vantage Point; decoupled 5 concepts (Gateway, Mission Control, Training Hub, Persona Launcher, Review Mode) into explicit non-overlapping layers.
 
 ---
 
@@ -580,7 +582,30 @@ All 16 core functional areas were verified operational in the local sandbox:
 
 ---
 
-## 11. Maintenance Protocol (Founder Home Mandate)
+## 11. Sandbox Mental Model Decision Ledger
+
+### Decision Summary
+- **Auditor:** Founder Operating System Architecture Review
+- **Date:** 2026-10-16
+- **Result:** **RESOLVED & ALIGNED (0 Conceptual Contradictions)**
+- **Governing Document:** [`SANDBOX_MENTAL_MODEL_DECISION.md`](SANDBOX_MENTAL_MODEL_DECISION.md)
+- **Constraint Preserved:** Strict Development Freeze honored (0 code/UI churn).
+
+### The Conceptual Contradiction Resolved
+- **Problem:** Founder Overview was ambiguously treated as both a Training Persona and an Administrative/Review function, causing accidental switches from synthetic sandbox to live local data.
+- **Candy's Operating Reality:** Candy is an **Evaluator, Demonstrator, and Validator** standing on the **Meta-Layer (Control Tower)**. She is never an in-flight trainee or routine operator inside the sandbox.
+- **Classification:** "Founder Overview" is classified as an **Evaluation Tool & Demonstration Vantage Point** (`Executive / System Overview`). It is **strictly removed from the Persona Launcher** and quarantined from training curriculum.
+
+### Decoupling of 5 Sandbox Concepts
+1. **Sandbox Gateway (Entry Airlock):** Declares 100% synthetic safety and provides 3 high-contrast doors, eliminating 35+ button choice paralysis.
+2. **Mission Control (Care Cockpit):** The simulated daily operating desktop displaying active child placement, routine schedule, and 6-button Quick Action Dock.
+3. **Training Hub (Flight School):** Structured pedagogical curriculum aligned with VCWTP; houses 4 learning modules, 6 practice missions, and competency checks.
+4. **Persona Launcher (Role Rigging):** Simulator identity switcher atomically pairing actor + child (Sarah &rarr; Liam, Eleanor &rarr; Emma, Samantha &rarr; Liam, Angela &rarr; Emma, Kassidy &rarr; Caseworker).
+5. **Review Mode (Director's Console):** Persistent meta-layer floating above the app (`#founderFloatingDock`) offering 1-click role swapping, system architecture inspection, and in-app feedback capture.
+
+---
+
+## 12. Maintenance Protocol (Founder Home Mandate)
 
 > **PRIMARY PROJECT HOME:** `FOUNDER_ORIENTATION_DASHBOARD.md` and `PROJECT_STATE.md` are the single source of truth.
 >
