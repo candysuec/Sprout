@@ -31,6 +31,7 @@ You are standing in **Sprout v3.2 Foundation Approved (Development Freeze Active
 - **Founder Review Finding #001 Resolved (PASS):** Eliminated navigation friction by mounting 1-click Review Mode entry globally across 5 surfaces (persistent floating dock `#founderFloatingDock`, top sticky header `#btnOpenReviewMode`, main navigation bar, Mission Control dock, and Parent Workspace banner). Review Mode and persona switching are now accessible from every screen in 1 click without application restart or work loss.
 - **Founder Review Finding #002 Resolved (PASS):** Restored and surfaced the complete **Persona Launcher** across both the global modal (`#founderReviewModal`) and directly embedded as the primary section on the Training Hub screen (`#trainingPersonaLauncher`), presenting all 5 personas with 1-click launch actions (Founder Overview, Foster Caregiver, Kinship Caregiver, Parent Participant, Respite Provider).
 - **Role-Based Training Validation Completed (PASS):** Executed comprehensive cognitive understanding walkthrough across **10 key roles** (Candy/Founder, Foster Parent, Kinship Caregiver, Respite Provider, Adoptive Family, DCF Caseworker, DCF Supervisor, Trainer, New User, Demo/Evaluator) across all 12 core domains. Full report published in [`TRAINING_VALIDATION_REPORT.md`](file:///c:/Users/candy/OneDrive/Documents/01_PERSONAL_&_FAMILY/Davis%20&%20VTDCF%20Shared%20Folder/foster-portal/docs/TRAINING_VALIDATION_REPORT.md). Zero critical cognitive blocks (0 P0 items). System achieves self-teaching design with average orientation score of 9.28/10, confidence of 9.54/10, and ease-of-use of 9.34/10.
+- **Sandbox Orientation Review Completed (CONDITIONAL PASS):** Thorough orientation audit evaluating the sandbox entry experience through Candy's eyes. Addresses all 4 Special Review Items (separating Founder from training personas, moving Child in Placement to sticky top header, structuring Training Hub into curriculum hierarchy, and providing explicit Sandbox welcome/safety banner to eliminate 35+ button choice paralysis). Full report published in [`SANDBOX_ORIENTATION_REPORT.md`](file:///c:/Users/candy/OneDrive/Documents/01_PERSONAL_&_FAMILY/Davis%20&%20VTDCF%20Shared%20Folder/foster-portal/docs/SANDBOX_ORIENTATION_REPORT.md). Prioritized action backlog defined (3 P0, 5 P1, 3 P2 items).
 
 ---
 
@@ -48,6 +49,7 @@ You are standing in **Sprout v3.2 Foundation Approved (Development Freeze Active
 | **Founder Acceptance** | **ACCEPTED** | Candy completed all 4 primary operating journeys without becoming the detective. |
 | **Founder Sandbox Review** | **READY (16/16 Passed, Findings #001 & #002 Resolved)** | Complete Persona Launcher accessible globally via modal and embedded directly on Training Hub screen. |
 | **Role-Based Training Validation** | **PASS (10/10 Roles Scored, 0 P0s)** | Comprehensive cognitive audit across 10 roles & 12 domains; 0 critical blocks; 9.34/10 ease-of-use. |
+| **Sandbox Orientation Review** | **CONDITIONAL PASS (P0 Backlog Prioritized)** | 4 Special Review Items audited; Founder separated; Child placement repositioned; 3 P0, 5 P1, 3 P2 backlog. |
 
 ---
 
@@ -67,6 +69,7 @@ These are the only active workstreams currently in motion:
 | Workstream | Scope | Target File(s) | Status |
 | :--- | :--- | :--- | :---: |
 | **Role-Based Training Validation** | Cognitive understanding audit of 10 user archetypes across all 12 domains. | `docs/TRAINING_VALIDATION_REPORT.md` | **COMPLETE & VALIDATED (0 P0s)** |
+| **Sandbox Orientation Review** | Evaluation of entry experience, 4 special review items, and orientation backlog. | `docs/SANDBOX_ORIENTATION_REPORT.md` | **COMPLETE & AUDITED (3 P0, 5 P1, 3 P2)** |
 | **Founder Sandbox Walkthrough** | Guided 5-persona self-review and feedback capture without developer assistance. | `app/static/index.html`, `app/static/app.js`, `app/server.py` | **ACTIVE & READY** |
 | **Real-World Validation (Observation Mode)** | Support Founder demos; observe real users (Foster, Kinship, Parent, Respite); capture friction only. | `docs/FOUNDER_ORIENTATION_DASHBOARD.md`, `docs/PROJECT_STATE.md` | **ACTIVE & OBSERVING** |
 | **Founder Home Alignment** | Single source-of-truth project maintenance across state ledgers. | `docs/FOUNDER_ORIENTATION_DASHBOARD.md`, `docs/PROJECT_STATE.md` | **ACTIVE & SYNCHRONIZED (178/178 Tests)** |

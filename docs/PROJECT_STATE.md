@@ -26,6 +26,7 @@
 | **Founder Acceptance** | **ACCEPTED / FROZEN** | [`PROJECT_STATE.md`](PROJECT_STATE.md) | Zero Confusion / Hesitation (Freeze Active) |
 | **Founder Sandbox Review Readiness** | **READY & VERIFIED (16/16 Passed)** | [`PROJECT_STATE.md`](PROJECT_STATE.md) | 5 Review Personas & Local Feedback Mounted |
 | **Role-Based Training Validation** | **PASS (10/10 Roles Scored, 0 P0s)** | [`TRAINING_VALIDATION_REPORT.md`](TRAINING_VALIDATION_REPORT.md) | 10 Archetypes / 12 Domains Audited |
+| **Sandbox Orientation Review** | **CONDITIONAL PASS (P0 Backlog Prioritized)** | [`SANDBOX_ORIENTATION_REPORT.md`](SANDBOX_ORIENTATION_REPORT.md) | 4 Special Items & 11 Backlog Items Audited |
 
 ---
 
@@ -102,6 +103,7 @@
   - **Visible Training Selection Screen:** Embedded the dedicated Persona Launcher (`#trainingPersonaLauncher`) directly at the top of the Training Hub screen (`renderTrainingSimulatorView`), giving the reviewer an unmissable, clearly visible training selection screen presenting: (1) Founder Overview, (2) Foster Caregiver, (3) Kinship Caregiver, (4) Parent Participant, and (5) Respite Provider.
   - **Global Modal Persona Launcher:** Retitled and reinforced the global Review Mode modal (`#founderReviewModal`) to explicitly feature **PERSONA LAUNCHER • SPROUT REVIEW MODE** with instant 1-click launch actions across all 5 personas from any screen.
 - [x] **Role-Based Training Validation Across 10 Personas (`docs/TRAINING_VALIDATION_REPORT.md`):** Complete day-in-the-life walkthrough for Candy (Founder), Foster Parent, Kinship Caregiver, Respite Provider, Adoptive Family, DCF Caseworker, DCF Supervisor, Trainer, New User, and Demo/Evaluator across all 12 system domains. Confirmed 0 critical cognitive blockers (0 P0), 9.28/10 average orientation, 9.54/10 average confidence, and 9.34/10 average ease-of-use.
+- [x] **Sandbox Orientation Review Across Entry Surfaces (`docs/SANDBOX_ORIENTATION_REPORT.md`):** Evaluated sandbox entry, Persona Launcher, Training Hub, and Mission Control through Candy's eyes. Analyzed 4 Special Review Items: (1) Founder separated from training personas, (2) Active child promoted to permanent sticky header, (3) Training Hub organized into 4 sequential curriculum tabs, and (4) Mission Control entry provided with explicit synthetic sandbox welcome and single "Start Here" hero action. Prioritized 3 P0, 5 P1, and 3 P2 backlog items.
 
 ---
 
@@ -513,7 +515,36 @@ All 16 core functional areas were verified operational in the local sandbox:
 
 ---
 
-## 9. Maintenance Protocol (Founder Home Mandate)
+## 9. Sandbox Orientation Review Ledger
+
+### Validation Summary
+- **Auditor:** Founder Operating System Validation Suite
+- **Date:** 2026-10-16
+- **Result:** **CONDITIONAL PASS (P0 Orientation Backlog Defined)**
+- **Governing Report:** [`SANDBOX_ORIENTATION_REPORT.md`](SANDBOX_ORIENTATION_REPORT.md)
+
+### Audit of Special Review Items
+1. **Founder View in Persona Launcher:** Founder Overview separated from training personas. Prevents accidental exit from synthetic sandbox to local database.
+2. **Child in Placement Visibility:** Relocate Active Child Selector from hidden sub-bar to permanent sticky top header across 100% of screens.
+3. **Training Hub Navigation:** Restructure Training Hub into 4 sequential tabs (Welcome/Objectives, Role Catalog, Scenario Simulator, Competency Tracker) eliminating duplicate persona cards.
+4. **Main Sandbox Page Entry:** Add explicit Sandbox Welcome & Safety Banner; introduce single high-contrast Hero Action to eliminate 35+ button choice paralysis.
+
+### Prioritized Sandbox Orientation Backlog
+- **P0-01 (Critical):** Separate Founder Overview from Training Personas (`#founderReviewModal`, `#trainingPersonaLauncher`).
+- **P0-02 (Critical):** Permanently surface Active Child selector in Sticky Top Header (`#topHeader`).
+- **P0-03 (Critical):** Eliminate Mission Control landing choice overload via single Hero Action.
+- **P1-01 (Friction):** Unify duplicate persona modules on Training Hub screen.
+- **P1-02 (Friction):** Replace 49 browser `alert()` popups with styled in-app modals.
+- **P1-03 (Friction):** Atomically pair training personas with canonical children (Sarah &rarr; Liam, Eleanor &rarr; Emma).
+- **P1-04 (Friction):** Add explicit Sandbox Orientation & Consequence-Free Safety Banner.
+- **P1-05 (Friction):** Organize Training Hub into 4 pedagogical curriculum tabs.
+- **P2-01 (Polish):** Clarify Workspace Mode switch confirmation dialog.
+- **P2-02 (Polish):** Refine Parent Portal exit button for review mode.
+- **P2-03 (Polish):** Format feedback modal context readout into visual chips.
+
+---
+
+## 10. Maintenance Protocol (Founder Home Mandate)
 
 > **PRIMARY PROJECT HOME:** `FOUNDER_ORIENTATION_DASHBOARD.md` and `PROJECT_STATE.md` are the single source of truth.
 >
@@ -529,6 +560,7 @@ When completing any sprint or task:
 1. Update checkboxes in Section 2 (Complete, In Progress, Blocked).
 2. Update the corresponding sections in [`FOUNDER_ORIENTATION_DASHBOARD.md`](FOUNDER_ORIENTATION_DASHBOARD.md).
 3. Commit with prefix `chore(state): update project state ledger`.
+
 
 
 
