@@ -52,10 +52,24 @@ You are standing in **Sprout v3.2 Mental Model Enforced (Sprint Complete)**.
 
 ## 🎯 WHAT MATTERS?
 
-Only two things matter right now:
+Only three things matter right now:
 
-1. **Protecting Caregiver Cognitive Load:** Never make Candy or any caregiver act as the integration layer, memory clerk, detective, or debugger. Every screen must answer: *Where am I? What is next?*
-2. **Execution Without Regression:** Preserving 100% test pass rate and backward compatibility with local workspace data.
+1. **The Drift Prevention Gate (Mandatory Before Any Work/Document/Feature):**
+   - **Q1:** What decision changes because this exists? *(If none: STOP).*
+   - **Q2:** Does this affect **ROLE**, **WORKSPACE**, or **STATE**? *(If not: Challenge necessity).*
+   - **Q3:** How does **Parent Participant** fit? *(If Parent cannot be clearly explained: Re-evaluate).*
+   - **Q4:** How does this help answer: *Where am I? What matters? What is next? What is blocked?*
+   - **Q5:** Does this introduce new terminology, categories, or conceptual layers? *(If yes: Justify with concrete operational impact).*
+   - **Q6:** Would a future AI need this to avoid making a wrong decision? *(If no: Do not add it).*
+2. **Protecting Caregiver Cognitive Load:** Never make Candy or any caregiver act as the integration layer, memory clerk, detective, or debugger. Every screen must answer: *Where am I? What is next?*
+3. **Execution Without Regression:** Preserving 100% test pass rate and backward compatibility with local workspace data.
+
+---
+
+### 🛡️ THE DRIFT INVARIANT:
+- **Reduce complexity.**
+- **Never increase complexity.**
+- **Never create governance that requires additional governance.**
 
 ---
 

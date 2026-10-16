@@ -169,10 +169,38 @@ Whenever friction arises in navigation or mental models, the solution is **never
 
 ---
 
-## 7. CONCLUSION & COMPLIANCE
+## 8. THE DRIFT PREVENTION GATE (THE 6 MANDATORY QUESTIONS)
 
-By retiring Audience, Purpose, and Workflow from software governance, and strictly adhering to the 10 Operating Truths, Sprout eliminates 90% of recurring historical drift.
+Before ANY future document, feature, workspace, screen, role, or review is created, it **MUST** pass this gate:
+
+1. **What decision changes because this exists?**  
+   *If none: STOP.*
+2. **Does this affect: ROLE, WORKSPACE, or STATE?**  
+   *If not: Challenge necessity.*
+3. **How does Parent Participant fit?**  
+   *If Parent cannot be clearly explained: Re-evaluate the concept.*
+4. **How does this help answer:**  
+   - *Where am I?*  
+   - *What matters?*  
+   - *What is next?*  
+   - *What is blocked?*  
+5. **Does this introduce new terminology, new categories, or new conceptual layers?**  
+   *If yes: Justify with concrete operational impact.*
+6. **Would a future AI need this to avoid making a wrong decision?**  
+   *If no: Do not add it.*
+
+### The Invariant:
+* **Reduce complexity.**
+* **Never increase complexity.**
+* **Never create governance that requires additional governance.**
+
+---
+
+## 9. CONCLUSION & COMPLIANCE
+
+By retiring Audience, Purpose, and Workflow from software governance, strictly enforcing the 10 Operating Truths, and routing all proposals through the 6-question Drift Prevention Gate, Sprout permanently protects caregiver cognitive clarity.
 
 * **Governed Truth Established:** [`DRIFT_ACCOUNTABILITY_REPORT.md`](DRIFT_ACCOUNTABILITY_REPORT.md)
 * **Single Source of Truth:** This document is the definitive lens through which all future UI refinements must be judged.
 * **Code / UI Status:** Zero code modified. Freeze honored. Complexity reduced.
+
