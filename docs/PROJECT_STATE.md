@@ -30,6 +30,7 @@
 | **Sandbox Journey Mapping** | **PASS (8/8 Roles Mapped, Taxonomy Defined)** | [`SANDBOX_JOURNEY_MAP.md`](SANDBOX_JOURNEY_MAP.md) | 3-Step Sequence & 6 Archetypes |
 | **Sandbox Mental Model Decision** | **RESOLVED & ALIGNED (Meta vs Practice)** | [`SANDBOX_MENTAL_MODEL_DECISION.md`](SANDBOX_MENTAL_MODEL_DECISION.md) | Founder Removed from Personas |
 | **Mental Model Enforcement** | **ENFORCED & VERIFIED (MME-01 through MME-04)** | [`MENTAL_MODEL_ENFORCEMENT_BACKLOG.md`](MENTAL_MODEL_ENFORCEMENT_BACKLOG.md) | 4 P0 Tickets Implemented & 178 Tests Passing |
+| **Concept Governance** | **AUTHORITATIVE & SEALED (7 Categories)** | [`CONCEPT_GOVERNANCE_REGISTER.md`](CONCEPT_GOVERNANCE_REGISTER.md) | Audience ≠ Role, Tool ≠ Workspace, Workflow ≠ Role |
 
 ---
 
@@ -37,6 +38,7 @@
 
 ### ✅ Complete (Production Ready)
 - [x] **Foundational Strategic Constitution:** Redefined Sprout as Child & Family Success Operating System.
+- [x] **Concept Governance Register:** Created authoritative vocabulary register across 7 categories (ROLE, AUDIENCE, TOOL, WORKSPACE, WORKFLOW, PURPOSE, STATE) with permanent concept invariant rules.
 - [x] **Mental Model Enforcement Sprint (P0 Scope Complete):** Disentangled Review Mode (Director Console) from Persona Launcher (Simulator Rig); quarantined Founder from practice roles; created dedicated Gateway Airlock (3 Doors) on Mission Control; permanently anchored Active Child in sticky header on 100% of screens.
 - [x] **Four Data Sovereignty Domains:** `child`, `case`, `caregiver`, `parent` domains segregated.
 - [x] **5-Level Note Classification Hierarchy:** `legacy_unreviewed`, `private`, `working`, `official`, `shared_family`.

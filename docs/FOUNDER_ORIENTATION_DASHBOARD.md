@@ -26,6 +26,7 @@ You are standing in **Sprout v3.2 Mental Model Enforced (Sprint Complete)**.
 - **Founder Acceptance Walkthrough Signed Off:** Candy Chevalier verified all 4 operating journeys. Captured **0 confusion, 0 hesitation, 0 unexpected behavior, 0 missing information**.
 - **Role-Based Training Validation Completed (PASS):** Executed comprehensive cognitive understanding walkthrough across **10 key roles** across all 12 core domains (9.34/10 ease-of-use).
 - **Sandbox Mental Model Decision Canonical Standard Enforced:** All 5 layers (Review Mode, Sandbox Gateway, Persona Launcher, Mission Control, Training Hub) are rigorously separated in UI and behavior.
+- **Concept Governance Register Established (Authoritative Semantic Standard):** Created [`CONCEPT_GOVERNANCE_REGISTER.md`](CONCEPT_GOVERNANCE_REGISTER.md) defining the 7 canonical categories (ROLE, AUDIENCE, TOOL, WORKSPACE, WORKFLOW, PURPOSE, STATE). Enforced the permanent Category-Assignment Rule (Audience ≠ Role, Role ≠ Tool, Tool ≠ Workspace, Workspace ≠ Purpose, Workflow ≠ Role) and cataloged 10 critical concept drift findings.
 
 ---
 
@@ -42,6 +43,7 @@ You are standing in **Sprout v3.2 Mental Model Enforced (Sprint Complete)**.
 | **Founder Cognitive Load** | **PASS** | Single source-of-truth home (`FOUNDER_ORIENTATION_DASHBOARD.md` & `PROJECT_STATE.md`). 178/178 tests passing. |
 | **Founder Acceptance** | **ACCEPTED** | Candy completed all 4 primary operating journeys without becoming the detective. |
 | **Mental Model Enforcement** | **ENFORCED & PASS (MME-01 through MME-04)** | Review Mode vs Persona Launcher split; Founder quarantined from training roles; Gateway Airlock & 3 Doors mounted; Active Child permanently anchored in sticky header. |
+| **Concept Governance** | **ESTABLISHED & AUTHORITATIVE (7 Categories)** | Master semantic register locked in `CONCEPT_GOVERNANCE_REGISTER.md`. Permanent rule: Audience ≠ Role, Role ≠ Tool, Tool ≠ Workspace, Workspace ≠ Purpose, Workflow ≠ Role. |
 | **Test Verification Baseline** | **178/178 PASSING (100%)** | 4 full verification suites passing with zero failures. |
 
 ---
