@@ -169,10 +169,26 @@ Whenever friction arises in navigation or mental models, the solution is **never
 
 ---
 
-## 8. THE DRIFT PREVENTION GATE (THE 6 MANDATORY QUESTIONS)
+## 8. THE DRIFT PREVENTION GATE
 
 Before ANY future document, feature, workspace, screen, role, or review is created, it **MUST** pass this gate:
 
+### 🛡️ THE PRIMARY USER TEST (THE BEDROCK FILTER)
+> **Before introducing any concept:**  
+> **Identify the real human whose day improves.**  
+>  
+> **Direct Operational Users:**  
+> ✅ **Parent Participant**  
+> ✅ **Foster Caregiver**  
+> ✅ **Kinship Caregiver**  
+> ✅ **Respite Provider**  
+>  
+> **External Figures:**  
+> If the beneficiary is a **Legislator**, **Trainer**, **Donor**, or **Evaluator**, then the concept **must prove why it belongs inside the software itself** rather than in documentation, live demonstrations, or printed/exported reports. If it cannot prove this: **DO NOT BUILD IT IN-APP.**
+
+---
+
+### The 6 Mandatory Drift Gate Checks:
 1. **What decision changes because this exists?**  
    *If none: STOP.*
 2. **Does this affect: ROLE, WORKSPACE, or STATE?**  

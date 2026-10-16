@@ -55,6 +55,7 @@ You are standing in **Sprout v3.2 Mental Model Enforced (Sprint Complete)**.
 Only three things matter right now:
 
 1. **The Drift Prevention Gate (Mandatory Before Any Work/Document/Feature):**
+   - **Primary User Test (The Bedrock Filter):** Identify the real human whose day improves (**Parent Participant**, **Foster Caregiver**, **Kinship Caregiver**, **Respite Provider**). If the answer is **Legislator**, **Trainer**, **Donor**, or **Evaluator**, it must prove why it belongs inside the software rather than in documentation, demos, or exported reports. If it cannot prove this: **DO NOT BUILD IT IN-APP.**
    - **Q1:** What decision changes because this exists? *(If none: STOP).*
    - **Q2:** Does this affect **ROLE**, **WORKSPACE**, or **STATE**? *(If not: Challenge necessity).*
    - **Q3:** How does **Parent Participant** fit? *(If Parent cannot be clearly explained: Re-evaluate).*
