@@ -220,13 +220,13 @@ HOUSEHOLDS = [
         "Address": "612 Sycamore Street, Fictional Center, VT 05012",
         "Status": "Active",
         "Capacity": 2,
-        "OccupiedBeds": 0,
-        "OpenBeds": 2,
+        "OccupiedBeds": 1,
+        "OpenBeds": 1,
         # Caregiver Journey Model
         "HouseholdStructure": "Friends / Co-Caregivers",
         "CaregiverStage": "Newly Licensed (0-1 Year)",
         "Approvals": ["Respite"],
-        "CurrentPlacements": 0,
+        "CurrentPlacements": 1,
         "YearsWorkingWithDCF": 0.9,
         "PlacementsCompleted": 6,
         "AdoptionFinalizations": 0,
@@ -511,14 +511,14 @@ CAPABILITIES = [
 # 5. CHILDREN & YOUTH (Demographics & Permanency Goals)
 # ==============================================================================
 CHILDREN = [
-    # 3 Infants
+    # 3 Primary Training Anchor Children
     {"ChildID": "CH-201", "Initials": "LB", "FullName": "Liam Brooks", "DOB": "2024-03-14", "Age": 0, "AgeBracket": "Infant", "Gender": "Male", "PermanencyGoal": "Reunification"},
-    {"ChildID": "CH-202", "Initials": "NR", "FullName": "Noah Ramos", "DOB": "2024-06-02", "Age": 0, "AgeBracket": "Infant", "Gender": "Male", "PermanencyGoal": "Reunification"},
-    {"ChildID": "CH-203", "Initials": "MP", "FullName": "Mia Parker", "DOB": "2023-12-10", "Age": 0, "AgeBracket": "Infant", "Gender": "Female", "PermanencyGoal": "Adoption"},
+    {"ChildID": "CH-202", "Initials": "EV", "FullName": "Emma Vance", "DOB": "2023-04-18", "Age": 3, "AgeBracket": "Toddler", "Gender": "Female", "PermanencyGoal": "Relative Guardianship"},
+    {"ChildID": "CH-203", "Initials": "NM", "FullName": "Noah Miller", "DOB": "2018-09-12", "Age": 8, "AgeBracket": "Elementary", "Gender": "Male", "PermanencyGoal": "Reunification"},
 
-    # 3 Toddlers
-    {"ChildID": "CH-204", "Initials": "EH", "FullName": "Ethan Hayes", "DOB": "2022-08-25", "Age": 2, "AgeBracket": "Toddler", "Gender": "Male", "PermanencyGoal": "Reunification"},
-    {"ChildID": "CH-205", "Initials": "OH", "FullName": "Olivia Hayes", "DOB": "2021-11-19", "Age": 2, "AgeBracket": "Toddler", "Gender": "Female", "PermanencyGoal": "Reunification"},
+    # 3 Continuum & Sibling Support Children
+    {"ChildID": "CH-204", "Initials": "MV", "FullName": "Marcus Vance", "DOB": "2019-05-20", "Age": 7, "AgeBracket": "Elementary", "Gender": "Male", "PermanencyGoal": "Reunification"},
+    {"ChildID": "CH-205", "Initials": "CL", "FullName": "Chloe Lin", "DOB": "2017-06-14", "Age": 9, "AgeBracket": "Elementary", "Gender": "Female", "PermanencyGoal": "Reunification"},
     {"ChildID": "CH-206", "Initials": "SJ", "FullName": "Sophia Jenkins", "DOB": "2022-02-04", "Age": 2, "AgeBracket": "Toddler", "Gender": "Female", "PermanencyGoal": "Assessment Pending"},
 
     # 4 Elementary Age
@@ -551,11 +551,11 @@ PLACEMENTS = [
     {
         "PlacementID": "PLC-301",
         "ChildID": "CH-201",
-        "HouseholdID": "HH-105",
-        "PlacementType": "Respite Care",
+        "HouseholdID": "HH-101",
+        "PlacementType": "Foster Care",
         "ProgramParticipation": ["Infant Support", "Family Reunification Services"],
         "StartDate": "2024-09-01",
-        "SpecialScenario": "Infant in respite care with licensed respite couple"
+        "SpecialScenario": "Infant Liam Brooks placed with single female foster caregiver (Sarah Jenkins)"
     },
     {
         "PlacementID": "PLC-302",
@@ -596,11 +596,11 @@ PLACEMENTS = [
     {
         "PlacementID": "PLC-306",
         "ChildID": "CH-206",
-        "HouseholdID": "HH-107",
-        "PlacementType": "Emergency Placement",
+        "HouseholdID": "HH-105",
+        "PlacementType": "Respite Care",
         "ProgramParticipation": ["Family Reunification Services"],
         "StartDate": "2024-10-11",
-        "SpecialScenario": "Emergency overnight placement (72-hour hold)"
+        "SpecialScenario": "Emergency respite placement"
     },
     {
         "PlacementID": "PLC-307",
@@ -622,12 +622,12 @@ PLACEMENTS = [
     },
     {
         "PlacementID": "PLC-309",
-        "ChildID": "CH-209",
+        "ChildID": "CH-202",
         "HouseholdID": "HH-113",
         "PlacementType": "Kinship Care",
-        "ProgramParticipation": ["Family Reunification Services"],
+        "ProgramParticipation": ["Family Reunification Services", "Kinship Support"],
         "StartDate": "2022-05-14",
-        "SpecialScenario": "Kinship placement with grandparent transitioning to guardianship"
+        "SpecialScenario": "Toddler Emma Vance placed with grandparents (Eleanor & Arthur Vance) transitioning to relative guardianship"
     },
     {
         "PlacementID": "PLC-310",
@@ -641,11 +641,11 @@ PLACEMENTS = [
     {
         "PlacementID": "PLC-311",
         "ChildID": "CH-211",
-        "HouseholdID": "HH-101",
+        "HouseholdID": "HH-108",
         "PlacementType": "Pre-Adoptive Placement",
         "ProgramParticipation": ["Behavioral Health Supports"],
         "StartDate": "2022-11-10",
-        "SpecialScenario": "Child transitioning to adoption with single female caregiver"
+        "SpecialScenario": "Child transitioning to adoption"
     },
     {
         "PlacementID": "PLC-312",
@@ -704,7 +704,7 @@ PLACEMENTS = [
     {
         "PlacementID": "PLC-318",
         "ChildID": "CH-218",
-        "HouseholdID": "HH-101",
+        "HouseholdID": "HH-102",
         "PlacementType": "Foster Care",
         "ProgramParticipation": ["Family Reunification Services"],
         "StartDate": "2023-01-20",
@@ -727,6 +727,15 @@ PLACEMENTS = [
         "ProgramParticipation": ["Independent Living"],
         "StartDate": "2023-05-01",
         "SpecialScenario": "Child preparing for independent living (19yo vocational apprentice)"
+    },
+    {
+        "PlacementID": "PLC-321",
+        "ChildID": "CH-201",
+        "HouseholdID": "HH-112",
+        "PlacementType": "Respite Care",
+        "ProgramParticipation": ["Infant Support", "Care & Safety Handoff"],
+        "StartDate": "2024-10-15",
+        "SpecialScenario": "Infant Liam Brooks in 48-hour weekend respite care with Samantha Price & Jordan Taylor"
     }
 ]
 
@@ -736,50 +745,50 @@ PLACEMENTS = [
 SAMPLE_RECORDS = [
     {
         "id": 1001,
-        "child_id": 201,  # CH-201
+        "child_id": 201,  # CH-201 Liam Brooks (Infant, 6 mos)
         "category": "medical",
         "sub_type": "Pediatric Checkup",
-        "title": "Annual Well-Child & Vision Exam",
+        "title": "30-Day EPSDT Well-Child & Immunization Exam",
         "event_date": "2026-03-15",
         "location": "Green Mountain Pediatrics",
-        "participants": "Dr. Miller, Sarah Jenkins (Caregiver), CH-201",
-        "summary": "Annual well-child exam completed. Height and weight on 55th percentile. Vision screening normal (20/20). Updated Tdap and flu vaccines administered. No medication changes.",
+        "participants": "Dr. Miller, Sarah Jenkins (Caregiver), Liam Brooks",
+        "summary": "Statutory 30-day EPSDT exam completed. Height and weight at 55th percentile. Pediatric reflexes and auditory screening normal. 6-month Rotavirus and DTaP vaccines administered.",
         "follow_up_needed": 0,
-        "follow_up_notes": "Next annual physical scheduled for March 2027.",
+        "follow_up_notes": "9-month developmental checkup scheduled.",
         "follow_up_due_date": "",
         "severity": "Routine",
         "dcf_draft_generated": 1,
-        "dcf_draft_text": "FYI to DCF Family Services Worker: CH-201 attended annual well-child checkup with Dr. Miller on 03/15/2026. Immunizations brought current. Summary copy uploaded to binder.",
+        "dcf_draft_text": "EPSDT Statutory Compliance Notice: Liam Brooks (CH-201) attended required EPSDT checkup on 03/15/2026. Immunizations current. Exam record uploaded to binder.",
         "communication_status": "Sent"
     },
     {
         "id": 1002,
         "child_id": 201,
-        "category": "education",
-        "sub_type": "IEP Review",
-        "title": "Quarterly 504 / Reading Support Conference",
+        "category": "daily",
+        "sub_type": "Infant Care & Sleep",
+        "title": "Formula Schedule & Night Sleep Rhythm",
         "event_date": "2026-03-22",
-        "location": "Maple Ridge Elementary",
-        "participants": "Ms. Harper (Teacher), Sarah Jenkins, Guidance Counselor",
-        "summary": "Met with 4th grade teacher to review reading accommodation plan. Reading comprehension improved by two grade levels since fall. Recommended continuing 30 min daily literacy practice at home.",
-        "follow_up_needed": 1,
-        "follow_up_notes": "Log weekly reading practice logs into Sprout binder.",
-        "follow_up_due_date": "2026-04-30",
-        "severity": "Important",
-        "dcf_draft_generated": 1,
-        "dcf_draft_text": "Monthly Education Update: CH-201 504 meeting held on 03/22/2026. Reading scores trending upward with positive behavioral participation in class.",
-        "communication_status": "Draft"
+        "location": "Maple Ridge Home",
+        "participants": "Sarah Jenkins, Liam Brooks",
+        "summary": "Liam took 4 oz of gentle formula at 11:30 AM and 3:30 PM without reflux. Settled smoothly into sensory-safe bassinet with white noise machine.",
+        "follow_up_needed": 0,
+        "follow_up_notes": "",
+        "follow_up_due_date": "",
+        "severity": "Routine",
+        "dcf_draft_generated": 0,
+        "dcf_draft_text": "",
+        "communication_status": "Logged"
     },
     {
         "id": 1003,
         "child_id": 201,
         "category": "family_time",
         "sub_type": "Supervised Visit",
-        "title": "Bi-Weekly Family Time with Biological Mother",
+        "title": "Supervised Family Time with Biological Mother",
         "event_date": "2026-04-02",
-        "location": "DCF District Office Family Center",
-        "participants": "CH-201, Biological Mother, Visit Supervisor Kelly R.",
-        "summary": "1.5-hour supervised visit. CH-201 brought school artwork and engaged warmly in board games. Smooth transition at drop-off and pickup. CH-201 reported feeling happy afterwards.",
+        "location": "Easterseals Family Time Center",
+        "participants": "Liam Brooks, Biological Mother (Angela Davis), Visit Specialist Kelly R.",
+        "summary": "1-hour supervised visit. Mother held and fed Liam his afternoon bottle, engaged warmly with soft rattle toy, and sang soothing lullabies. Positive transition at handoff.",
         "follow_up_needed": 0,
         "follow_up_notes": "",
         "follow_up_due_date": "",
@@ -790,57 +799,111 @@ SAMPLE_RECORDS = [
     },
     {
         "id": 1004,
-        "child_id": 202,  # CH-202
-        "category": "education",
-        "sub_type": "Vocational Training",
-        "title": "Technical Center Enrollment & Tools Orientation",
+        "child_id": 202,  # CH-202 Emma Vance (Toddler, 3 yrs)
+        "category": "medical",
+        "sub_type": "Pediatric Checkup",
+        "title": "3-Year Well-Child Checkup & Dr. Dynasaur Enrollment",
         "event_date": "2026-03-10",
-        "location": "Regional Technical Center",
-        "participants": "Marcus Vance, CH-202, Admissions Advisor",
-        "summary": "Orientation for Automotive Technology certificate program completed. Required safety gear and tool kit checklist received.",
-        "follow_up_needed": 1,
-        "follow_up_notes": "Submit voucher request for safety boots and textbook stipend.",
-        "follow_up_due_date": "2026-04-15",
-        "severity": "Important",
+        "location": "Community Health Center",
+        "participants": "Eleanor Vance (Grandparent), Emma Vance, Dr. Thorne",
+        "summary": "3-year pediatric physical completed. Growth trajectory healthy (60th percentile). Dr. Dynasaur healthcare coverage verified active. Fluoride varnish applied.",
+        "follow_up_needed": 0,
+        "follow_up_notes": "Annual dental cleaning scheduled for October.",
+        "follow_up_due_date": "",
+        "severity": "Routine",
         "dcf_draft_generated": 1,
-        "dcf_draft_text": "CH-202 completed enrollment in Automotive Tech program. Requesting DCF educational stipend approval for required PPE.",
-        "communication_status": "Draft"
-    },
-    {
-        "id": 1005,
-        "child_id": 204,  # CH-204
-        "category": "legal",
-        "sub_type": "Adoption Milestone",
-        "title": "Adoption Subsidy Agreement Review & Final Court Date",
-        "event_date": "2026-03-28",
-        "location": "Family Division Probate Court",
-        "participants": "Emily Miller, David Miller, Adoption Worker, Attorney",
-        "summary": "Pre-finalization adoption subsidy meeting completed. Title IV-E agreement executed. Final hearing scheduled for permanent adoption decree.",
-        "follow_up_needed": 1,
-        "follow_up_notes": "Submit certified copy of vital records to attorney.",
-        "follow_up_due_date": "2026-05-10",
-        "severity": "Court Relevant",
-        "dcf_draft_generated": 1,
-        "dcf_draft_text": "Notice of adoption finalization scheduling received for CH-204.",
+        "dcf_draft_text": "Kinship Health Update: Emma Vance (CH-202) completed 3-year pediatric physical. Health record uploaded.",
         "communication_status": "Sent"
     },
     {
+        "id": 1005,
+        "child_id": 202,
+        "category": "case",
+        "sub_type": "Kinship Support",
+        "title": "$350 Emergency Family Support Grant & Reach Up Disbursed",
+        "event_date": "2026-03-18",
+        "location": "DCF District Office",
+        "participants": "Eleanor Vance, Kinship Specialist Sarah M.",
+        "summary": "Received $350 emergency family support fund check for toddler car seat and clothing essentials. Reach Up child-only financial stipend confirmed active.",
+        "follow_up_needed": 0,
+        "follow_up_notes": "",
+        "follow_up_due_date": "",
+        "severity": "Important",
+        "dcf_draft_generated": 0,
+        "dcf_draft_text": "",
+        "communication_status": "Logged"
+    },
+    {
         "id": 1006,
-        "child_id": 209,  # CH-209
-        "category": "medical",
-        "sub_type": "Mental Health Therapy",
-        "title": "Weekly Trauma-Informed Counseling Session",
+        "child_id": 202,
+        "category": "education",
+        "sub_type": "Early Learning",
+        "title": "Head Start Preschool Playgroup Enrollment",
         "event_date": "2026-04-05",
-        "location": "Youth & Family Counseling Center",
-        "participants": "Elena Ramos, CH-209, Dr. Aris (LCSW)",
-        "summary": "Individual EMDR and emotional regulation session. Youth showed great progress in identifying sensory triggers and using breathing techniques.",
+        "location": "Valley Early Learning Center",
+        "participants": "Eleanor Vance, Emma Vance, Teacher Brenda",
+        "summary": "Emma attended first morning playgroup session. Interacted enthusiastically in music circle and building blocks corner.",
         "follow_up_needed": 0,
         "follow_up_notes": "",
         "follow_up_due_date": "",
         "severity": "Routine",
         "dcf_draft_generated": 0,
         "dcf_draft_text": "",
+        "communication_status": "Logged"
+    },
+    {
+        "id": 1007,
+        "child_id": 201,
+        "category": "mileage",
+        "sub_type": "State Mileage Reimbursement",
+        "title": "FS-334B Mileage Claim: Easterseals & Clinic ($184.20)",
+        "event_date": "2026-04-10",
+        "location": "DCF District 5 Route",
+        "participants": "Sarah Jenkins",
+        "summary": "Monthly travel log for medical clinic and family time visits. 288 cumulative monthly miles logged. State form FS-334B compiled for $184.20 reimbursement.",
+        "follow_up_needed": 0,
+        "follow_up_notes": "Form ready for 1-click submission.",
+        "follow_up_due_date": "",
+        "severity": "Routine",
+        "dcf_draft_generated": 1,
+        "dcf_draft_text": "FS-334B Mileage Claim compiled for Sarah Jenkins: 288 miles ($184.20).",
+        "communication_status": "Ready"
+    },
+    {
+        "id": 1008,
+        "child_id": 201,
+        "category": "therapy",
+        "sub_type": "Early Intervention",
+        "title": "Pediatric Sensory & Motor Development Consultation",
+        "event_date": "2026-04-12",
+        "location": "Maple Ridge Home",
+        "participants": "Sarah Jenkins, Liam Brooks, OT Specialist Marcus W.",
+        "summary": "In-home early intervention occupational therapy session. Liam demonstrated improved prone head lift and bilateral grasping. Caregiver provided sensory soothing techniques.",
+        "follow_up_needed": 0,
+        "follow_up_notes": "Next monthly home session set for May 14.",
+        "follow_up_due_date": "",
+        "severity": "Routine",
+        "dcf_draft_generated": 1,
+        "dcf_draft_text": "Early intervention OT session completed for Liam Brooks with positive milestones.",
         "communication_status": "Sent"
+    },
+    {
+        "id": 1009,
+        "child_id": 201,
+        "category": "case",
+        "sub_type": "Worker Home Visit",
+        "title": "Monthly DCF Family Services Worker Home Visit",
+        "event_date": "2026-04-14",
+        "location": "Maple Ridge Home",
+        "participants": "Sarah Jenkins, Liam Brooks, Family Services Worker Amanda P.",
+        "summary": "Monthly statutory casework visit. Walkthrough of infant nursery completed; safe sleep standards verified. Discussion of reunification roadmap and upcoming joint team meeting.",
+        "follow_up_needed": 0,
+        "follow_up_notes": "Court progress summary due in 3 weeks.",
+        "follow_up_due_date": "",
+        "severity": "Routine",
+        "dcf_draft_generated": 1,
+        "dcf_draft_text": "DCF Monthly Caseworker Home Visit documented. Sleeping area and routine compliant.",
+        "communication_status": "Logged"
     }
 ]
 

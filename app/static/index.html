@@ -109,7 +109,7 @@
           </div>
           <div class="text-left leading-tight">
             <span class="text-[9px] text-emerald-300 font-semibold block uppercase tracking-wider">Placed Child</span>
-            <select id="childSelect" onchange="onChildChange()" class="bg-transparent text-white font-bold text-xs focus:outline-none cursor-pointer max-w-[120px] sm:max-w-[150px] truncate">
+            <select id="childSelect" onchange="onChildChange()" class="bg-transparent text-white font-bold text-xs focus:outline-none cursor-pointer max-w-[120px] sm:max-w-[150px] truncate privacy-sensitive">
               <!-- Populated dynamically based on children list -->
             </select>
           </div>
@@ -221,7 +221,7 @@
               👶
             </div>
             <span class="text-[10px] text-emerald-900 font-extrabold uppercase tracking-wider mr-1">Active:</span>
-            <span id="navPlacedChildInitials" class="text-emerald-950 font-black text-xs">Child In Care</span>
+            <span id="navPlacedChildInitials" class="text-emerald-950 font-black text-xs privacy-sensitive">Child In Care</span>
           </div>
 
           <!-- Quick Emergency Summary Mode (P1.8) -->
@@ -1603,104 +1603,263 @@
         </button>
       </div>
 
-      <!-- Body: 4 Authentic Child Welfare Practice Roles (MME-02: Founder Removed) -->
-      <div class="p-6 space-y-4 overflow-y-auto flex-1">
-        <div class="p-3.5 bg-emerald-950/60 border border-emerald-700/50 rounded-2xl flex items-center justify-between gap-3 text-xs text-emerald-200">
-          <div class="flex items-center gap-2">
-            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
-            <span><strong>Consequence-Free Sandbox:</strong> Select any practice persona below. Your active role and designated child will be automatically anchored together.</span>
+      <!-- Body: Two-Dataset Architecture (Dataset A: Day 1 vs Dataset B: 90-Day Established) -->
+      <div class="p-6 space-y-5 overflow-y-auto flex-1">
+        
+        <!-- Dataset Selector Bar & 1-Click Reset -->
+        <div class="p-3 bg-slate-900/90 border border-slate-700/80 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm">
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <button id="btnDatasetA" onclick="switchDatasetMode('a')" class="flex-1 sm:flex-none px-3.5 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+              <span>Dataset A: New to Sprout (Day 1)</span>
+            </button>
+            <button id="btnDatasetB" onclick="switchDatasetMode('b')" class="flex-1 sm:flex-none px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
+              <i data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i>
+              <span>Dataset B: 90-Day User (Established)</span>
+            </button>
+          </div>
+          <button onclick="resetTrainingSandbox()" class="w-full sm:w-auto px-3.5 py-2 bg-purple-600/90 hover:bg-purple-500 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer border border-purple-400/40 shrink-0" title="Restore pristine Day 1 onboarding state for training demos">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+            <span>Reset Day 1 Sandbox</span>
+          </button>
+        </div>
+
+        <!-- =================================================================== -->
+        <!-- DATASET A: NEW TO SPROUT (DAY 1 ONBOARDING)                         -->
+        <!-- =================================================================== -->
+        <div id="datasetACards" class="space-y-4">
+          <div class="p-3 bg-emerald-950/50 border border-emerald-600/50 rounded-2xl flex items-center justify-between gap-2 text-xs text-emerald-200">
+            <div class="flex items-center gap-2">
+              <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+              <span><strong>Dataset A Active:</strong> 4 clean onboarding households. 0 clutter, placement clocks at Day 1, prominent first tasks for onboarding training.</span>
+            </div>
+            <span class="text-[10px] bg-emerald-500/20 text-emerald-300 font-black px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0 border border-emerald-400/30">Day 1 Sandbox</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <!-- 1. New Foster Caregiver (Sarah Jenkins & Liam Brooks - Infant) -->
+            <div class="bg-slate-800/80 hover:bg-slate-800 border border-blue-600/60 rounded-2xl p-4.5 transition flex flex-col justify-between gap-3 shadow-sm">
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="text-xs font-black uppercase tracking-wider text-blue-400 flex items-center gap-1.5">
+                    <i data-lucide="heart-handshake" class="w-4 h-4"></i> 1. New Foster Caregiver
+                  </span>
+                  <span class="text-[10px] font-bold bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full">Day 1 • Sarah Jenkins</span>
+                </div>
+                <p class="text-xs text-slate-300 leading-snug">Day 1 of placement for infant <strong>Liam Brooks (6 mos)</strong>: clean timeline, statutory 30-day health clock at Day 1 (30 days remaining), and prominent 15-second emergency intake log.</p>
+                <div class="mt-2.5 flex flex-wrap gap-1.5 text-[11px] text-slate-400">
+                  <span class="px-2 py-0.5 bg-slate-900 rounded-md text-emerald-300">Liam Brooks (CH-201)</span>
+                  <span class="px-2 py-0.5 bg-slate-900 rounded-md">Day 1 Clock</span>
+                  <span class="px-2 py-0.5 bg-slate-900 rounded-md">15s Quick Log</span>
+                </div>
+              </div>
+              <button onclick="launchPersonaReview('foster', 'a')" class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                <span>Launch New Foster (Day 1)</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+
+            <!-- 2. New Kinship Caregiver (Eleanor Vance & Emma Vance - Toddler) -->
+            <div class="bg-slate-800/80 hover:bg-slate-800 border border-teal-600/60 rounded-2xl p-4.5 transition flex flex-col justify-between gap-3 shadow-sm">
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="text-xs font-black uppercase tracking-wider text-teal-400 flex items-center gap-1.5">
+                    <i data-lucide="users-2" class="w-4 h-4"></i> 2. New Kinship Caregiver
+                  </span>
+                  <span class="text-[10px] font-bold bg-teal-500/20 text-teal-300 px-2 py-0.5 rounded-full">Day 1 • Eleanor Vance</span>
+                </div>
+                <p class="text-xs text-slate-300 leading-snug">Grandparents accepting emergency placement of <strong>Emma Vance (Age 3)</strong>: prominent Days 1–3 Survival Triage card, $350 emergency fund application, and plain-English Acronym Decoder.</p>
+                <div class="mt-2.5 flex flex-wrap gap-1.5 text-[11px] text-slate-400">
+                  <span class="px-2 py-0.5 bg-slate-900 rounded-md text-teal-300">Emma Vance (CH-202)</span>
+                  <span class="px-2 py-0.5 bg-slate-900 rounded-md">$350 Grant Triage</span>
+                  <span class="px-2 py-0.5 bg-slate-900 rounded-md">Jargon Decoder</span>
+                </div>
+              </div>
+              <button onclick="launchPersonaReview('kinship', 'a')" class="w-full py-2 bg-teal-600 hover:bg-teal-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                <span>Launch New Kinship (Day 1)</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+
+            <!-- 3. New Parent Participant (Danielle Miller & Noah Miller) -->
+            <div class="bg-slate-800/80 hover:bg-slate-800 border border-indigo-600/60 rounded-2xl p-4.5 transition flex flex-col justify-between gap-3 shadow-sm">
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="text-xs font-black uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
+                    <i data-lucide="heart" class="w-4 h-4"></i> 3. New Parent Participant
+                  </span>
+                  <span class="text-[10px] font-bold bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full">Day 1 • Danielle Miller</span>
+                </div>
+                <p class="text-xs text-slate-300 leading-snug">First login for biological mother <strong>Danielle Miller</strong>: Provisional 30-day orientation status, clean case plan roadmap (0% progress), and upcoming initial supervised family visit.</p>
+                <div class="mt-2.5 flex flex-wrap gap-1.5 text-[11px] text-slate-400">
+                  <span class="px-2 py-0.5 bg-slate-900 rounded-md text-indigo-300">Noah Miller (CH-203)</span>
+                  <span class="px-2 py-0.5 bg-slate-900 rounded-md">Provisional Access</span>
+                  <span class="px-2 py-0.5 bg-slate-900 rounded-md">First Visit Setup</span>
+                </div>
+              </div>
+              <button onclick="launchPersonaReview('danielle', 'a')" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                <span>Launch New Parent (Day 1)</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+
+            <!-- 4. New Respite Provider (Samantha Price & Liam Brooks - Infant) -->
+            <div class="bg-slate-800/80 hover:bg-slate-800 border border-rose-600/60 rounded-2xl p-4.5 transition flex flex-col justify-between gap-3 shadow-sm">
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="text-xs font-black uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
+                    <i data-lucide="shield-alert" class="w-4 h-4"></i> 4. New Respite Provider
+                  </span>
+                  <span class="text-[10px] font-bold bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded-full">Day 1 • Samantha Price</span>
+                </div>
+                <p class="text-xs text-slate-300 leading-snug">Initial 48-hour weekend stay for infant <strong>Liam Brooks</strong>: concise Care & Safety Sheet with allergy alerts, feeding schedule, bedtime routines, and clean medication MAR ready for first administration.</p>
+                <div class="mt-2.5 flex flex-wrap gap-1.5 text-[11px] text-slate-400">
+                  <span class="px-2 py-0.5 bg-slate-900 rounded-md text-rose-300">Liam Brooks (CH-201)</span>
+                  <span class="px-2 py-0.5 bg-slate-900 rounded-md">48-Hr Care Sheet</span>
+                  <span class="px-2 py-0.5 bg-slate-900 rounded-md">Clean MAR Ready</span>
+                </div>
+              </div>
+              <button onclick="launchPersonaReview('respite', 'a')" class="w-full py-2 bg-rose-600 hover:bg-rose-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                <span>Launch New Respite (Day 1)</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </button>
+            </div>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-          <!-- 1. Foster Caregiver: Sarah Jenkins -> Liam Brooks -->
-          <div class="bg-slate-800/80 hover:bg-slate-800 border border-blue-600/60 rounded-2xl p-4.5 transition flex flex-col justify-between gap-3 shadow-sm">
-            <div>
-              <div class="flex items-center justify-between mb-1.5">
-                <span class="text-xs font-black uppercase tracking-wider text-blue-400 flex items-center gap-1.5">
-                  <i data-lucide="heart-handshake" class="w-4 h-4"></i> 1. Foster Caregiver
-                </span>
-                <span class="text-[10px] font-bold bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full">Sarah Jenkins</span>
-              </div>
-              <p class="text-xs text-slate-300 leading-snug">Caring for infant <strong>Liam Brooks (CH-201, 6 mos)</strong>: practice 15-second routine logging, 5-click late-night intake, and 1-click DCF monthly report export.</p>
-              <div class="mt-2.5 flex flex-wrap gap-1.5 text-[11px] text-slate-400">
-                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Liam Brooks (CH-201)</span>
-                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Daily 15s Log</span>
-                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Export Month</span>
-              </div>
+        <!-- =================================================================== -->
+        <!-- DATASET B: 90-DAY ESTABLISHED USERS (FULL POWER)                    -->
+        <!-- =================================================================== -->
+        <div id="datasetBCards" class="space-y-4 hidden">
+          <div class="p-3 bg-indigo-950/50 border border-indigo-600/50 rounded-2xl flex items-center justify-between gap-2 text-xs text-indigo-200">
+            <div class="flex items-center gap-2">
+              <i data-lucide="database" class="w-4 h-4 text-indigo-400 shrink-0"></i>
+              <span><strong>Dataset B Active:</strong> 4 established 90-day households. 60+ routine logs, completed EPSDT health exams, court export packages, verified certificates, and mileage logs.</span>
             </div>
-            <button onclick="launchPersonaReview('foster')" class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
-              <span>Launch Foster Caregiver View</span>
-              <i data-lucide="arrow-right" class="w-4 h-4"></i>
-            </button>
+            <span class="text-[10px] bg-indigo-500/20 text-indigo-300 font-black px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0 border border-indigo-400/30">90-Day History</span>
           </div>
 
-          <!-- 2. Kinship Caregiver: Eleanor & Arthur Vance -> Emma Vance -->
-          <div class="bg-slate-800/80 hover:bg-slate-800 border border-teal-600/60 rounded-2xl p-4.5 transition flex flex-col justify-between gap-3 shadow-sm">
-            <div>
-              <div class="flex items-center justify-between mb-1.5">
-                <span class="text-xs font-black uppercase tracking-wider text-teal-400 flex items-center gap-1.5">
-                  <i data-lucide="users-2" class="w-4 h-4"></i> 2. Kinship Caregiver
-                </span>
-                <span class="text-[10px] font-bold bg-teal-500/20 text-teal-300 px-2 py-0.5 rounded-full">Eleanor Vance</span>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <!-- 1. Established Foster Caregiver (Sarah Jenkins & Liam Brooks) -->
+            <div class="bg-slate-800/80 hover:bg-slate-800 border border-blue-600/60 rounded-2xl p-4.5 transition flex flex-col justify-between gap-3 shadow-sm">
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="text-xs font-black uppercase tracking-wider text-blue-400 flex items-center gap-1.5">
+                    <i data-lucide="heart-handshake" class="w-4 h-4"></i> 1. Established Foster Caregiver
+                  </span>
+                  <span class="text-[10px] font-bold bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full">90 Days • Sarah Jenkins</span>
+                </div>
+                <p class="text-xs text-slate-300 leading-snug">90 days of successful care for <strong>Liam Brooks</strong>: 60+ routine logs, completed 30-day EPSDT exam on file with DCF, 1-click DCF monthly report (.docx), and State Mileage Claim ($184.20).</p>
+                <div class="mt-2.5 flex flex-wrap gap-1.5 text-[11px] text-slate-400">
+                  <span class="px-2 py-0.5 bg-slate-900 rounded-md text-emerald-300">EPSDT Compliant</span>
+                  <span class="px-2 py-0.5 bg-slate-900 rounded-md">60+ Routine Logs</span>
+                  <span class="px-2 py-0.5 bg-slate-900 rounded-md">Mileage Claim ($184)</span>
+                </div>
               </div>
-              <p class="text-xs text-slate-300 leading-snug">Grandparents caring for <strong>Emma Vance (CH-202, Age 3)</strong>: access plain-English Days 1-3 triage, discover $350 emergency fund, and decode welfare acronyms.</p>
-              <div class="mt-2.5 flex flex-wrap gap-1.5 text-[11px] text-slate-400">
-                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Emma Vance (CH-202)</span>
-                <span class="px-2 py-0.5 bg-slate-900 rounded-md">$350 Grant</span>
-                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Jargon Decoder</span>
-              </div>
+              <button onclick="launchPersonaReview('foster', 'b')" class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                <span>Launch Established Foster (90 Days)</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </button>
             </div>
-            <button onclick="launchPersonaReview('kinship')" class="w-full py-2 bg-teal-600 hover:bg-teal-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
-              <span>Launch Kinship Caregiver View</span>
-              <i data-lucide="arrow-right" class="w-4 h-4"></i>
-            </button>
-          </div>
 
-          <!-- 3. Parent Participant: Angela Davis -> Emma Vance -->
-          <div class="bg-slate-800/80 hover:bg-slate-800 border border-indigo-600/60 rounded-2xl p-4.5 transition flex flex-col justify-between gap-3 shadow-sm">
-            <div>
-              <div class="flex items-center justify-between mb-1.5">
-                <span class="text-xs font-black uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
-                  <i data-lucide="heart" class="w-4 h-4"></i> 3. Parent Participant
-                </span>
-                <span class="text-[10px] font-bold bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full">Angela Davis</span>
+            <!-- 2. Established Kinship Caregiver (Eleanor Vance & Emma Vance) -->
+            <div class="bg-slate-800/80 hover:bg-slate-800 border border-teal-600/60 rounded-2xl p-4.5 transition flex flex-col justify-between gap-3 shadow-sm">
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="text-xs font-black uppercase tracking-wider text-teal-400 flex items-center gap-1.5">
+                    <i data-lucide="users-2" class="w-4 h-4"></i> 2. Established Kinship Caregiver
+                  </span>
+                  <span class="text-[10px] font-bold bg-teal-500/20 text-teal-300 px-2 py-0.5 rounded-full">90 Days • Eleanor Vance</span>
+                </div>
+                <p class="text-xs text-slate-300 leading-snug">Grandparents caring for <strong>Emma Vance</strong> at 90 days: active Reach Up child-only grant, CCFAP child care subsidy, dental/preschool notes, and permanency roadmap for relative legal guardianship.</p>
+                <div class="mt-2.5 flex flex-wrap gap-1.5 text-[11px] text-slate-400">
+                  <span class="px-2 py-0.5 bg-slate-900 rounded-md text-teal-300">Reach Up Active</span>
+                  <span class="px-2 py-0.5 bg-slate-900 rounded-md">CCFAP Subsidy</span>
+                  <span class="px-2 py-0.5 bg-slate-900 rounded-md">Guardianship Roadmap</span>
+                </div>
               </div>
-              <p class="text-xs text-slate-300 leading-snug">Working toward reunification with <strong>Emma Vance</strong>: isolated dignity workspace with action roadmap, 1-click visit check-in, and evidence vault.</p>
-              <div class="mt-2.5 flex flex-wrap gap-1.5 text-[11px] text-slate-400">
-                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Action Roadmap</span>
-                <span class="px-2 py-0.5 bg-slate-900 rounded-md">1-Click Check-in</span>
-                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Evidence Vault</span>
-              </div>
+              <button onclick="launchPersonaReview('kinship', 'b')" class="w-full py-2 bg-teal-600 hover:bg-teal-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                <span>Launch Established Kinship (90 Days)</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </button>
             </div>
-            <button onclick="launchPersonaReview('parent')" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
-              <span>Launch Parent Workspace</span>
-              <i data-lucide="arrow-right" class="w-4 h-4"></i>
-            </button>
-          </div>
 
-          <!-- 4. Respite Provider: Samantha Price -> Liam Brooks -->
-          <div class="bg-slate-800/80 hover:bg-slate-800 border border-rose-600/60 rounded-2xl p-4.5 transition flex flex-col justify-between gap-3 shadow-sm">
-            <div>
-              <div class="flex items-center justify-between mb-1.5">
-                <span class="text-xs font-black uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
-                  <i data-lucide="shield-alert" class="w-4 h-4"></i> 4. Respite Provider
-                </span>
-                <span class="text-[10px] font-bold bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded-full">Samantha Price</span>
+            <!-- 3. Established Parent Participant (Angela Davis & Emma Vance) -->
+            <div class="bg-slate-800/80 hover:bg-slate-800 border border-indigo-600/60 rounded-2xl p-4.5 transition flex flex-col justify-between gap-3 shadow-sm">
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="text-xs font-black uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
+                    <i data-lucide="heart" class="w-4 h-4"></i> 3. Established Parent Participant
+                  </span>
+                  <span class="text-[10px] font-bold bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full">Day 90 • Angela Davis</span>
+                </div>
+                <p class="text-xs text-slate-300 leading-snug">Day 90 for biological mother <strong>Angela Davis</strong>: 75% complete court roadmap, 100% on-time visit streak at Easterseals, and 3 verified certificates in Evidence Vault (parenting class, lease, wellness).</p>
+                <div class="mt-2.5 flex flex-wrap gap-1.5 text-[11px] text-slate-400">
+                  <span class="px-2 py-0.5 bg-slate-900 rounded-md text-indigo-300">75% Plan Progress</span>
+                  <span class="px-2 py-0.5 bg-slate-900 rounded-md">100% Visit Streak</span>
+                  <span class="px-2 py-0.5 bg-slate-900 rounded-md">3 Verified Certificates</span>
+                </div>
               </div>
-              <p class="text-xs text-slate-300 leading-snug">Providing 48-hour weekend care for <strong>Liam Brooks</strong>: concise Care & Safety Sheet with allergy alerts, medication MAR, bedtime soothing, and emergency contacts in <30s.</p>
-              <div class="mt-2.5 flex flex-wrap gap-1.5 text-[11px] text-slate-400">
-                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Care & Safety Sheet</span>
-                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Allergies & MAR</span>
-                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Case Leaks Shielded</span>
-              </div>
+              <button onclick="launchPersonaReview('angela', 'b')" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                <span>Launch Established Parent (90 Days)</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </button>
             </div>
-            <button onclick="launchPersonaReview('respite')" class="w-full py-2 bg-rose-600 hover:bg-rose-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
-              <span>Launch Respite Provider View</span>
-              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+
+            <!-- 4. Established Respite Provider (Samantha Price & Liam Brooks) -->
+            <div class="bg-slate-800/80 hover:bg-slate-800 border border-rose-600/60 rounded-2xl p-4.5 transition flex flex-col justify-between gap-3 shadow-sm">
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="text-xs font-black uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
+                    <i data-lucide="shield-alert" class="w-4 h-4"></i> 4. Established Respite Provider
+                  </span>
+                  <span class="text-[10px] font-bold bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded-full">90 Days • Samantha Price</span>
+                </div>
+                <p class="text-xs text-slate-300 leading-snug">Experienced respite household: 4 completed weekend respite stays documented, 16 confirmed medication/feeding administrations on MAR without incident, and signed digital vouchers stored in vault.</p>
+                <div class="mt-2.5 flex flex-wrap gap-1.5 text-[11px] text-slate-400">
+                  <span class="px-2 py-0.5 bg-slate-900 rounded-md text-rose-300">4 Completed Stays</span>
+                  <span class="px-2 py-0.5 bg-slate-900 rounded-md">16 MAR Doses</span>
+                  <span class="px-2 py-0.5 bg-slate-900 rounded-md">Digital Signed Vouchers</span>
+                </div>
+              </div>
+              <button onclick="launchPersonaReview('respite', 'b')" class="w-full py-2 bg-rose-600 hover:bg-rose-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                <span>Launch Established Respite (90 Days)</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- =================================================================== -->
+        <!-- EXPANDED BIOLOGICAL PARENT PARTICIPANT CONTINUUM (4 SCENARIOS)      -->
+        <!-- =================================================================== -->
+        <div class="p-4 bg-slate-900/90 border border-slate-700/80 rounded-2xl space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-black uppercase tracking-wider text-indigo-300 flex items-center gap-1.5">
+              <i data-lucide="git-merge" class="w-4 h-4 text-indigo-400"></i> Parent Participant Continuum (1-Click Demonstration)
+            </span>
+            <span class="text-[10px] text-slate-400 font-semibold">Dignity • Accountability • Reunification</span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+            <button onclick="launchPersonaReview('danielle', 'a')" class="p-2.5 bg-slate-800 hover:bg-slate-700 border border-indigo-500/30 hover:border-indigo-400 rounded-xl text-left transition flex flex-col justify-between cursor-pointer">
+              <span class="font-bold text-white text-xs">1. Danielle Miller</span>
+              <span class="text-[10px] text-indigo-300 font-semibold mt-1">Day 1 • Provisional (0%)</span>
+            </button>
+            <button onclick="launchPersonaReview('jason', 'b')" class="p-2.5 bg-slate-800 hover:bg-slate-700 border border-amber-500/30 hover:border-amber-400 rounded-xl text-left transition flex flex-col justify-between cursor-pointer">
+              <span class="font-bold text-white text-xs">2. Jason Vance</span>
+              <span class="text-[10px] text-amber-300 font-semibold mt-1">Day 30 • Address Masked</span>
+            </button>
+            <button onclick="launchPersonaReview('angela', 'b')" class="p-2.5 bg-slate-800 hover:bg-slate-700 border border-emerald-500/30 hover:border-emerald-400 rounded-xl text-left transition flex flex-col justify-between cursor-pointer">
+              <span class="font-bold text-white text-xs">3. Angela Davis</span>
+              <span class="text-[10px] text-emerald-300 font-semibold mt-1">Day 90 • Engaged (75%)</span>
+            </button>
+            <button onclick="launchPersonaReview('maria', 'b')" class="p-2.5 bg-slate-800 hover:bg-slate-700 border border-teal-500/30 hover:border-teal-400 rounded-xl text-left transition flex flex-col justify-between cursor-pointer">
+              <span class="font-bold text-white text-xs">4. Maria Lin</span>
+              <span class="text-[10px] text-teal-300 font-semibold mt-1">Day 120+ • Graduation (100%)</span>
             </button>
           </div>
         </div>
+
       </div>
     </div>
   </div>

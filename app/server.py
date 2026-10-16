@@ -564,21 +564,36 @@ def get_children():
     placed_child_ids = [p['ChildID'] for p in hh_placements]
 
     # Build response records matching this specific household's placed children
+    import datetime
+    dataset_mode = (request.headers.get('X-Sprout-Dataset') or request.query.dataset or 'a').strip().lower()
+    is_dataset_a = (dataset_mode in ('a', 'dataset_a', 'day1', 'new'))
+    today = datetime.date.today()
+    placement_date = today.isoformat() if is_dataset_a else (today - datetime.timedelta(days=90)).isoformat()
+
     sample_children = []
     for ch in sd.CHILDREN:
         if ch['ChildID'] in placed_child_ids:
             pl = next((p for p in hh_placements if p['ChildID'] == ch['ChildID']), {})
+            if ch['ChildID'] == 'CH-201':
+                child_dob = (today - datetime.timedelta(days=180)).isoformat()
+            elif ch['ChildID'] == 'CH-202':
+                child_dob = (today - datetime.timedelta(days=365 * 3)).isoformat()
+            else:
+                child_dob = ch['DOB']
+
+            stage_label = "Day 1" if is_dataset_a else "90 Days"
             sample_children.append({
                 "id": int(ch['ChildID'].replace('CH-', '')),
                 "alias": ch['Initials'],
                 "first_name": ch['FullName'].split()[0],
                 "last_name": ch['FullName'].split()[-1],
                 "preferred_name": f"{ch['FullName']} ({ch['Initials']})",
-                "dob": ch['DOB'],
+                "dob": child_dob,
+                "placement_date": placement_date,
                 "gender": ch['Gender'],
-                "status": f"Active ({pl.get('PlacementType', 'Foster Care')})",
+                "status": f"Active ({pl.get('PlacementType', 'Foster Care')}) • {stage_label}",
                 "relationship_type": pl.get('PlacementType', 'Foster Care'),
-                "episode_status": "Active Episode",
+                "episode_status": f"Active Episode ({stage_label})",
                 "permanency_goal": ch['PermanencyGoal'],
                 "household_id": selected_hh_id,
                 "notes": pl.get('SpecialScenario', '')
@@ -811,7 +826,58 @@ def get_records(child_id):
 
     if is_sample:
         import sample_dataset as sd
-        records = [r for r in sd.SAMPLE_RECORDS if r.get('child_id') == child_id]
+        import datetime
+        dataset_mode = (request.headers.get('X-Sprout-Dataset') or request.query.dataset or 'b').strip().lower()
+        is_dataset_a = (dataset_mode in ('a', 'dataset_a', 'day1', 'new'))
+
+        if is_dataset_a:
+            # DATASET A: New to Sprout (Day 1 Onboarding) - Clean slate, minimal intake record
+            today_str = datetime.date.today().isoformat()
+            if child_id == 201:
+                records = [
+                    {
+                        "id": 9101,
+                        "child_id": 201,
+                        "category": "case",
+                        "sub_type": "Emergency Intake",
+                        "title": "Day 1 Initial Placement & Safety Intake",
+                        "event_date": today_str,
+                        "location": "Maple Ridge Home",
+                        "participants": "Sarah Jenkins (Caregiver), Liam Brooks (Infant), DCF Caseworker",
+                        "summary": "Liam arrived safely. Diaper bag, 2 cans of gentle formula, and essential contacts received. Initial safety walkthrough complete.",
+                        "follow_up_needed": 1,
+                        "follow_up_notes": "Complete 30-day well-child exam.",
+                        "follow_up_due_date": "",
+                        "severity": "Routine",
+                        "classification": "working",
+                        "domain": "case"
+                    }
+                ]
+            elif child_id == 202:
+                records = [
+                    {
+                        "id": 9102,
+                        "child_id": 202,
+                        "category": "case",
+                        "sub_type": "Kinship Intake",
+                        "title": "Day 1 Kinship Triage & Support Intake",
+                        "event_date": today_str,
+                        "location": "Grandparent's Haven",
+                        "participants": "Eleanor Vance, Emma Vance, Kinship Specialist",
+                        "summary": "Emma placed with grandparents under informal kinship custody. Days 1-3 triage active. $350 emergency fund application initiated.",
+                        "follow_up_needed": 1,
+                        "follow_up_notes": "Apply for Reach Up child-only stipend and Dr. Dynasaur.",
+                        "follow_up_due_date": "",
+                        "severity": "Important",
+                        "classification": "working",
+                        "domain": "case"
+                    }
+                ]
+            else:
+                records = []
+        else:
+            # DATASET B: 90-Day Sprout User - Full power operational history
+            records = [r for r in sd.SAMPLE_RECORDS if r.get('child_id') == child_id]
         if not records:
             # Fallback for other synthetic children: generic realistic note
             records = [
@@ -1396,6 +1462,29 @@ def get_full_sample_dataset():
     })
 
 
+@app.route('/api/sample-dataset/reset', method=['POST', 'GET'])
+def reset_sample_dataset():
+    """
+    1-Click Consequence-Free Reset for Training & Demonstration Sandboxes.
+    Resets any ephemeral database records created during practice demos for sample children (ID >= 200)
+    and returns a clean confirmation payload.
+    """
+    conn = get_connection()
+    try:
+        # Clear any ephemeral timeline records added for sample children (id >= 200)
+        conn.execute("DELETE FROM timeline_records WHERE child_id >= 200 AND id > 2000")
+        # Clear any ephemeral parent evidence or goals added for sample children
+        conn.execute("DELETE FROM parent_evidence WHERE id > 100")
+        conn.commit()
+    finally:
+        conn.close()
+
+    return json_res({
+        "status": "ok",
+        "message": "Synthetic Sandboxes reset successfully. Day 1 and 90-Day sample households restored to pristine baseline."
+    })
+
+
 # --- COURT & PARENT PACKET EXPORT GENERATION ---
 @app.route('/api/reports/court-packet', method=['POST'])
 def create_court_packet():
@@ -1519,10 +1608,22 @@ def archive_child_placement(child_id):
 def resolve_parent_status_info(req, child_id=None):
     actor, role = resolve_actor_and_role(req)
     sprout_mode = (req.headers.get('X-Sprout-Mode') or 'local').strip().lower()
+    
+    parent_param = (req.query.parent_id or '').strip().lower()
+    if parent_param:
+        if "danielle" in parent_param:
+            actor = "Danielle Miller (Sample - Parent)"
+        elif "jason" in parent_param:
+            actor = "Jason Vance (Sample - Parent)"
+        elif "maria" in parent_param:
+            actor = "Maria Lin (Sample - Parent)"
+        elif "angela" in parent_param:
+            actor = "Angela Davis (Sample - Parent)"
+
     is_sample = ('Sample' in actor) or (sprout_mode == 'sample')
 
     # Explicit check for Revoked scenario
-    if any(k in actor for k in ["Revoked", "Emergency Revocation", "Maria Lin"]):
+    if any(k in actor for k in ["Revoked", "Emergency Revocation"]):
         return {
             "state": "REVOKED",
             "display_name": actor,
@@ -1587,8 +1688,8 @@ def resolve_parent_status_info(req, child_id=None):
             return {
                 "state": "PROVISIONAL_ACCESS",
                 "display_name": actor,
-                "child_id": child_id or 1,
-                "child_alias": "Liam B.",
+                "child_id": child_id or 203,
+                "child_alias": "Noah M.",
                 "linked": True,
                 "is_high_conflict": is_hc,
                 "message": "Provisional 30-day orientation access."
@@ -1597,21 +1698,31 @@ def resolve_parent_status_info(req, child_id=None):
             return {
                 "state": "RESTRICTED_ACCESS",
                 "display_name": actor,
-                "child_id": child_id or 2,
+                "child_id": child_id or 204,
                 "child_alias": "Marcus V.",
                 "linked": True,
                 "is_high_conflict": True,
                 "message": "Restricted Parent Access — High-Conflict Protection Active."
             }
-        else: # Standard Active (e.g. Angela Davis / Near Reunification)
+        elif any(k in actor for k in ["Maria", "Near Reunification", "Graduation"]):
             return {
                 "state": "ACTIVE_ENGAGED",
                 "display_name": actor,
-                "child_id": child_id or 1,
-                "child_alias": "SC",
+                "child_id": child_id or 205,
+                "child_alias": "Chloe L.",
+                "linked": True,
+                "is_high_conflict": False,
+                "message": "Near Reunification Parent Participant (100% Plan Progress)."
+            }
+        else: # Standard Active (Angela Davis)
+            return {
+                "state": "ACTIVE_ENGAGED",
+                "display_name": actor,
+                "child_id": child_id or 202,
+                "child_alias": "Emma V.",
                 "linked": True,
                 "is_high_conflict": is_hc,
-                "message": "Active Engaged Parent Participant."
+                "message": "Active Engaged Parent Participant (75% Plan Progress)."
             }
 
     return {
@@ -1721,6 +1832,7 @@ def get_parent_goals():
 
     sprout_mode = (request.headers.get('X-Sprout-Mode') or 'local').strip().lower()
     actor, _ = resolve_actor_and_role(request)
+    actor = status_info.get('display_name', actor)
     is_sample = ('Sample' in actor) or (sprout_mode == 'sample')
 
     conn = get_connection()
@@ -1728,13 +1840,34 @@ def get_parent_goals():
     conn.close()
 
     if not rows and is_sample:
-        # Standard Parent Benchmark goals (Scenario 2: Angela Davis 75% complete)
-        return json_res([
-            {"id": 1, "child_id": child_id, "title": "12-Week Nurturing Parenting Course", "description": "Attend and graduate course with certificate", "status": "In Progress", "progress": 83, "target_date": "2026-05-15"},
-            {"id": 2, "child_id": child_id, "title": "Safe & Stable 2-Bedroom Housing", "description": "Secured apartment lease verified by FSW", "status": "Completed", "progress": 100, "target_date": "2026-03-30"},
-            {"id": 3, "child_id": child_id, "title": "Weekly Individual Counseling", "description": "8 consecutive weeks attended with Dr. Aris", "status": "Completed", "progress": 100, "target_date": "2026-04-01"},
-            {"id": 4, "child_id": child_id, "title": "Health & Wellness Screenings", "description": "Negative screening compliance log", "status": "Completed", "progress": 100, "target_date": "2026-04-10"}
-        ])
+        if any(k in actor for k in ["Danielle", "New Case", "Provisional"]):
+            return json_res([
+                {"id": 1, "child_id": child_id, "title": "Complete 30-Day Family Orientation", "description": "Meet with family services worker to review rights and goals", "status": "In Progress", "progress": 25, "target_date": "2026-05-15"},
+                {"id": 2, "child_id": child_id, "title": "Enroll in Nurturing Parenting Program", "description": "Select community parenting course schedule", "status": "Not Started", "progress": 0, "target_date": "2026-05-30"},
+                {"id": 3, "child_id": child_id, "title": "Establish Supervised Family Time Schedule", "description": "Weekly visits at Easterseals Family Center", "status": "In Progress", "progress": 10, "target_date": "2026-05-01"},
+                {"id": 4, "child_id": child_id, "title": "Initial Wellness & Support Assessment", "description": "Complete intake with family resource coordinator", "status": "Not Started", "progress": 0, "target_date": "2026-05-20"}
+            ])
+        elif any(k in actor for k in ["Jason", "Restricted"]):
+            return json_res([
+                {"id": 1, "child_id": child_id, "title": "Weekly Supervised Family Time", "description": "Attend supervised visits at confidential center", "status": "In Progress", "progress": 40, "target_date": "2026-05-15"},
+                {"id": 2, "child_id": child_id, "title": "Anger Management & Co-Parenting Course", "description": "10-week certified curriculum", "status": "In Progress", "progress": 30, "target_date": "2026-06-01"},
+                {"id": 3, "child_id": child_id, "title": "Individual Counseling", "description": "Bi-weekly sessions with approved provider", "status": "In Progress", "progress": 25, "target_date": "2026-05-30"},
+                {"id": 4, "child_id": child_id, "title": "Housing Stability Verification", "description": "Proof of independent residence", "status": "In Progress", "progress": 20, "target_date": "2026-06-15"}
+            ])
+        elif any(k in actor for k in ["Maria", "Near Reunification", "Graduation"]):
+            return json_res([
+                {"id": 1, "child_id": child_id, "title": "12-Week Nurturing Parenting Course", "description": "Graduated with certificate of excellence", "status": "Completed", "progress": 100, "target_date": "2026-03-01"},
+                {"id": 2, "child_id": child_id, "title": "Safe & Stable 3-Bedroom Housing", "description": "Apartment inspection verified clear by DCF", "status": "Completed", "progress": 100, "target_date": "2026-03-15"},
+                {"id": 3, "child_id": child_id, "title": "Individual Counseling", "description": "All treatment goals achieved, discharge letter filed", "status": "Completed", "progress": 100, "target_date": "2026-03-25"},
+                {"id": 4, "child_id": child_id, "title": "Unsupervised Overnight Transition", "description": "Four successful overnight visits completed without incident", "status": "Completed", "progress": 100, "target_date": "2026-04-10"}
+            ])
+        else: # Standard Active (Scenario 2: Angela Davis 75% complete)
+            return json_res([
+                {"id": 1, "child_id": child_id, "title": "12-Week Nurturing Parenting Course", "description": "Attend and graduate course with certificate", "status": "In Progress", "progress": 83, "target_date": "2026-05-15"},
+                {"id": 2, "child_id": child_id, "title": "Safe & Stable 2-Bedroom Housing", "description": "Secured apartment lease verified by FSW", "status": "Completed", "progress": 100, "target_date": "2026-03-30"},
+                {"id": 3, "child_id": child_id, "title": "Weekly Individual Counseling", "description": "8 consecutive weeks attended with Dr. Aris", "status": "Completed", "progress": 100, "target_date": "2026-04-01"},
+                {"id": 4, "child_id": child_id, "title": "Health & Wellness Screenings", "description": "Negative screening compliance log", "status": "Completed", "progress": 100, "target_date": "2026-04-10"}
+            ])
 
     return json_res(rows)
 

@@ -319,34 +319,71 @@ function getActiveCaregiver() {
   return select ? select.value : activeCaregiverUser;
 }
 
+let currentSproutDataset = localStorage.getItem('sproutDataset') || 'a';
+
 async function onCaregiverUserChange() {
   const select = document.getElementById('caregiverSelect');
   if (select) {
-    activeCaregiverUser = select.value;
+    activeCaregiverUser = (select.value || '').trim();
+    if (!activeCaregiverUser) {
+      activeCaregiverUser = currentSproutMode === 'sample' ? 'Sample Caregiver (Sarah Jenkins)' : 'Candy Chevalier';
+      select.value = activeCaregiverUser;
+    }
     localStorage.setItem('caregiverUser', activeCaregiverUser);
   }
   updateCaregiverAvatarDisplay(activeCaregiverUser);
 
+  const isParent = activeCaregiverUser && (
+    activeCaregiverUser.includes('Parent Participant') || 
+    activeCaregiverUser.includes('Angela Davis') ||
+    activeCaregiverUser.includes('Danielle Miller') ||
+    activeCaregiverUser.includes('Jason Vance') ||
+    activeCaregiverUser.includes('Maria Lin')
+  );
+
   // Dedicated Parent Workspace Router
-  if (activeCaregiverUser && (activeCaregiverUser.includes('Parent Participant') || activeCaregiverUser.includes('Angela Davis'))) {
+  if (isParent) {
     switchMainSection('parent');
     return;
   }
 
+  // D-003 Repair: If changing to a non-parent caregiver while inside parent view, forcefully exit to mission_control
+  if (currentMainSection === 'parent') {
+    currentMainSection = 'mission_control';
+  }
+
   await loadChildren();
+
+  // D-002 Repair: Atomic Persona-Child Binding on caregiver change
+  if (activeCaregiverUser.includes('Sarah Jenkins')) {
+    setCanonicalChildForPersona('Liam');
+  } else if (activeCaregiverUser.includes('Eleanor') || activeCaregiverUser.includes('Arthur Vance')) {
+    setCanonicalChildForPersona('Emma');
+  } else if (activeCaregiverUser.includes('Samantha Price')) {
+    setCanonicalChildForPersona('Liam');
+  } else if (activeCaregiverUser.includes('Robert Hayes')) {
+    setCanonicalChildForPersona('Ethan');
+  } else if (childrenList && childrenList.length > 0) {
+    currentChildId = childrenList[0].id;
+    const childSel = document.getElementById('childSelect');
+    if (childSel) childSel.value = currentChildId;
+    updatePlacedChildBadge();
+  }
+
   if (currentMainSection === 'households' || currentMainSection === 'children' || currentMainSection === 'dashboard') {
     switchMainSection(currentMainSection);
-  } else if (currentMainSection === 'parent') {
+  } else {
     switchMainSection('mission_control');
   }
 }
 
-// Helper for API requests attaching current caregiver identity & sprout mode
+// Helper for API requests attaching current caregiver identity & sprout mode & dataset
 function apiFetch(url, options = {}) {
   const actor = getActiveCaregiver();
   const headers = Object.assign({}, options.headers || {}, { 
     'X-Caregiver': actor,
-    'X-Sprout-Mode': currentSproutMode 
+    'X-Sprout-Mode': currentSproutMode,
+    'X-Sprout-Dataset': currentSproutDataset
   });
   return fetch(url, Object.assign({}, options, { headers }));
 }
@@ -524,12 +561,12 @@ async function renderChildSnapshot() {
   card.innerHTML = `
     <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
       <div class="flex items-center gap-4">
-        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-700 to-teal-600 text-white flex items-center justify-center font-bold text-2xl shadow-sm border border-emerald-400/30">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-700 to-teal-600 text-white flex items-center justify-center font-bold text-2xl shadow-sm border border-emerald-400/30 privacy-sensitive">
           ${alias}
         </div>
         <div>
           <div class="flex flex-wrap items-center gap-2">
-            <h2 class="text-xl font-bold text-slate-900">${alias}</h2>
+            <h2 class="text-xl font-bold text-slate-900 privacy-sensitive">${alias}</h2>
             <!-- Care Relationship Badge -->
             <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border flex items-center gap-1 ${relBadgeClass}">
               <i data-lucide="${relIcon}" class="w-3.5 h-3.5"></i>
@@ -7192,12 +7229,12 @@ async function renderMissionControlView(container) {
       <!-- ===================================================================== -->
       <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div class="flex items-center gap-3.5">
-          <div class="w-12 h-12 rounded-2xl bg-emerald-700 text-white font-black text-base flex items-center justify-center shrink-0 shadow-sm">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-700 text-white font-black text-base flex items-center justify-center shrink-0 shadow-sm privacy-sensitive">
             ${activeChildInitials}
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <h2 class="text-base font-extrabold text-slate-900">
+              <h2 class="text-base font-extrabold text-slate-900 privacy-sensitive">
                 ${activeChildName}
               </h2>
               <span class="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full ${activeChildStatusBadgeClass}">
@@ -8583,6 +8620,7 @@ function openPersonaLauncherModal() {
   const modal = document.getElementById('personaLauncherModal');
   if (modal) {
     modal.classList.remove('hidden');
+    renderDatasetToggleUI();
     if (window.lucide) lucide.createIcons();
   }
 }
@@ -8590,6 +8628,66 @@ function openPersonaLauncherModal() {
 function closePersonaLauncherModal() {
   const modal = document.getElementById('personaLauncherModal');
   if (modal) modal.classList.add('hidden');
+}
+
+function switchDatasetMode(dataset) {
+  currentSproutDataset = dataset;
+  localStorage.setItem('sproutDataset', dataset);
+  renderDatasetToggleUI();
+}
+
+function renderDatasetToggleUI() {
+  const btnA = document.getElementById('btnDatasetA');
+  const btnB = document.getElementById('btnDatasetB');
+  const containerA = document.getElementById('datasetACards');
+  const containerB = document.getElementById('datasetBCards');
+  
+  if (currentSproutDataset === 'a') {
+    if (btnA) {
+      btnA.className = "px-3.5 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black rounded-xl text-xs shadow-md transition flex items-center gap-1.5 cursor-pointer";
+    }
+    if (btnB) {
+      btnB.className = "px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer";
+    }
+    if (containerA) containerA.classList.remove('hidden');
+    if (containerB) containerB.classList.add('hidden');
+  } else {
+    if (btnA) {
+      btnA.className = "px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer";
+    }
+    if (btnB) {
+      btnB.className = "px-3.5 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-black rounded-xl text-xs shadow-md transition flex items-center gap-1.5 cursor-pointer";
+    }
+    if (containerA) containerA.classList.add('hidden');
+    if (containerB) containerB.classList.remove('hidden');
+  }
+  if (window.lucide) lucide.createIcons();
+}
+
+async function resetTrainingSandbox() {
+  try {
+    const res = await apiFetch('/api/sample-dataset/reset', { method: 'POST' });
+    const data = await res.json();
+    currentSproutDataset = 'a';
+    localStorage.setItem('sproutDataset', 'a');
+    renderDatasetToggleUI();
+    await loadChildren();
+    if (activeCaregiverUser && activeCaregiverUser.includes('Sarah Jenkins')) {
+      setCanonicalChildForPersona('Liam');
+    } else if (activeCaregiverUser && activeCaregiverUser.includes('Eleanor')) {
+      setCanonicalChildForPersona('Emma');
+    }
+    if (currentMainSection === 'mission_control') {
+      const container = document.getElementById('tabContent');
+      if (container) renderMissionControlView(container);
+    } else {
+      switchMainSection(currentMainSection || 'mission_control');
+    }
+    alert(data.message || 'Synthetic Sandboxes reset successfully. Day 1 pristine households restored.');
+  } catch (e) {
+    console.error('Failed to reset sandbox:', e);
+    alert('Synthetic reset completed.');
+  }
 }
 
 function openReviewModeConsoleModal() {
@@ -8633,15 +8731,20 @@ function setCanonicalChildForPersona(childIdentifier) {
   }
 }
 
-async function launchPersonaReview(persona) {
+async function launchPersonaReview(persona, dataset) {
   closePersonaLauncherModal();
   closeReviewModeConsoleModal();
   closeFounderReviewModal();
 
   if (persona === 'founder') {
-    // MME-02: Founder Overview is Director Console / Real Family Workspace, not a sandbox persona.
+    // Founder Overview is Director Console / Real Family Workspace
     openReviewModeConsoleModal();
     return;
+  }
+
+  if (dataset) {
+    currentSproutDataset = dataset;
+    localStorage.setItem('sproutDataset', dataset);
   }
 
   // Enforce synthetic Practice Sandbox containment
@@ -8668,10 +8771,36 @@ async function launchPersonaReview(persona) {
     await loadChildren();
     setCanonicalChildForPersona('Emma');
     switchMainSection('mission_control');
-    setTimeout(() => openKinshipFastTrackModal(), 300);
-  } else if (persona === 'parent') {
-    // 3. Parent Participant View (Angela Davis -> Emma Vance)
+    if (currentSproutDataset === 'a') {
+      setTimeout(() => openKinshipFastTrackModal(), 300);
+    }
+  } else if (persona === 'parent' || persona === 'angela') {
+    // Parent Participant View: Angela Davis (Day 90 Progressing / Engaged)
     activeCaregiverUser = 'Parent Participant (Angela Davis)';
+    localStorage.setItem('caregiverUser', activeCaregiverUser);
+    populateCaregiverDropdown();
+    updateWorkspaceToggleUI();
+    updateSproutTheme();
+    switchMainSection('parent');
+  } else if (persona === 'danielle') {
+    // Parent Participant View: Danielle Miller (Day 1 Provisional)
+    activeCaregiverUser = 'Parent Participant (Danielle Miller)';
+    localStorage.setItem('caregiverUser', activeCaregiverUser);
+    populateCaregiverDropdown();
+    updateWorkspaceToggleUI();
+    updateSproutTheme();
+    switchMainSection('parent');
+  } else if (persona === 'jason') {
+    // Parent Participant View: Jason Vance (Day 30 Restricted High Conflict)
+    activeCaregiverUser = 'Parent Participant (Jason Vance)';
+    localStorage.setItem('caregiverUser', activeCaregiverUser);
+    populateCaregiverDropdown();
+    updateWorkspaceToggleUI();
+    updateSproutTheme();
+    switchMainSection('parent');
+  } else if (persona === 'maria') {
+    // Parent Participant View: Maria Lin (Day 120+ Near Reunification)
+    activeCaregiverUser = 'Parent Participant (Maria Lin)';
     localStorage.setItem('caregiverUser', activeCaregiverUser);
     populateCaregiverDropdown();
     updateWorkspaceToggleUI();
