@@ -29,6 +29,7 @@
 | **Sandbox Orientation Review** | **CONDITIONAL PASS (P0 Backlog Prioritized)** | [`SANDBOX_ORIENTATION_REPORT.md`](SANDBOX_ORIENTATION_REPORT.md) | 4 Special Items & 11 Backlog Items Audited |
 | **Sandbox Journey Mapping** | **PASS (8/8 Roles Mapped, Taxonomy Defined)** | [`SANDBOX_JOURNEY_MAP.md`](SANDBOX_JOURNEY_MAP.md) | 3-Step Sequence & 6 Archetypes |
 | **Sandbox Mental Model Decision** | **RESOLVED & ALIGNED (Meta vs Practice)** | [`SANDBOX_MENTAL_MODEL_DECISION.md`](SANDBOX_MENTAL_MODEL_DECISION.md) | Founder Removed from Personas |
+| **Mental Model Enforcement** | **AUDITED & BACKLOGGED (4 P0, 2 P1)** | [`MENTAL_MODEL_ENFORCEMENT_BACKLOG.md`](MENTAL_MODEL_ENFORCEMENT_BACKLOG.md) | 6 UI Layer Collisions Cataloged |
 
 ---
 
@@ -108,6 +109,7 @@
 - [x] **Sandbox Orientation Review Across Entry Surfaces (`docs/SANDBOX_ORIENTATION_REPORT.md`):** Evaluated sandbox entry, Persona Launcher, Training Hub, and Mission Control through Candy's eyes. Analyzed 4 Special Review Items: (1) Founder separated from training personas, (2) Active child promoted to permanent sticky header, (3) Training Hub organized into 4 sequential curriculum tabs, and (4) Mission Control entry provided with explicit synthetic sandbox welcome and single "Start Here" hero action. Prioritized 3 P0, 5 P1, and 3 P2 backlog items.
 - [x] **Sandbox Journey Mapping Across 8 Roles (`docs/SANDBOX_JOURNEY_MAP.md`):** Complete intended experience design defining the 3-step cognitive onboarding sequence (Grounding, Anchoring, Proof), detailed 8-role journey blueprints (Trainer, Evaluator, Legislator, New Caregiver, Kinship Caregiver, Respite Provider, DCF Worker, Candy), and 6-screen taxonomy (Orientation, Launch, Training, Validation, Review, Administrative). Development freeze strictly preserved.
 - [x] **Sandbox Mental Model Decision (`docs/SANDBOX_MENTAL_MODEL_DECISION.md`):** Authoritatively resolved conceptual contradiction. Established Candy as Evaluator/Demonstrator (Meta-Layer); classified Founder Overview as an Evaluation Tool & Demonstration Vantage Point; decoupled 5 concepts (Gateway, Mission Control, Training Hub, Persona Launcher, Review Mode) into explicit non-overlapping layers.
+- [x] **Mental Model Enforcement Review (`docs/MENTAL_MODEL_ENFORCEMENT_BACKLOG.md`):** Complete UI audit against the 5 canonical layers. Cataloged 6 conceptual collisions (Review Mode/Persona Launcher modal conflation, Mission Control acting as gateway, raw alert tours, Training Hub duplicate persona stack, reference pills cluttering clinical binders, and Founder mode switch). Formulated 6 surgical enforcement tickets (4 P0, 2 P1) with 0 UI churn.
 
 ---
 
@@ -605,7 +607,34 @@ All 16 core functional areas were verified operational in the local sandbox:
 
 ---
 
-## 12. Maintenance Protocol (Founder Home Mandate)
+## 12. Mental Model Enforcement Ledger
+
+### Enforcement Summary
+- **Auditor:** Founder Operating System Layer Alignment Audit
+- **Date:** 2026-10-16
+- **Result:** **PASS (6 Layer Collisions Cataloged • 4 P0, 2 P1 Tickets Ready)**
+- **Governing Specification:** [`MENTAL_MODEL_ENFORCEMENT_BACKLOG.md`](MENTAL_MODEL_ENFORCEMENT_BACKLOG.md)
+- **Constraint Preserved:** Strict Development Freeze honored (0 code/UI churn).
+
+### The 6 Conceptual Collisions Identified
+1. **Flag 1: Review Mode looks like Persona Launching:** `#founderReviewModal` merges Director tools and in-flight persona switching into one modal titled `PERSONA LAUNCHER • Review Mode`.
+2. **Flag 2: Mission Control acts like a Gateway:** Slogans and orientation tours usurp the caregiver's daily dashboard, creating 35+ competing buttons and hiding the placed child.
+3. **Flag 3: Gateway acts like Training:** Quick start orientation buttons trigger raw browser `window.alert(...)` stubs instead of styled guided tours.
+4. **Flag 4: Training Hub duplicates Persona Launcher:** Stacks a 5-card dark gradient launcher on top of a 4-card training module on the same screen without curriculum progression.
+5. **Flag 5: Operations look like Training:** Reference guide pills ("Profiles of Caregivers", "System Help") sit permanently above daily clinical and care charting.
+6. **Flag 6: Founder Overview appears as a training role:** Founder card appears in the launcher; clicking it flips mode from `sample` to `local`, exiting the synthetic sandbox.
+
+### Prioritized Enforcement Action Tickets
+- **MME-01 (P0):** Disentangle Review Mode from Persona Launcher (Split `#founderReviewModal` into `#personaLauncherModal` and `#reviewModeConsoleModal`).
+- **MME-02 (P0):** Remove Founder Overview from Persona Launcher & Training Catalog; relocate to Review Mode Console as `Executive Overview & System Audit`.
+- **MME-03 (P0):** Create Dedicated Sandbox Gateway & Strip Gateway Bloat from Mission Control (3 Doors: Tour, Role, Capabilities).
+- **MME-04 (P0):** Anchor Active Child in Top Sticky Header on 100% of screens (visible and selectable on Mission Control).
+- **MME-05 (P1):** Reorganize Training Hub into 4 Sequential Curriculum Tabs (Orientation, Role Catalog, Scenarios, Competencies); eliminate duplicate persona stack.
+- **MME-06 (P1):** Clean Operational Workspaces of Meta & Demo Clutter (Remove `Review Mode` from dock; move reference buttons to Help drawer).
+
+---
+
+## 13. Maintenance Protocol (Founder Home Mandate)
 
 > **PRIMARY PROJECT HOME:** `FOUNDER_ORIENTATION_DASHBOARD.md` and `PROJECT_STATE.md` are the single source of truth.
 >
