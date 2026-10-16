@@ -28,6 +28,7 @@ You are standing in **Sprout v3.2 Mental Model Enforced (Sprint Complete)**.
 - **Sandbox Mental Model Decision Canonical Standard Enforced:** All 5 layers (Review Mode, Sandbox Gateway, Persona Launcher, Mission Control, Training Hub) are rigorously separated in UI and behavior.
 - **Concept Governance Register Established (Authoritative Semantic Standard):** Created [`CONCEPT_GOVERNANCE_REGISTER.md`](CONCEPT_GOVERNANCE_REGISTER.md) defining canonical categories.
 - **Drift Accountability Review Completed (Authoritative Foundation Truth):** Created [`DRIFT_ACCOUNTABILITY_REPORT.md`](DRIFT_ACCOUNTABILITY_REPORT.md) answering *"Why are we having the same conversation repeatedly?"*. Pruned taxonomy down to 3 real software decisions (ROLE, WORKSPACE, STATE), retired AUDIENCE, PURPOSE, and WORKFLOW from software governance, confirmed the reality of the 7 figures, and locked **The 10 Things Every Future AI Must Never Forget**.
+- **Trainer Validation Requirement & Video Walkthrough Audit (Reality Reconciled):** Created [`TRAINER_VALIDATION_REQUIREMENT.md`](TRAINER_VALIDATION_REQUIREMENT.md) based on video review (`Recording 2026-10-16 185103.mp4`). Documented Defects D-001 (PII Shield), D-002 (Dead State Lockout), D-003 (Parent Contamination) and established the **Two-Dataset Architecture** (Dataset A: Day 1 Onboarding vs. Dataset B: 90-Day Established) across Foster, Kinship, Parent, and Respite.
 
 ---
 
