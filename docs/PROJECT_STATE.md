@@ -29,7 +29,7 @@
 | **Sandbox Orientation Review** | **CONDITIONAL PASS (P0 Backlog Prioritized)** | [`SANDBOX_ORIENTATION_REPORT.md`](SANDBOX_ORIENTATION_REPORT.md) | 4 Special Items & 11 Backlog Items Audited |
 | **Sandbox Journey Mapping** | **PASS (8/8 Roles Mapped, Taxonomy Defined)** | [`SANDBOX_JOURNEY_MAP.md`](SANDBOX_JOURNEY_MAP.md) | 3-Step Sequence & 6 Archetypes |
 | **Sandbox Mental Model Decision** | **RESOLVED & ALIGNED (Meta vs Practice)** | [`SANDBOX_MENTAL_MODEL_DECISION.md`](SANDBOX_MENTAL_MODEL_DECISION.md) | Founder Removed from Personas |
-| **Mental Model Enforcement** | **AUDITED & BACKLOGGED (4 P0, 2 P1)** | [`MENTAL_MODEL_ENFORCEMENT_BACKLOG.md`](MENTAL_MODEL_ENFORCEMENT_BACKLOG.md) | 6 UI Layer Collisions Cataloged |
+| **Mental Model Enforcement** | **ENFORCED & VERIFIED (MME-01 through MME-04)** | [`MENTAL_MODEL_ENFORCEMENT_BACKLOG.md`](MENTAL_MODEL_ENFORCEMENT_BACKLOG.md) | 4 P0 Tickets Implemented & 178 Tests Passing |
 
 ---
 
@@ -37,6 +37,7 @@
 
 ### ✅ Complete (Production Ready)
 - [x] **Foundational Strategic Constitution:** Redefined Sprout as Child & Family Success Operating System.
+- [x] **Mental Model Enforcement Sprint (P0 Scope Complete):** Disentangled Review Mode (Director Console) from Persona Launcher (Simulator Rig); quarantined Founder from practice roles; created dedicated Gateway Airlock (3 Doors) on Mission Control; permanently anchored Active Child in sticky header on 100% of screens.
 - [x] **Four Data Sovereignty Domains:** `child`, `case`, `caregiver`, `parent` domains segregated.
 - [x] **5-Level Note Classification Hierarchy:** `legacy_unreviewed`, `private`, `working`, `official`, `shared_family`.
 - [x] **High-Conflict Mode Model:** Masking rules for addresses, E911 coords, and school physical locations.

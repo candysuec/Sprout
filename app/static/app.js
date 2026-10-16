@@ -362,8 +362,8 @@ async function loadChildren() {
       if (childrenList.length === 0) {
         const opt = document.createElement('option');
         opt.value = '';
-        opt.textContent = 'No Children In Care';
-        opt.className = 'bg-slate-800 text-white';
+        opt.textContent = 'None Placed';
+        opt.className = 'bg-slate-800 text-slate-400 italic';
         select.appendChild(opt);
       } else {
         childrenList.forEach((ch) => {
@@ -371,7 +371,8 @@ async function loadChildren() {
           opt.value = ch.id;
           opt.className = 'bg-slate-800 text-white font-bold';
           const initials = ch.alias || _initials(ch.first_name, ch.last_name) || 'CD';
-          opt.textContent = initials;
+          const name = ch.first_name ? `${initials} (${ch.first_name})` : initials;
+          opt.textContent = name;
           select.appendChild(opt);
         });
       }
@@ -385,10 +386,32 @@ async function loadChildren() {
       }
     }
 
+    updatePlacedChildBadge();
     renderChildSnapshot();
     loadTabContent();
   } catch (err) {
     console.error('Failed to load children:', err);
+  }
+}
+
+function updatePlacedChildBadge() {
+  const badgeEl = document.getElementById('placedChildEpisodeBadge');
+  const navInitialsEl = document.getElementById('navPlacedChildInitials');
+  const activeChild = childrenList.find(c => c.id === currentChildId);
+
+  if (activeChild) {
+    const initials = activeChild.alias || _initials(activeChild.first_name, activeChild.last_name) || 'CD';
+    if (navInitialsEl) navInitialsEl.textContent = initials;
+    if (badgeEl) {
+      badgeEl.textContent = activeChild.status || 'Active Placed';
+      badgeEl.className = 'hidden sm:inline-flex text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 uppercase';
+    }
+  } else {
+    if (navInitialsEl) navInitialsEl.textContent = 'None';
+    if (badgeEl) {
+      badgeEl.textContent = 'None Placed';
+      badgeEl.className = 'hidden sm:inline-flex text-[9px] font-bold px-2 py-0.5 rounded-full bg-slate-700/50 text-slate-400 border border-slate-600 uppercase';
+    }
   }
 }
 
@@ -397,6 +420,7 @@ function onChildChange() {
   if (select && select.value) {
     currentChildId = parseInt(select.value);
   }
+  updatePlacedChildBadge();
   renderChildSnapshot();
   loadTabContent();
 }
@@ -5989,7 +6013,7 @@ async function renderTrainingSimulatorView(container) {
         </div>
       </div>
 
-      <!-- PRIMARY PERSONA LAUNCHER: 5 GUIDED TRAINING & REVIEW PERSONAS -->
+      <!-- PRIMARY PERSONA LAUNCHER: 4 GUIDED PRACTICE PERSONAS -->
       <div id="trainingPersonaLauncher" class="bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 rounded-3xl p-6 text-white shadow-xl border-2 border-emerald-500/80 space-y-5">
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-700 pb-4">
           <div class="flex items-center gap-3">
@@ -5998,55 +6022,32 @@ async function renderTrainingSimulatorView(container) {
             </div>
             <div>
               <div class="flex items-center gap-2">
-                <h3 class="text-lg sm:text-xl font-black text-white tracking-tight">PERSONA LAUNCHER</h3>
+                <h3 class="text-lg sm:text-xl font-black text-white tracking-tight">PRACTICE SIMULATOR ROLES</h3>
                 <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/30 text-emerald-300 border border-emerald-400/50">
-                  5 Guided Review Paths
+                  4 Authentic Practice Paths
                 </span>
               </div>
-              <p class="text-xs text-slate-300">Select any training persona below to immediately launch their complete workflow with 1 click.</p>
+              <p class="text-xs text-slate-300">Select any simulated practice role below to experience Sprout through their specific care perspective.</p>
             </div>
           </div>
-          <button onclick="openFounderReviewModal()" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black rounded-xl text-xs transition shadow-md flex items-center gap-2 shrink-0 cursor-pointer">
-            <i data-lucide="sparkles" class="w-4 h-4"></i>
-            <span>Quick Launcher Modal</span>
+          <button onclick="openPersonaLauncherModal()" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black rounded-xl text-xs transition shadow-md flex items-center gap-2 shrink-0 cursor-pointer">
+            <i data-lucide="users" class="w-4 h-4"></i>
+            <span>Persona Launcher Modal</span>
           </button>
         </div>
 
-        <!-- 5 Personas Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <!-- 1. Founder Overview -->
-          <div class="bg-slate-800/90 border-2 border-emerald-500/80 rounded-2xl p-4.5 transition flex flex-col justify-between gap-3 shadow-md hover:border-emerald-400">
-            <div>
-              <div class="flex items-center justify-between mb-1.5">
-                <span class="text-xs font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
-                  <i data-lucide="compass" class="w-4 h-4"></i> 1. Founder Overview
-                </span>
-                <span class="text-[10px] font-bold bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full">Primary Home</span>
-              </div>
-              <p class="text-xs text-slate-300 leading-snug">Review high-level system status, children in care, household licensing, and command center priorities.</p>
-              <div class="mt-2.5 flex flex-wrap gap-1.5 text-[11px] text-slate-400">
-                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Project Status</span>
-                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Children</span>
-                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Households</span>
-                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Dashboard</span>
-              </div>
-            </div>
-            <button onclick="launchPersonaReview('founder')" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
-              <span>Launch Founder View</span>
-              <i data-lucide="arrow-right" class="w-4 h-4"></i>
-            </button>
-          </div>
-
-          <!-- 2. Foster Caregiver -->
+        <!-- 4 Personas Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- 1. Foster Caregiver -->
           <div class="bg-slate-800/90 border border-blue-500/70 rounded-2xl p-4.5 transition flex flex-col justify-between gap-3 shadow-md hover:border-blue-400">
             <div>
               <div class="flex items-center justify-between mb-1.5">
                 <span class="text-xs font-black uppercase tracking-wider text-blue-400 flex items-center gap-1.5">
-                  <i data-lucide="heart-handshake" class="w-4 h-4"></i> 2. Foster Caregiver
+                  <i data-lucide="heart-handshake" class="w-4 h-4"></i> 1. Foster Caregiver
                 </span>
                 <span class="text-[10px] font-bold bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full">Routine Care</span>
               </div>
-              <p class="text-xs text-slate-300 leading-snug">Experience 5-click late-night intake, 15-second daily routine logging, and 1-click DCF monthly report generation.</p>
+              <p class="text-xs text-slate-300 leading-snug">Sarah Jenkins (HH-101): Experience 5-click late-night intake, 15-second routine logging, and 1-click DCF monthly report generation.</p>
               <div class="mt-2.5 flex flex-wrap gap-1.5 text-[11px] text-slate-400">
                 <span class="px-2 py-0.5 bg-slate-900 rounded-md">Emergency Placement</span>
                 <span class="px-2 py-0.5 bg-slate-900 rounded-md">Daily 15s Log</span>
@@ -6054,21 +6055,21 @@ async function renderTrainingSimulatorView(container) {
               </div>
             </div>
             <button onclick="launchPersonaReview('foster')" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
-              <span>Launch Foster Caregiver View</span>
+              <span>Launch Foster Role</span>
               <i data-lucide="arrow-right" class="w-4 h-4"></i>
             </button>
           </div>
 
-          <!-- 3. Kinship Caregiver -->
+          <!-- 2. Kinship Caregiver -->
           <div class="bg-slate-800/90 border border-teal-500/70 rounded-2xl p-4.5 transition flex flex-col justify-between gap-3 shadow-md hover:border-teal-400">
             <div>
               <div class="flex items-center justify-between mb-1.5">
                 <span class="text-xs font-black uppercase tracking-wider text-teal-400 flex items-center gap-1.5">
-                  <i data-lucide="users-2" class="w-4 h-4"></i> 3. Kinship Caregiver
+                  <i data-lucide="users-2" class="w-4 h-4"></i> 2. Kinship Caregiver
                 </span>
                 <span class="text-[10px] font-bold bg-teal-500/20 text-teal-300 px-2 py-0.5 rounded-full">Relative Care</span>
               </div>
-              <p class="text-xs text-slate-300 leading-snug">Plain-English Fast-Track Guide for grandparents/relatives: emergency cash benefits triage, consent paperwork, and jargon decoder.</p>
+              <p class="text-xs text-slate-300 leading-snug">Eleanor & Arthur Vance (HH-113): Plain-English Fast-Track Guide for grandparents: cash benefits triage, consent paperwork, and jargon decoder.</p>
               <div class="mt-2.5 flex flex-wrap gap-1.5 text-[11px] text-slate-400">
                 <span class="px-2 py-0.5 bg-slate-900 rounded-md">Fast Track Guide</span>
                 <span class="px-2 py-0.5 bg-slate-900 rounded-md">Cash Benefits</span>
@@ -6076,21 +6077,21 @@ async function renderTrainingSimulatorView(container) {
               </div>
             </div>
             <button onclick="launchPersonaReview('kinship')" class="w-full py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
-              <span>Launch Kinship View</span>
+              <span>Launch Kinship Role</span>
               <i data-lucide="arrow-right" class="w-4 h-4"></i>
             </button>
           </div>
 
-          <!-- 4. Parent Participant -->
+          <!-- 3. Parent Participant -->
           <div class="bg-slate-800/90 border border-indigo-500/70 rounded-2xl p-4.5 transition flex flex-col justify-between gap-3 shadow-md hover:border-indigo-400">
             <div>
               <div class="flex items-center justify-between mb-1.5">
                 <span class="text-xs font-black uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
-                  <i data-lucide="heart" class="w-4 h-4"></i> 4. Parent Participant
+                  <i data-lucide="heart" class="w-4 h-4"></i> 3. Parent Participant
                 </span>
                 <span class="text-[10px] font-bold bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full">Reunification</span>
               </div>
-              <p class="text-xs text-slate-300 leading-snug">Dignity-first Parent Workspace: track case goals, 1-click on-time visit check-in, shared moments feed, and certificates vault.</p>
+              <p class="text-xs text-slate-300 leading-snug">Angela Davis: Dignity-first Parent Workspace: track case goals, 1-click on-time visit check-in, shared moments feed, and certificates vault.</p>
               <div class="mt-2.5 flex flex-wrap gap-1.5 text-[11px] text-slate-400">
                 <span class="px-2 py-0.5 bg-slate-900 rounded-md">Action Roadmap</span>
                 <span class="px-2 py-0.5 bg-slate-900 rounded-md">1-Click Check-in</span>
@@ -6099,21 +6100,34 @@ async function renderTrainingSimulatorView(container) {
               </div>
             </div>
             <button onclick="launchPersonaReview('parent')" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
-              <span>Launch Parent Workspace</span>
+              <span>Launch Parent Role</span>
               <i data-lucide="arrow-right" class="w-4 h-4"></i>
             </button>
           </div>
 
-          <!-- 5. Respite Provider -->
-          <div class="bg-slate-800/90 border border-rose-500/70 rounded-2xl p-4.5 transition flex flex-col justify-between gap-3 shadow-md hover:border-rose-400 md:col-span-2 lg:col-span-2">
+          <!-- 4. Respite Provider -->
+          <div class="bg-slate-800/90 border border-rose-500/70 rounded-2xl p-4.5 transition flex flex-col justify-between gap-3 shadow-md hover:border-rose-400">
             <div>
               <div class="flex items-center justify-between mb-1.5">
                 <span class="text-xs font-black uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
-                  <i data-lucide="shield-alert" class="w-4 h-4"></i> 5. Respite Provider
+                  <i data-lucide="shield-alert" class="w-4 h-4"></i> 4. Respite Provider
                 </span>
                 <span class="text-[10px] font-bold bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded-full">Weekend Care</span>
               </div>
-              <p class="text-xs text-slate-300 leading-snug">Concise emergency Care & Safety Sheet with allergy alerts, medication schedules, comforting bedtime routines, and emergency numbers in <30 seconds.</p>
+              <p class="text-xs text-slate-300 leading-snug">Samantha Price & Jordan Taylor (HH-112): Concise emergency Care & Safety Sheet with allergy alerts, medication schedules, and soothing bedtime routines.</p>
+              <div class="mt-2.5 flex flex-wrap gap-1.5 text-[11px] text-slate-400">
+                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Care Sheet</span>
+                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Routines</span>
+                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Contacts</span>
+              </div>
+            </div>
+            <button onclick="launchPersonaReview('respite')" class="w-full py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+              <span>Launch Respite Role</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
               <div class="mt-2.5 flex flex-wrap gap-1.5 text-[11px] text-slate-400">
                 <span class="px-2 py-0.5 bg-slate-900 rounded-md">Care & Safety Sheet</span>
                 <span class="px-2 py-0.5 bg-slate-900 rounded-md">Safety Information</span>
@@ -7079,50 +7093,137 @@ function generateTransitionPacket() {
 // ==============================================================================
 
 async function renderMissionControlView(container) {
-  container.innerHTML = `
-    <div class="space-y-8 animate-fadeIn pb-12">
+  const isSample = currentSproutMode === 'sample';
+  const activeChild = childrenList.find(c => c.id === currentChildId) || (childrenList.length > 0 ? childrenList[0] : null);
+  const activeChildName = activeChild ? (activeChild.preferred_name || `${activeChild.first_name || ''} ${activeChild.last_name || ''}`.trim() || activeChild.alias) : 'No Child Currently Placed';
+  const activeChildInitials = activeChild ? (activeChild.alias || _initials(activeChild.first_name, activeChild.last_name) || 'CD') : '--';
+  const activeChildStatus = activeChild ? (activeChild.status || 'Active Placement') : 'Household Standby';
+  const activeChildStatusBadgeClass = activeChild ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-slate-700/50 text-slate-400 border border-slate-600';
+  const activeChildPlacedText = activeChild ? `${activeChild.relationship_type || 'Foster Care'} • Goal: ${activeChild.permanency_goal || 'Reunification'}` : 'Ready for Placement Intake';
 
-      <!-- Mission Control Universal Safe Home Banner -->
-      <div class="bg-gradient-to-br from-emerald-950 via-slate-900 to-indigo-950 rounded-3xl p-6 sm:p-8 text-white shadow-xl border border-emerald-800/80 relative overflow-hidden">
-        <div class="absolute -right-10 -bottom-10 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="relative z-10 max-w-4xl space-y-4">
-          <div class="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full text-xs font-black uppercase tracking-wider">
-            <i data-lucide="compass" class="w-4 h-4 text-emerald-400"></i> Sprout Mission Control & Operating System
+  container.innerHTML = `
+    <div class="space-y-6 animate-fadeIn pb-12">
+
+      <!-- ===================================================================== -->
+      <!-- LAYER 2: SANDBOX GATEWAY AIRLOCK (SYNTHETIC SAFETY & 3 DOORS)         -->
+      <!-- ===================================================================== -->
+      ${isSample ? `
+      <div id="sandboxGatewayAirlock" class="bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 rounded-3xl p-6 sm:p-7 text-white shadow-xl border-2 border-blue-500/70 relative overflow-hidden space-y-5">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-blue-800/60 pb-4">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-500/20 text-blue-300 border border-blue-400/30 flex items-center gap-1">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-blue-400"></i> Sandbox Gateway • Layer 2
+              </span>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                100% Synthetic • Consequence-Free
+              </span>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">
+              Practice Sandbox Gateway
+            </h2>
+            <p class="text-xs text-blue-200 leading-relaxed max-w-2xl">
+              You are in the Sprout Practice Sandbox. All records and children are simulated. Explore without hesitation—nothing you click can harm real families, alter state records, or compromise privacy.
+            </p>
           </div>
-          <h1 class="text-3xl sm:text-4xl font-black tracking-tight text-white">
-            SPROUT
-          </h1>
-          <p class="text-emerald-300 text-sm font-bold uppercase tracking-wider">
-            Vermont Caregiver Operating System
-          </p>
-          <div class="flex flex-wrap items-center gap-4 text-xs font-bold text-slate-300 pt-1">
-            <span class="flex items-center gap-1.5 text-emerald-400"><i data-lucide="shield-check" class="w-4 h-4"></i> Protect Children.</span>
-            <span class="flex items-center gap-1.5 text-blue-400"><i data-lucide="feather" class="w-4 h-4"></i> Reduce Burden.</span>
-            <span class="flex items-center gap-1.5 text-amber-400"><i data-lucide="check-circle-2" class="w-4 h-4"></i> Stay Prepared.</span>
-          </div>
-          <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-3xl pt-1">
-            Welcome to your universal safe home. Whether you are a brand new foster parent, seasoned kinship grandmother, respite provider, state supervisor, or VCWTP instructor, this Mission Control Center guides your next action with zero confusion.
-          </p>
-          
-          <!-- Immediate 1-Tap Quick Action Row -->
-          <div class="pt-3 flex flex-wrap items-center gap-3">
-            <button onclick="launchQuickStartTour(5)" class="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs shadow-md transition flex items-center gap-2">
-              <i data-lucide="zap" class="w-4 h-4"></i>
-              <span>5-Minute New User Orientation</span>
-            </button>
-            <button onclick="openSystemHelpModal()" class="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-xs border border-white/20 transition flex items-center gap-2">
-              <i data-lucide="book-open" class="w-4 h-4 text-emerald-300"></i>
-              <span>How Sprout Works Center</span>
-            </button>
-            <button onclick="switchMainSection('dashboard')" class="px-4 py-2.5 bg-emerald-900/80 hover:bg-emerald-800 text-emerald-100 font-bold rounded-xl text-xs border border-emerald-600/60 transition flex items-center gap-2">
-              <i data-lucide="sun" class="w-4 h-4 text-emerald-300"></i>
-              <span>Open Today's Priorities</span>
+          <div class="flex items-center gap-2 shrink-0">
+            <button onclick="openReviewModeConsoleModal()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs border border-slate-700 transition flex items-center gap-1.5 cursor-pointer" title="Open Director Review Console">
+              <i data-lucide="compass" class="w-3.5 h-3.5 text-emerald-400"></i>
+              <span>Director Console</span>
             </button>
           </div>
         </div>
+
+        <!-- The Three Doorways (Door A, Door B, Door C) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+          <!-- Door A: 5-Minute Tour -->
+          <div onclick="launchQuickStartTour(5)" class="bg-blue-900/40 hover:bg-blue-900/70 border border-blue-600/50 hover:border-blue-400 p-4 rounded-2xl cursor-pointer transition flex flex-col justify-between gap-3 shadow-sm group">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[10px] font-black uppercase tracking-wider text-blue-300 bg-blue-500/20 px-2 py-0.5 rounded-md">Door A • 5 Mins</span>
+                <i data-lucide="zap" class="w-4 h-4 text-amber-400 group-hover:scale-110 transition"></i>
+              </div>
+              <h3 class="font-bold text-white text-xs">5-Minute Guided Tour</h3>
+              <p class="text-[11px] text-blue-200/80 leading-snug mt-1">For stakeholders, donors, and first-time guests. See how Sprout eliminates caregiver friction in 4 clicks.</p>
+            </div>
+            <div class="text-[11px] font-black text-blue-300 flex items-center gap-1 group-hover:text-white transition">
+              <span>Launch Tour</span>
+              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </div>
+          </div>
+
+          <!-- Door B: Practice Role -->
+          <div onclick="openPersonaLauncherModal()" class="bg-emerald-950/40 hover:bg-emerald-950/70 border border-emerald-600/50 hover:border-emerald-400 p-4 rounded-2xl cursor-pointer transition flex flex-col justify-between gap-3 shadow-sm group">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[10px] font-black uppercase tracking-wider text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-md">Door B • Trainee</span>
+                <i data-lucide="users" class="w-4 h-4 text-emerald-400 group-hover:scale-110 transition"></i>
+              </div>
+              <h3 class="font-bold text-white text-xs">Choose a Practice Role</h3>
+              <p class="text-[11px] text-emerald-200/80 leading-snug mt-1">Step into the shoes of Sarah (Foster), Eleanor (Kinship), Angela (Parent), or Samantha (Respite).</p>
+            </div>
+            <div class="text-[11px] font-black text-emerald-300 flex items-center gap-1 group-hover:text-white transition">
+              <span>Open Role Rig</span>
+              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </div>
+          </div>
+
+          <!-- Door C: System Capabilities -->
+          <div onclick="switchMainSection('training')" class="bg-indigo-950/40 hover:bg-indigo-950/70 border border-indigo-600/50 hover:border-indigo-400 p-4 rounded-2xl cursor-pointer transition flex flex-col justify-between gap-3 shadow-sm group">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[10px] font-black uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-md">Door C • Evaluator</span>
+                <i data-lucide="graduation-cap" class="w-4 h-4 text-indigo-400 group-hover:scale-110 transition"></i>
+              </div>
+              <h3 class="font-bold text-white text-xs">Explore Flight School</h3>
+              <p class="text-[11px] text-indigo-200/80 leading-snug mt-1">For supervisors and instructors. Review formal VCWTP competencies, scenario drills, and 15 model homes.</p>
+            </div>
+            <div class="text-[11px] font-black text-indigo-300 flex items-center gap-1 group-hover:text-white transition">
+              <span>Open Training Hub</span>
+              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      ` : ''}
+
+      <!-- ===================================================================== -->
+      <!-- LAYER 4: ACTIVE PLACED CHILD COCKPIT HEADER                           -->
+      <!-- ===================================================================== -->
+      <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-3.5">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-700 text-white font-black text-base flex items-center justify-center shrink-0 shadow-sm">
+            ${activeChildInitials}
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-base font-extrabold text-slate-900">
+                ${activeChildName}
+              </h2>
+              <span class="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full ${activeChildStatusBadgeClass}">
+                ${activeChildStatus}
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">
+              Caregiver Household: <strong class="text-slate-800">${activeCaregiverUser || 'Select Caregiver'}</strong> • Placement: <strong class="text-slate-800">${activeChildPlacedText}</strong>
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 w-full sm:w-auto shrink-0">
+          <button onclick="switchMainSection('children')" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer">
+            <i data-lucide="user" class="w-3.5 h-3.5 text-slate-600"></i>
+            <span>Child Profile</span>
+          </button>
+          <button onclick="switchMainSection('dashboard')" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl text-xs shadow-sm transition flex items-center gap-1.5 cursor-pointer">
+            <i data-lucide="sun" class="w-3.5 h-3.5"></i>
+            <span>Today's Priorities</span>
+          </button>
+        </div>
       </div>
 
-      <!-- P0-1: MISSION CONTROL QUICK ACTION DOCK (PERMANENT VISIBILITY) -->
+      <!-- ===================================================================== -->
+      <!-- P0-1: MISSION CONTROL QUICK ACTION DOCK (6 CANONICAL ACTIONS ONLY)   -->
+      <!-- ===================================================================== -->
       <div class="bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 rounded-3xl p-5 shadow-xl border border-emerald-600/70 flex flex-col md:flex-row items-center justify-between gap-4">
         <div class="flex items-center gap-3">
           <div class="p-3 bg-emerald-500/20 text-emerald-300 rounded-2xl border border-emerald-400/30 shrink-0">
@@ -7131,37 +7232,33 @@ async function renderMissionControlView(container) {
           <div>
             <h3 class="text-white font-black text-base flex items-center gap-2">
               Mission Control Quick Action Dock
-              <span class="text-[10px] font-bold bg-emerald-500/30 text-emerald-300 px-2.5 py-0.5 rounded-full border border-emerald-400/40 uppercase tracking-wide">1-Tap Action</span>
+              <span class="text-[10px] font-bold bg-emerald-500/30 text-emerald-300 px-2.5 py-0.5 rounded-full border border-emerald-400/40 uppercase tracking-wide">Daily Care</span>
             </h3>
-            <p class="text-xs text-emerald-200/80">Log routine events, launch emergency placement intake, open babysitter sheets, access kinship guides, or close placements.</p>
+            <p class="text-xs text-emerald-200/80">Everyday caregiver actions: 15-second logs, intake wizard, emergency handoff, kinship guide, case closure, monthly export.</p>
           </div>
         </div>
         <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto shrink-0">
-          <button onclick="openFounderReviewModal()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer" title="Reopen Founder Review Mode & Switch Personas">
-            <i data-lucide="play-circle" class="w-4 h-4 text-slate-950"></i>
-            <span>Review Mode</span>
-          </button>
-          <button onclick="openRecordModal()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5" title="Log a routine observation in 15 seconds">
+          <button onclick="openRecordModal()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer" title="Log a routine observation in 15 seconds">
             <i data-lucide="plus-circle" class="w-4 h-4"></i>
             <span>+ 15-Sec Log</span>
           </button>
-          <button onclick="openEmergencyPlacementWizard()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-rose-700 hover:bg-rose-600 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5" title="Launch 5-Step Guided Emergency Placement Wizard (Basics, Meds, Contacts, Soothing, Care Sheet)">
+          <button onclick="openEmergencyPlacementWizard()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-rose-700 hover:bg-rose-600 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer" title="Launch 5-Step Guided Emergency Placement Wizard">
             <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-300"></i>
             <span>Emergency Intake</span>
           </button>
-          <button onclick="openEmergencyHandoffCard()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5" title="Print/View 1-Click Care & Safety Sheet for Babysitter, Doctor, or Crisis ER">
+          <button onclick="openEmergencyHandoffCard()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer" title="Print/View 1-Click Care & Safety Sheet for Babysitter, Doctor, or Crisis ER">
             <i data-lucide="shield-alert" class="w-4 h-4"></i>
             <span>Care Sheet</span>
           </button>
-          <button onclick="openKinshipFastTrackModal()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-teal-800 hover:bg-teal-700 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5" title="Open Plain-English Kinship Fast-Track Guide (Benefits, Paperwork, Jargon Decoder)">
+          <button onclick="openKinshipFastTrackModal()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-teal-800 hover:bg-teal-700 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer" title="Open Plain-English Kinship Fast-Track Guide">
             <i data-lucide="compass" class="w-4 h-4 text-teal-300"></i>
             <span>Kinship Guide</span>
           </button>
-          <button onclick="openPermanencyHandoverWizard()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-indigo-700 hover:bg-indigo-600 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5" title="Launch 5-Step Permanency & Handover Wizard (Lifebook, Parent Access, Placement Closure, Zero-Data-Loss Archive)">
+          <button onclick="openPermanencyHandoverWizard()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-indigo-700 hover:bg-indigo-600 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer" title="Launch 5-Step Permanency & Handover Wizard">
             <i data-lucide="flag" class="w-4 h-4 text-indigo-300"></i>
             <span>Case Closure</span>
           </button>
-          <button onclick="quickExportThisMonth()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-cyan-700 hover:bg-cyan-600 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5" title="Generate and download current month's official DCF progress report (.docx)">
+          <button onclick="quickExportThisMonth()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-cyan-700 hover:bg-cyan-600 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer" title="Generate and download current month's official DCF progress report (.docx)">
             <i data-lucide="file-down" class="w-4 h-4"></i>
             <span>Export Month</span>
           </button>
@@ -7176,10 +7273,10 @@ async function renderMissionControlView(container) {
               <i data-lucide="layout-grid" class="w-5 h-5 text-emerald-700"></i>
               WHAT WOULD YOU LIKE TO DO TODAY?
             </h2>
-            <p class="text-xs text-slate-500">Select a quadrant below to immediately launch the targeted workflow.</p>
+            <p class="text-xs text-slate-500">Select a core workspace quadrant to enter your targeted operational area.</p>
           </div>
           <span class="text-[11px] font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full border border-slate-200">
-            Self-Guiding Interaction Model
+            Core Workspaces
           </span>
         </div>
 
@@ -7196,27 +7293,19 @@ async function renderMissionControlView(container) {
               </div>
               <h3 class="font-extrabold text-slate-900 text-sm">Practice & Simulation</h3>
               <p class="text-xs text-slate-500 leading-relaxed">
-                Consequence-free flight simulator for new foster parents, kin, and instructors.
+                Consequence-free flight simulator for foster parents, kin, and state instructors.
               </p>
               <div class="space-y-1.5 pt-1 text-xs">
                 <button onclick="switchMainSection('training')" class="w-full text-left p-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-950 font-bold transition flex items-center justify-between">
                   <span>▶ Training Hub</span>
                   <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-blue-600"></i>
                 </button>
-                <button onclick="toggleSproutWorkspaceMode()" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
-                  <span>▶ Practice Sandbox</span>
-                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
-                </button>
-                <button onclick="switchMainSection('training')" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
-                  <span>▶ Scenario Simulations</span>
+                <button onclick="openPersonaLauncherModal()" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
+                  <span>▶ Switch Practice Role</span>
                   <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
                 </button>
                 <button onclick="openCaregiverProfilesModal()" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
                   <span>▶ 15 Model Households</span>
-                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
-                </button>
-                <button onclick="launchTrainerDemoLauncher()" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
-                  <span>▶ Instructor Demonstrations</span>
                   <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
                 </button>
               </div>
@@ -7252,14 +7341,6 @@ async function renderMissionControlView(container) {
                   <span>▶ Care Binder (20 Tabs)</span>
                   <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
                 </button>
-                <button onclick="switchMainSection('relationships')" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
-                  <span>▶ Circles of Care</span>
-                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
-                </button>
-                <button onclick="switchMainSection('life_journey')" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
-                  <span>▶ Life Journey Storybook</span>
-                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
-                </button>
               </div>
             </div>
             <button onclick="switchMainSection('dashboard')" class="w-full py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-2xs transition">
@@ -7285,20 +7366,12 @@ async function renderMissionControlView(container) {
                   <span>▶ DCF Command Center</span>
                   <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-indigo-600"></i>
                 </button>
-                <button onclick="switchMainSection('reports')" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
-                  <span>▶ Court Preparation (.docx)</span>
-                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
-                </button>
                 <button onclick="switchTab('expenses')" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
                   <span>▶ Mileage Claims (FS-334B)</span>
                   <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
                 </button>
                 <button onclick="switchChildTab('chins')" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
                   <span>▶ CHINS Timeline Stepper</span>
-                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
-                </button>
-                <button onclick="switchMainSection('households')" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
-                  <span>▶ 12 District Directory</span>
                   <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
                 </button>
               </div>
@@ -7330,14 +7403,6 @@ async function renderMissionControlView(container) {
                   <span>▶ Interactive Site Map</span>
                   <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
                 </button>
-                <button onclick="openProcessFlowsModal()" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
-                  <span>▶ Visual Process Flows</span>
-                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
-                </button>
-                <button onclick="openDecisionTreesModal()" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
-                  <span>▶ Decision Trees</span>
-                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
-                </button>
                 <button onclick="switchMainSection('settings')" class="w-full text-left p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold transition flex items-center justify-between">
                   <span>▶ Audit & Settings</span>
                   <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
@@ -7352,121 +7417,164 @@ async function renderMissionControlView(container) {
         </div>
       </div>
 
-      <!-- ROLE-BASED USER JOURNEY SELECTOR (Which experience applies to me?) -->
-      <div class="bg-gradient-to-br from-slate-50 to-emerald-50/50 rounded-3xl border border-emerald-200 p-6 space-y-4">
-        <div class="flex items-center justify-between border-b border-emerald-200/60 pb-3">
-          <div>
-            <h3 class="font-black text-slate-900 text-base flex items-center gap-2">
-              <i data-lucide="map-pin" class="w-5 h-5 text-emerald-700"></i>
-              WHICH EXPERIENCE APPLIES TO YOU? (Guided Pathways)
-            </h3>
-            <p class="text-xs text-slate-600">Select your role to view your tailored learning path, primary workflows, and daily actions.</p>
-          </div>
-          <span class="text-xs font-bold text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full">
-            7 Specialized Journeys
-          </span>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-          <!-- Role 1: New Foster Parent -->
-          <div onclick="openUserJourneyDetailModal('foster')" class="bg-white p-4 rounded-2xl border border-slate-200 hover:border-emerald-500 cursor-pointer transition shadow-2xs space-y-1.5">
-            <span class="text-[10px] font-black uppercase text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">Foster Home</span>
-            <h4 class="font-bold text-slate-900 text-xs">New Foster Parent</h4>
-            <p class="text-[11px] text-slate-500">Intake logging, 30-day health clock, daily observations, and medication records.</p>
-          </div>
-
-          <!-- Role 2: Kinship Caregiver -->
-          <div onclick="openUserJourneyDetailModal('kinship')" class="bg-white p-4 rounded-2xl border border-slate-200 hover:border-emerald-500 cursor-pointer transition shadow-2xs space-y-1.5">
-            <span class="text-[10px] font-black uppercase text-teal-700 bg-teal-50 px-2 py-0.5 rounded">Kinship / Grandparent</span>
-            <h4 class="font-bold text-slate-900 text-xs">Kinship Caregiver</h4>
-            <p class="text-[11px] text-slate-500">Relative search documentation, guardianship petitions, and family time tracking.</p>
-          </div>
-
-          <!-- Role 3: Respite Provider -->
-          <div onclick="openUserJourneyDetailModal('respite')" class="bg-white p-4 rounded-2xl border border-slate-200 hover:border-emerald-500 cursor-pointer transition shadow-2xs space-y-1.5">
-            <span class="text-[10px] font-black uppercase text-purple-700 bg-purple-50 px-2 py-0.5 rounded">Respite Care</span>
-            <h4 class="font-bold text-slate-900 text-xs">Respite Provider</h4>
-            <p class="text-[11px] text-slate-500">Weekend care, allergy/routine alerts, transport signatures, and privacy-shielded binder.</p>
-          </div>
-
-          <!-- Role 4: Adoptive Placement -->
-          <div onclick="openUserJourneyDetailModal('adoptive')" class="bg-white p-4 rounded-2xl border border-slate-200 hover:border-emerald-500 cursor-pointer transition shadow-2xs space-y-1.5">
-            <span class="text-[10px] font-black uppercase text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">Permanency</span>
-            <h4 class="font-bold text-slate-900 text-xs">Adoptive Placement</h4>
-            <p class="text-[11px] text-slate-500">Child Lifebook preservation, permanency court packets, and subsidy records.</p>
-          </div>
-
-          <!-- Role 5: State Trainer / Instructor -->
-          <div onclick="openUserJourneyDetailModal('trainer')" class="bg-white p-4 rounded-2xl border border-slate-200 hover:border-emerald-500 cursor-pointer transition shadow-2xs space-y-1.5">
-            <span class="text-[10px] font-black uppercase text-blue-700 bg-blue-50 px-2 py-0.5 rounded">VCWTP Instructor</span>
-            <h4 class="font-bold text-slate-900 text-xs">Trainer / Instructor</h4>
-            <p class="text-[11px] text-slate-500">10-minute cohort demonstration, 15 model homes, and crisis simulations.</p>
-          </div>
-
-          <!-- Role 6: DCF Caseworker / Supervisor -->
-          <div onclick="openUserJourneyDetailModal('supervisor')" class="bg-white p-4 rounded-2xl border border-slate-200 hover:border-emerald-500 cursor-pointer transition shadow-2xs space-y-1.5">
-            <span class="text-[10px] font-black uppercase text-amber-700 bg-amber-50 px-2 py-0.5 rounded">State Worker</span>
-            <h4 class="font-bold text-slate-900 text-xs">DCF Supervisor</h4>
-            <p class="text-[11px] text-slate-500">Reviewing pre-scrubbed caregiver court summaries and FS-334B claim validity.</p>
-          </div>
-
-          <!-- Role 7: Emergency Placement -->
-          <div onclick="openUserJourneyDetailModal('emergency')" class="bg-white p-4 rounded-2xl border border-slate-200 hover:border-emerald-500 cursor-pointer transition shadow-2xs space-y-1.5">
-            <span class="text-[10px] font-black uppercase text-rose-700 bg-rose-50 px-2 py-0.5 rounded">Urgent 24/7</span>
-            <h4 class="font-bold text-slate-900 text-xs">Emergency Intake</h4>
-            <p class="text-[11px] text-slate-500">11:00 PM rapid child profile, emergency handoff card, and 24/7 crisis numbers.</p>
-          </div>
-
-          <!-- Guided Tour Launcher Card -->
-          <div onclick="launchQuickStartTour(15)" class="bg-emerald-600 text-white p-4 rounded-2xl cursor-pointer hover:bg-emerald-700 transition shadow-sm space-y-1.5 flex flex-col justify-between">
-            <div>
-              <span class="text-[10px] font-black uppercase bg-white/20 text-white px-2 py-0.5 rounded">Self-Teaching</span>
-              <h4 class="font-bold text-white text-xs mt-1">15-Min Guided Tour</h4>
-              <p class="text-[11px] text-emerald-100">Step-by-step interactive walkthrough of all 4 cognitive domains.</p>
-            </div>
-            <span class="text-[11px] font-black flex items-center gap-1 text-emerald-200">Start Tour <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></span>
-          </div>
-        </div>
-      </div>
-
     </div>
   `;
 
   lucide.createIcons();
 }
 
+// In-App Sandbox Information & Tour Modal Handlers
+function showSandboxInfoModal(title, htmlContent, iconName = 'info') {
+  const modal = document.getElementById('sandboxInfoModal');
+  const titleEl = document.getElementById('sandboxInfoTitle');
+  const contentEl = document.getElementById('sandboxInfoContent');
+  const iconEl = document.getElementById('sandboxInfoIcon');
+
+  if (titleEl) titleEl.textContent = title;
+  if (contentEl) contentEl.innerHTML = htmlContent;
+  if (iconEl && iconName) iconEl.setAttribute('data-lucide', iconName);
+
+  if (modal) {
+    modal.classList.remove('hidden');
+    if (window.lucide) lucide.createIcons();
+  }
+}
+
+function closeSandboxInfoModal() {
+  const modal = document.getElementById('sandboxInfoModal');
+  if (modal) modal.classList.add('hidden');
+}
+
 // Modal Launchers for System Understanding Modals
 function launchQuickStartTour(minutes) {
-  alert(`🚀 Launching ${minutes}-Minute Self-Guided Tour:\n\n1. Sprout Universal Cockpit\n2. 4 Cognitive Care Domains (Health, Visits, Learning, Records)\n3. Logging 15-Second Notes & Mileage ($0.67/mi)\n4. Generating Court Summaries\n\nAll tools are 100% offline and safe to explore.`);
+  showSandboxInfoModal(
+    `${minutes}-Minute Self-Guided Tour`,
+    `
+    <div class="space-y-3">
+      <div class="p-3 bg-blue-950/60 border border-blue-700/60 rounded-xl text-blue-200">
+        🚀 <strong>Welcome to Sprout's 4-Step Orientation:</strong>
+      </div>
+      <ol class="space-y-2 list-decimal list-inside text-slate-300">
+        <li><strong>Sprout Mission Control:</strong> Single calm cockpit for all daily actions.</li>
+        <li><strong>4 Cognitive Care Domains:</strong> Health, Education, Visits & Court Records.</li>
+        <li><strong>Friction Elimination:</strong> 15-second routine logging, \$0.67/mi state mileage claims.</li>
+        <li><strong>Court Preparation:</strong> 1-click Title 33 progress reports (.docx) for DCF and GAL.</li>
+      </ol>
+      <div class="pt-2 flex justify-between items-center text-[11px] text-slate-400">
+        <span>Synthetic Sandbox Active</span>
+        <button onclick="closeSandboxInfoModal(); openPersonaLauncherModal();" class="text-emerald-400 hover:underline font-bold">Pick Practice Role →</button>
+      </div>
+    </div>
+    `,
+    'zap'
+  );
 }
 
 function launchTrainerDemoLauncher() {
-  alert(`🎯 Trainer Demonstration Launcher:\n\nSelect a demonstration profile:\n• 10-Minute New Caregiver Demo\n• Kinship Care Demonstration (Grandparents HH-113)\n• Respite Care Privacy Demo\n• 11:00 PM Emergency Placement Simulation\n• DCF Supervisor Claim Audit Demo`);
+  showSandboxInfoModal(
+    'Trainer Demonstration Launcher',
+    `
+    <div class="space-y-3">
+      <p class="text-slate-300">Select a demonstration profile for your cohort:</p>
+      <div class="space-y-1.5">
+        <button onclick="closeSandboxInfoModal(); launchPersonaReview('foster');" class="w-full text-left p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold transition flex items-center justify-between">
+          <span>10-Minute New Caregiver Demo (Sarah Jenkins)</span>
+          <i data-lucide="arrow-right" class="w-4 h-4 text-emerald-400"></i>
+        </button>
+        <button onclick="closeSandboxInfoModal(); launchPersonaReview('kinship');" class="w-full text-left p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold transition flex items-center justify-between">
+          <span>Kinship Care Demonstration (Eleanor Vance)</span>
+          <i data-lucide="arrow-right" class="w-4 h-4 text-teal-400"></i>
+        </button>
+        <button onclick="closeSandboxInfoModal(); launchPersonaReview('respite');" class="w-full text-left p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold transition flex items-center justify-between">
+          <span>Respite Care Privacy Demo (Samantha Price)</span>
+          <i data-lucide="arrow-right" class="w-4 h-4 text-purple-400"></i>
+        </button>
+      </div>
+    </div>
+    `,
+    'presentation'
+  );
 }
 
 function openSystemMapModal() {
-  alert(`🗺️ Interactive System Map:\n\nSprout Navigation Hierarchy:\n• Welcome Portal & Mission Control\n• Today (Command Center Briefing)\n• My Children (4 Cognitive Domains & 12 Sub-Tabs)\n• Care Binder (20 Vermont Folders)\n• Home & Licensing (FS-221A & VCWTP Ledger)\n• Circles of Care (4 concentric stakeholder tiers)\n• Life Journey (Child Lifebook Keepsakes)\n• Reports (Court Briefs & FS-334B Claims)\n• Settings (SHA-256 Blockchain Ledger & Backups)`);
+  showSandboxInfoModal(
+    'Interactive System Map',
+    `
+    <div class="space-y-3">
+      <div class="p-2.5 bg-slate-800 rounded-xl border border-slate-700 font-bold text-white">
+        Sprout Navigation Architecture:
+      </div>
+      <ul class="space-y-1.5 text-slate-300">
+        <li>• <strong>Mission Control:</strong> Operational Home Base & Gateway</li>
+        <li>• <strong>Today:</strong> Command Center Briefing & Priority Tasks</li>
+        <li>• <strong>My Children:</strong> 4 Cognitive Domains & 12 Specialized Tabs</li>
+        <li>• <strong>Care Binder:</strong> 20 Vermont DCF Folder Structure</li>
+        <li>• <strong>Home & Licensing:</strong> FS-221A Safety Checklist & VCWTP Ledger</li>
+        <li>• <strong>Circles of Care:</strong> 4 concentric stakeholder tiers</li>
+        <li>• <strong>Reports:</strong> Court Briefs (.docx) & FS-334B Mileage Claims</li>
+        <li>• <strong>Settings:</strong> Cryptographic SHA-256 Ledger & Backups</li>
+      </ul>
+    </div>
+    `,
+    'map'
+  );
 }
 
 function openProcessFlowsModal() {
-  alert(`📊 Process Flow Library:\n\nVisual Workflows Available:\n1. Emergency Placement: Placement Received ➔ Child Profile ➔ Medical Intake ➔ Safety Review\n2. Court Preparation: Timeline ➔ Communications ➔ Court Brief (.docx) ➔ GAL Submission\n3. Mileage Claim: Trip Log ➔ Ledger ➔ Form FS-334B ($0.67/mi) ➔ Submission`);
+  showSandboxInfoModal(
+    'Visual Process Flows',
+    `
+    <div class="space-y-3 text-slate-300">
+      <div class="p-3 bg-slate-800 rounded-xl border border-slate-700 space-y-1">
+        <h4 class="font-bold text-white text-xs">1. Emergency Placement (11:00 PM)</h4>
+        <p class="text-[11px] text-slate-400">Placement Received ➔ Child Profile ➔ Medical Intake ➔ Care Sheet Generated</p>
+      </div>
+      <div class="p-3 bg-slate-800 rounded-xl border border-slate-700 space-y-1">
+        <h4 class="font-bold text-white text-xs">2. Court Preparation (Title 33)</h4>
+        <p class="text-[11px] text-slate-400">Timeline Observations ➔ Sensitive Scrub ➔ Word Document (.docx) ➔ DCF / GAL</p>
+      </div>
+      <div class="p-3 bg-slate-800 rounded-xl border border-slate-700 space-y-1">
+        <h4 class="font-bold text-white text-xs">3. Mileage Reimbursement (\$0.67/mi)</h4>
+        <p class="text-[11px] text-slate-400">Trip Recorded ➔ Purpose Verified ➔ State Form FS-334B Exported</p>
+      </div>
+    </div>
+    `,
+    'git-branch'
+  );
 }
 
 function openDecisionTreesModal() {
-  alert(`🌲 System Decision Tree Center:\n\n1. Workspace Selection (Local Live vs Sandbox Simulator)\n2. Privacy Shielding (Child Reference ID & Presentation Blur)\n3. Respite Care Permission Gates (Confidentiality Protection)\n4. Canonical Containment Security (Safe Document Paths)`);
+  showSandboxInfoModal(
+    'System Decision Trees',
+    `
+    <div class="space-y-2.5 text-slate-300">
+      <div class="p-2.5 bg-slate-800 rounded-xl border border-slate-700">
+        <strong class="text-white">1. Real Family vs Sandbox Mode:</strong> Real Live Data stays sealed in local SQLite; Sandbox uses 100% synthetic models.
+      </div>
+      <div class="p-2.5 bg-slate-800 rounded-xl border border-slate-700">
+        <strong class="text-white">2. Privacy Shielding:</strong> Reference initials (e.g. "CD") and one-tap Presentation Blur prevent accidental PII exposure.
+      </div>
+      <div class="p-2.5 bg-slate-800 rounded-xl border border-slate-700">
+        <strong class="text-white">3. Role-Based Permissions:</strong> Respite providers see only active child needs; court and case documents remain hidden.
+      </div>
+    </div>
+    `,
+    'network'
+  );
 }
 
 function openUserJourneyDetailModal(roleKey) {
   const roles = {
-    foster: "New Foster Parent: Focuses on intake logging, 30-day health clock, school IEP notes, and mileage reimbursement.",
-    kinship: "Kinship Caregiver: Focuses on relative search, legal guardianship tracking, and family time visitation logs.",
-    respite: "Respite Provider: Focuses on daily routines, active medication schedules, allergy alerts, and emergency contacts.",
-    adoptive: "Adoptive Placement: Focuses on Child Lifebook preservation, permanency petitions, and subsidy documentation.",
-    trainer: "Trainer / Instructor: Demonstrates 15 model homes, scenario simulations, and zero data leakage.",
-    supervisor: "DCF Supervisor: Audits caregiver monthly reports, medical compliance, and FS-334B state claims.",
-    emergency: "Emergency Intake: Rapid 2-minute child registration, medication intake, and emergency handoff card."
+    foster: { title: "New Foster Parent Journey", text: "Focuses on intake logging, 30-day health clock, school IEP notes, and mileage reimbursement." },
+    kinship: { title: "Kinship Caregiver Journey", text: "Focuses on relative search, legal guardianship tracking, and family time visitation logs." },
+    respite: { title: "Respite Provider Journey", text: "Focuses on daily routines, active medication schedules, allergy alerts, and emergency contacts." },
+    adoptive: { title: "Adoptive Placement Journey", text: "Focuses on Child Lifebook preservation, permanency petitions, and subsidy documentation." },
+    trainer: { title: "Trainer / Instructor Journey", text: "Demonstrates 15 model homes, scenario simulations, and zero data leakage." },
+    supervisor: { title: "DCF Supervisor Journey", text: "Audits caregiver monthly reports, medical compliance, and FS-334B state claims." },
+    emergency: { title: "Emergency Intake Journey", text: "Rapid 2-minute child registration, medication intake, and emergency handoff card." }
   };
-  alert(`🧭 User Journey Pathway:\n\n${roles[roleKey] || 'Custom Caregiver Pathway'}`);
+  const info = roles[roleKey] || { title: "Custom Caregiver Journey", text: "Specialized documentation workflow tailored to caregiver perspective." };
+  showSandboxInfoModal(info.title, `<p class="text-slate-300">${info.text}</p>`, 'compass');
 }
 
 // ==============================================================================
@@ -8468,79 +8576,95 @@ function switchKftTab(tabKey) {
 }
 
 // ==============================================================================
-// FOUNDER REVIEW MODE & FEEDBACK CAPTURE HANDLERS
+// LAYER 1: DIRECTOR REVIEW CONSOLE & LAYER 3: PERSONA LAUNCHER HANDLERS
 // ==============================================================================
 
-function openFounderReviewModal() {
-  const modal = document.getElementById('founderReviewModal');
+function openPersonaLauncherModal() {
+  const modal = document.getElementById('personaLauncherModal');
   if (modal) {
     modal.classList.remove('hidden');
     if (window.lucide) lucide.createIcons();
   }
 }
 
-function closeFounderReviewModal() {
-  const modal = document.getElementById('founderReviewModal');
+function closePersonaLauncherModal() {
+  const modal = document.getElementById('personaLauncherModal');
   if (modal) modal.classList.add('hidden');
 }
 
-function launchPersonaReview(persona) {
+function openReviewModeConsoleModal() {
+  const modal = document.getElementById('reviewModeConsoleModal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    if (window.lucide) lucide.createIcons();
+  }
+}
+
+function closeReviewModeConsoleModal() {
+  const modal = document.getElementById('reviewModeConsoleModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+// Backwards-compatibility aliases
+function openFounderReviewModal() {
+  openReviewModeConsoleModal();
+}
+
+function closeFounderReviewModal() {
+  closeReviewModeConsoleModal();
+  closePersonaLauncherModal();
+}
+
+async function launchPersonaReview(persona) {
+  closePersonaLauncherModal();
+  closeReviewModeConsoleModal();
   closeFounderReviewModal();
 
   if (persona === 'founder') {
-    // 1. Founder Overview
-    currentSproutMode = 'local';
-    activeCaregiverUser = 'Candy Chevalier';
-    localStorage.setItem('sproutMode', 'local');
-    localStorage.setItem('caregiverUser', activeCaregiverUser);
-    populateCaregiverDropdown();
-    updateWorkspaceToggleUI();
-    updateSproutTheme();
-    loadChildren();
-    switchMainSection('dashboard');
-  } else if (persona === 'foster') {
-    // 2. Foster Caregiver View
-    currentSproutMode = 'sample';
+    // MME-02: Founder Overview is Director Console / Real Family Workspace, not a sandbox persona.
+    openReviewModeConsoleModal();
+    return;
+  }
+
+  // Enforce synthetic Practice Sandbox containment
+  currentSproutMode = 'sample';
+  localStorage.setItem('sproutMode', 'sample');
+
+  if (persona === 'foster') {
+    // 1. Foster Caregiver View (Sarah Jenkins • Established Foster Home)
     activeCaregiverUser = 'Sample Caregiver (Sarah Jenkins)';
-    localStorage.setItem('sproutMode', 'sample');
     localStorage.setItem('caregiverUser', activeCaregiverUser);
     populateCaregiverDropdown();
     updateWorkspaceToggleUI();
     updateSproutTheme();
-    loadChildren();
+    await loadChildren();
     switchMainSection('mission_control');
   } else if (persona === 'kinship') {
-    // 3. Kinship Caregiver View
-    currentSproutMode = 'sample';
+    // 2. Kinship Caregiver View (Eleanor & Arthur Vance • Grandparents)
     activeCaregiverUser = 'Sample Caregiver (Eleanor & Arthur Vance)';
-    localStorage.setItem('sproutMode', 'sample');
     localStorage.setItem('caregiverUser', activeCaregiverUser);
     populateCaregiverDropdown();
     updateWorkspaceToggleUI();
     updateSproutTheme();
-    loadChildren();
+    await loadChildren();
     switchMainSection('mission_control');
     setTimeout(() => openKinshipFastTrackModal(), 300);
   } else if (persona === 'parent') {
-    // 4. Parent Participant View
-    currentSproutMode = 'sample';
-    activeCaregiverUser = 'Angela Davis (Parent Participant)';
-    localStorage.setItem('sproutMode', 'sample');
+    // 3. Parent Participant View (Angela Davis • Reunification Roadmap)
+    activeCaregiverUser = 'Parent Participant (Angela Davis)';
     localStorage.setItem('caregiverUser', activeCaregiverUser);
     populateCaregiverDropdown();
     updateWorkspaceToggleUI();
     updateSproutTheme();
     switchMainSection('parent');
   } else if (persona === 'respite') {
-    // 5. Respite Provider View
-    currentSproutMode = 'sample';
-    activeCaregiverUser = 'Sample Caregiver (Samantha Price)';
-    localStorage.setItem('sproutMode', 'sample');
+    // 4. Respite Provider View (Samantha Price & Jordan Taylor • Weekend Care)
+    activeCaregiverUser = 'Sample Caregiver (Samantha Price & Jordan Taylor)';
     localStorage.setItem('caregiverUser', activeCaregiverUser);
     populateCaregiverDropdown();
     updateWorkspaceToggleUI();
     updateSproutTheme();
-    loadChildren();
+    await loadChildren();
     switchMainSection('mission_control');
     setTimeout(() => openEmergencyHandoffCard(), 300);
   }

@@ -159,55 +159,58 @@ The following 6 backlog tickets specify the precise surgical adjustments require
 
 ### Ticket MME-01: Disentangle Review Mode from Persona Launcher
 * **Severity:** **P0 (Critical Architecture Mismatch)**
+* **Status:** **RESOLVED & VERIFIED (Mental Model Enforcement Sprint)**
 * **Layer:** **Layer 1 (Review Mode) vs. Layer 3 (Persona Launcher)**
-* **Problem:** Review Mode and Persona Launcher are currently fused into a single modal (`#founderReviewModal`), titled confusingly as "PERSONA LAUNCHER • Review Mode".
-* **Enforcement Requirement:**
-  1. Split into two clean components:
+* **Problem:** Review Mode and Persona Launcher were previously fused into a single modal (`#founderReviewModal`), titled confusingly as "PERSONA LAUNCHER • Review Mode".
+* **Enforcement Implemented:**
+  1. Split into two clean distinct modal components:
      - **Component A: Persona Launcher Modal (`#personaLauncherModal`):** Contains ONLY the 4 authentic practice roles (Foster Caregiver, Kinship Caregiver, Parent Participant, Respite Provider).
      - **Component B: Review Mode Console (`#reviewModeConsoleModal`):** Contains Director/Evaluator tools: Executive System Overview, 178-Test Verification Board, SHA-256 Audit Inspector, Reset Sandbox Data, and Floating Feedback link.
-  2. The persistent floating dock (`#founderFloatingDock`) provides 1-click access to both: `[Choose Role]` and `[Executive Overview]`.
+  2. Persistent top header (`#topHeader`) and floating dock (`#founderFloatingDock`) offer direct, distinct 1-click access to both: `Review Console` (Layer 1) and `Practice Roles` (Layer 3).
 
 ---
 
 ### Ticket MME-02: Remove Founder Overview from Persona Launcher & Training Catalog
 * **Severity:** **P0 (Critical Safety & Identity Mismatch)**
+* **Status:** **RESOLVED & VERIFIED (Mental Model Enforcement Sprint)**
 * **Layer:** **Layer 3 (Persona Launcher) & Layer 5 (Training Hub)**
-* **Problem:** "1. Founder Overview" is Card #1 in the Persona Launcher and Training Hub. Clicking it executes `currentSproutMode = 'local'`, dumping the user into the real local database without warning.
-* **Enforcement Requirement:**
-  1. Remove "1. Founder Overview" completely from `#founderReviewModal` and `#trainingPersonaLauncher`.
-  2. Ensure the Persona Launcher strictly offers child welfare personas:
+* **Problem:** "1. Founder Overview" was Card #1 in the Persona Launcher and Training Hub. Clicking it executed `currentSproutMode = 'local'`, silently dumping the user into the real local database.
+* **Enforcement Implemented:**
+  1. Removed "1. Founder Overview" completely from `#personaLauncherModal` and `#trainingPersonaLauncher`.
+  2. The Persona Launcher strictly offers authentic practice roles:
      - Card 1: Foster Caregiver (Sarah Jenkins &rarr; Liam Brooks)
-     - Card 2: Kinship Caregiver (Eleanor Vance &rarr; Emma Vance)
+     - Card 2: Kinship Caregiver (Eleanor & Arthur Vance &rarr; Aiden Vance / Emma Vance)
      - Card 3: Parent Participant (Angela Davis &rarr; Emma Vance)
-     - Card 4: Respite Provider (Samantha Price &rarr; Liam Brooks)
-  3. Relocate Founder / Executive access to the Review Mode Console under the label **`Executive Overview & System Audit`**, ensuring it remains in synthetic sandbox mode by default.
+     - Card 4: Respite Provider (Samantha Price & Jordan Taylor &rarr; Liam Brooks)
+  3. Relocated Founder / Executive tools strictly to the Director Review Console (`#reviewModeConsoleModal`), preventing silent database mutation.
 
 ---
 
 ### Ticket MME-03: Create Dedicated Sandbox Gateway & Strip Gateway Bloat from Mission Control
 * **Severity:** **P0 (Critical Cognitive Overload)**
+* **Status:** **RESOLVED & VERIFIED (Mental Model Enforcement Sprint)**
 * **Layer:** **Layer 2 (Sandbox Gateway) vs. Layer 4 (Mission Control)**
-* **Problem:** Mission Control tries to act as both the entry gateway and the daily operating desktop, resulting in 35+ competing action buttons and severe choice paralysis.
-* **Enforcement Requirement:**
-  1. Implement a clear **Sandbox Gateway Banner / Airlock** at initial landing:
-     - Prominent Safety Declaration: *"Welcome to Sprout Sandbox • 100% Synthetic & Consequence-Free."*
-     - Present **Three Clear Doors** (A: 5-Min Guided Tour, B: Practice a Role, C: System Capabilities).
-  2. Strip marketing slogans and redundant orientation buttons from Mission Control so it functions strictly as the **Daily Care Cockpit**:
-     - Shows active child in placement prominently.
-     - Displays today's schedule and priority care alerts.
-     - Anchors the 6-button Quick Action Dock.
-  3. Relocate the 4 secondary quadrants (`TRAIN`, `CARE`, `DCF`, `SYSTEM`) to a structured, collapsible drawer or dedicated tabs.
+* **Problem:** Mission Control tried to act as both the entry gateway and the daily operating desktop, resulting in 35+ competing action buttons and choice paralysis.
+* **Enforcement Implemented:**
+  1. Implemented a dedicated **Sandbox Gateway Airlock (`#sandboxGatewayAirlock`)** at initial landing:
+     - Prominent Safety Declaration: *"Practice Sandbox Gateway • 100% Synthetic • Consequence-Free."*
+     - Three Clear Doorways: Door A (5-Min Tour), Door B (Choose Practice Role), Door C (Explore Flight School).
+  2. Cleaned Mission Control to function strictly as the **Daily Care Cockpit**:
+     - Shows active child placement card prominently.
+     - Anchors the 6-button Quick Action Dock (`+ 15-Sec Log`, `Emergency Intake`, `Care Sheet`, `Kinship Guide`, `Case Closure`, `Export Month`), removing the redundant Review Mode button.
+  3. Replaced raw browser `alert(...)` popups with accessible, styled in-app modal cards (`#sandboxInfoModal`).
 
 ---
 
 ### Ticket MME-04: Anchor Active Child in Top Sticky Header on 100% of Screens
 * **Severity:** **P0 (Critical Child Welfare Anchor)**
+* **Status:** **RESOLVED & VERIFIED (Mental Model Enforcement Sprint)**
 * **Layer:** **Layer 4 (Simulated Operations)**
-* **Problem:** The active child selector (`#childSelect`) is inside `#mainNavigationContainer`, which is hidden on Mission Control. On the main landing screen, the user cannot see who the placed child is.
-* **Enforcement Requirement:**
-  1. Move the Active Child Selector into the permanent top sticky header (`#topHeader`) directly next to the caregiver identity.
-  2. Ensure the Active Child is visible on 100% of screens (Mission Control, Care Binder, Medical MAR, Timeline).
-  3. Atomically lock the child when a persona is selected (Foster &rarr; Liam, Kinship &rarr; Emma, Respite &rarr; Liam).
+* **Problem:** Active child selector (`#childSelect`) was inside `#mainNavigationContainer`, which was hidden on Mission Control.
+* **Enforcement Implemented:**
+  1. Anchored `#childSelect` permanently inside `#placedChildBadgeContainer` within `#topHeader`, guaranteeing 100% sticky visibility across all screens (Mission Control, Dashboard, Binder, Medical, Timeline).
+  2. Implemented `updatePlacedChildBadge()` to update child status badge and alias initials on every change.
+  3. Persona switching atomically sets caregiver and loads child in care.
 
 ---
 

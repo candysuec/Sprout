@@ -1,45 +1,36 @@
 # FOUNDER ORIENTATION DASHBOARD
 **Initiative:** Sprout  
 **Project:** Child & Family Success Operating System  
-**Current Milestone:** v3.2 Foundation Approved — Development Freeze Active  
+**Current Milestone:** v3.2 Mental Model Enforced — 178/178 Tests Passing (100%)  
 **Last Verified:** 2026-10-16  
 
 ---
 
 ## 🧭 WHERE AM I?
 
-You are standing in **Sprout v3.2 Foundation Approved (Development Freeze Active)**.
+You are standing in **Sprout v3.2 Mental Model Enforced (Sprint Complete)**.
 
 - **The Vision Is Decided:** Sprout is a **Child & Family Success Operating System**, not a case management system, not a state database, and not a passive binder.
 - **The Architecture Is Implemented & Frozen:** Four Data Sovereignty Domains (`child`, `case`, `caregiver`, `parent`), 5-Level Note Classification (`legacy_unreviewed`, `private`, `working`, `official`, `shared_family`), and DCF Output Integration are operational in SQLite.
-- **Database Migration 7 Executed:** `timeline_records` upgraded with classification, domain, sensitivity_level, and retention_state. Parent workspace tables (`parent_users`, `parent_goals`, `parent_evidence`) and composite indexes deployed.
-- **Authorization Middleware Deployed:** `app/auth_middleware.py` mounted. Role resolution, domain gates, high-conflict address masking, and EXIF scrubber active.
-- **Parent Participant Workspace Operational:** 5 benchmark parent scenarios verified; emergency access revocation & legal hold tested.
-- **High-Stress Boundary Friction Eliminated:**
-  - **Emergency Placement Wizard (`#emergencyPlacementWizardModal`):** 5-step guided intake with atomic medication and emergency contacts creation in a single transaction, auto-opening Care & Safety Sheet with zero extra clicks.
-  - **Permanency & Handover Wizard (`#permanencyHandoverWizardModal`):** 5-step closure generating keepsake Family Lifebook `.docx`, reviewing parent access transitions (`GRADUATED` / `REVOKED`), soft-archiving timeline records (`retention_state = 'Archived'`), and writing SHA-256 audit logs.
-  - **Kinship Fast-Track Guide (`#kinshipFastTrackModal`):** 5 plain-English sections (Immediate Triage, Cash & Benefits, Urgent Paperwork, What Can Wait, Welfare Jargon Decoder) accessible via 1-tap dock button and embedded pathway card.
-- **Mission Control Quick Action Dock Enhanced:** 6 permanent 1-tap actions (`+ 15-Sec Log`, `Emergency Intake`, `Care Sheet`, `Kinship Guide`, `Case Closure`, `Export Month`).
+- **Mental Model Enforcement Sprint Complete (P0 Tickets Resolved & Verified):**
+  - **MME-01 (Disentangle Review Mode from Persona Launcher):** Split `#founderReviewModal` into two dedicated modals: `#personaLauncherModal` (Layer 3: Practice Simulator Rig with 4 authentic practice roles) and `#reviewModeConsoleModal` (Layer 1: Director's Review Console with test suite monitor, SHA-256 auditor, sandbox reset, and feedback). Persistent top header and floating dock offer independent 1-click access to both.
+  - **MME-02 (Quarantine Founder Overview from Practice Roles):** Removed "1. Founder Overview" from Persona Launcher and Training Catalog. Practice roles strictly feature authentic child welfare caregivers (Sarah &rarr; Liam, Eleanor &rarr; Aiden/Emma, Angela &rarr; Emma, Samantha &rarr; Liam). Silent database mode mutation to `local` eliminated.
+  - **MME-03 (Dedicated Sandbox Gateway Airlock & Clean Dock):** Initial sandbox landing features the Layer 2 Gateway Airlock (`#sandboxGatewayAirlock`) declaring 100% synthetic safety and 3 clear doors (Door A: 5-Min Tour, Door B: Choose Practice Role, Door C: Explore Flight School). Mission Control is stripped of 35+ button paralysis, functioning strictly as the daily care cockpit with a 6-button Quick Action Dock (Review Mode removed from dock). Unstyled browser alerts replaced with in-app modal cards (`#sandboxInfoModal`).
+  - **MME-04 (Anchor Active Child in Sticky Header):** Anchored `#childSelect` inside `#placedChildBadgeContainer` within `#topHeader`, guaranteeing permanent visibility on 100% of screens (Mission Control, Dashboard, Binder, Medical, Timeline).
 - **The Entire System Is 100% Tested:** Automated test suites pass **178/178 tests (100%)**:
   - `test_e2e_flows.py`: 73/73
   - `test_phase13b_governance.py`: 46/46
   - `test_parent_workspace_integration.py`: 30/30
   - `test_operational_readiness.py`: 29/29
 - **Release Readiness & Human Walkthrough Verified (PASS):** 4 real-world user personas completed all primary journeys with zero detective work.
-- **Founder Acceptance Walkthrough Signed Off:** Candy Chevalier verified all 4 operating journeys. Captured **0 confusion, 0 hesitation, 0 unexpected behavior, 0 missing information**. Development freeze activated.
-- **Founder Sandbox Review Mode Ready:** 16/16 readiness check items verified (100%). Guided review launcher (`#founderReviewModal`) and persistent floating feedback modal (`#founderFeedbackModal`) mounted.
-- **Founder Review Finding #001 Resolved (PASS):** Eliminated navigation friction by mounting 1-click Review Mode entry globally across 5 surfaces (persistent floating dock `#founderFloatingDock`, top sticky header `#btnOpenReviewMode`, main navigation bar, Mission Control dock, and Parent Workspace banner). Review Mode and persona switching are now accessible from every screen in 1 click without application restart or work loss.
-- **Founder Review Finding #002 Resolved (PASS):** Restored and surfaced the complete **Persona Launcher** across both the global modal (`#founderReviewModal`) and directly embedded as the primary section on the Training Hub screen (`#trainingPersonaLauncher`), presenting all 5 personas with 1-click launch actions (Founder Overview, Foster Caregiver, Kinship Caregiver, Parent Participant, Respite Provider).
-- **Role-Based Training Validation Completed (PASS):** Executed comprehensive cognitive understanding walkthrough across **10 key roles** (Candy/Founder, Foster Parent, Kinship Caregiver, Respite Provider, Adoptive Family, DCF Caseworker, DCF Supervisor, Trainer, New User, Demo/Evaluator) across all 12 core domains. Full report published in [`TRAINING_VALIDATION_REPORT.md`](file:///c:/Users/candy/OneDrive/Documents/01_PERSONAL_&_FAMILY/Davis%20&%20VTDCF%20Shared%20Folder/foster-portal/docs/TRAINING_VALIDATION_REPORT.md). Zero critical cognitive blocks (0 P0 items). System achieves self-teaching design with average orientation score of 9.28/10, confidence of 9.54/10, and ease-of-use of 9.34/10.
-- **Sandbox Orientation Review Completed (CONDITIONAL PASS):** Thorough orientation audit evaluating the sandbox entry experience through Candy's eyes. Addresses all 4 Special Review Items (separating Founder from training personas, moving Child in Placement to sticky top header, structuring Training Hub into curriculum hierarchy, and providing explicit Sandbox welcome/safety banner to eliminate 35+ button choice paralysis). Full report published in [`SANDBOX_ORIENTATION_REPORT.md`](file:///c:/Users/candy/OneDrive/Documents/01_PERSONAL_&_FAMILY/Davis%20&%20VTDCF%20Shared%20Folder/foster-portal/docs/SANDBOX_ORIENTATION_REPORT.md). Prioritized action backlog defined (3 P0, 5 P1, 3 P2 items).
-- **Sandbox Journey Mapping Completed (PASS):** Using orientation and training validation findings, defined the complete intended sandbox experience without modifying UI (freeze respected). Established the 3-step cognitive onboarding sequence (Grounding, Anchoring, Proof), detailed 8-role journey blueprints (Trainer, Evaluator, Legislator, New Caregiver, Kinship Caregiver, Respite Provider, DCF Worker, Candy), and defined the 6-screen taxonomy (Orientation, Launch, Training, Validation, Review, Administrative). Full specification published in [`SANDBOX_JOURNEY_MAP.md`](file:///c:/Users/candy/OneDrive/Documents/01_PERSONAL_&_FAMILY/Davis%20&%20VTDCF%20Shared%20Folder/foster-portal/docs/SANDBOX_JOURNEY_MAP.md).
-- **Sandbox Mental Model Decision Resolved (PASS):** Authoritatively resolved conceptual contradiction regarding Founder Overview. Determined that Candy is an Evaluator, Demonstrator, and Validator (Meta-Layer), NOT an in-flight trainee. Classified Founder Overview as an **Evaluation Tool / Executive Demonstration Vantage Point**, removing it from training role-play personas and preventing accidental exits from the synthetic sandbox. Formally decoupled the 5 core concepts: Gateway (Safety & Doors), Mission Control (Daily Desktop), Training Hub (Flight School), Persona Launcher (Role Rigging), and Review Mode (Meta-Console). Full architectural decision published in [`SANDBOX_MENTAL_MODEL_DECISION.md`](file:///c:/Users/candy/OneDrive/Documents/01_PERSONAL_&_FAMILY/Davis%20&%20VTDCF%20Shared%20Folder/foster-portal/docs/SANDBOX_MENTAL_MODEL_DECISION.md).
-- **Mental Model Enforcement Review Completed (PASS):** Evaluated entire current UI against the 5 canonical layers. Identified and flagged 6 conceptual collisions (Modal conflation, Mission Control acting as gateway, raw alert tours, Training Hub duplicate persona stack, reference pills cluttering clinical binders, and Founder mode switch). Formulated 6 surgical enforcement tickets (4 P0, 2 P1) in [`MENTAL_MODEL_ENFORCEMENT_BACKLOG.md`](file:///c:/Users/candy/OneDrive/Documents/01_PERSONAL_&_FAMILY/Davis%20&%20VTDCF%20Shared%20Folder/foster-portal/docs/MENTAL_MODEL_ENFORCEMENT_BACKLOG.md) without modifying code (freeze preserved).
+- **Founder Acceptance Walkthrough Signed Off:** Candy Chevalier verified all 4 operating journeys. Captured **0 confusion, 0 hesitation, 0 unexpected behavior, 0 missing information**.
+- **Role-Based Training Validation Completed (PASS):** Executed comprehensive cognitive understanding walkthrough across **10 key roles** across all 12 core domains (9.34/10 ease-of-use).
+- **Sandbox Mental Model Decision Canonical Standard Enforced:** All 5 layers (Review Mode, Sandbox Gateway, Persona Launcher, Mission Control, Training Hub) are rigorously separated in UI and behavior.
 
 ---
 
 ### 🔒 FOUNDER ACCEPTANCE & DEVELOPMENT FREEZE: ACTIVE
-**Status:** **APPROVED & ARCHITECTURALLY FROZEN**  
+**Status:** **APPROVED & MENTAL MODEL ENFORCED**  
 **Operating Rule:** ⛔ No new feature development | ⛔ No architecture changes | ⛔ No governance changes | ⛔ No role changes | ⛔ No database schema changes.
 
 | Evaluated Dimension | Status | Verified Operating Reality |
@@ -50,12 +41,8 @@ You are standing in **Sprout v3.2 Foundation Approved (Development Freeze Active
 | **Respite Cognitive Load** | **PASS** | 1-tap Care & Safety Sheet with allergies, meds, comforting, and emergency numbers in <30s. |
 | **Founder Cognitive Load** | **PASS** | Single source-of-truth home (`FOUNDER_ORIENTATION_DASHBOARD.md` & `PROJECT_STATE.md`). 178/178 tests passing. |
 | **Founder Acceptance** | **ACCEPTED** | Candy completed all 4 primary operating journeys without becoming the detective. |
-| **Founder Sandbox Review** | **READY (16/16 Passed, Findings #001 & #002 Resolved)** | Complete Persona Launcher accessible globally via modal and embedded directly on Training Hub screen. |
-| **Role-Based Training Validation** | **PASS (10/10 Roles Scored, 0 P0s)** | Comprehensive cognitive audit across 10 roles & 12 domains; 0 critical blocks; 9.34/10 ease-of-use. |
-| **Sandbox Orientation Review** | **CONDITIONAL PASS (P0 Backlog Prioritized)** | 4 Special Review Items audited; Founder separated; Child placement repositioned; 3 P0, 5 P1, 3 P2 backlog. |
-| **Sandbox Journey Mapping** | **PASS (8/8 Roles Mapped, Taxonomy Defined)** | 3-step sequence (Grounding, Anchoring, Proof), 8 role blueprints, 6 screen archetypes. Development freeze honored. |
-| **Sandbox Mental Model Decision** | **RESOLVED & ALIGNED (Meta vs Practice)** | Founder Overview classified as Evaluation Tool / Executive Vantage Point (Meta-Layer); removed from practice personas. |
-| **Mental Model Enforcement** | **AUDITED & BACKLOGGED (6 Tickets Defined)** | Evaluated UI against 5 layers; flagged 6 conceptual collisions; 4 P0 and 2 P1 enforcement tickets ready for post-freeze refinement. |
+| **Mental Model Enforcement** | **ENFORCED & PASS (MME-01 through MME-04)** | Review Mode vs Persona Launcher split; Founder quarantined from training roles; Gateway Airlock & 3 Doors mounted; Active Child permanently anchored in sticky header. |
+| **Test Verification Baseline** | **178/178 PASSING (100%)** | 4 full verification suites passing with zero failures. |
 
 ---
 
