@@ -8615,6 +8615,24 @@ function closeFounderReviewModal() {
   closePersonaLauncherModal();
 }
 
+function setCanonicalChildForPersona(childIdentifier) {
+  if (!childrenList || childrenList.length === 0) return;
+  const lower = childIdentifier.toLowerCase();
+  const matched = childrenList.find(c =>
+    (c.first_name && c.first_name.toLowerCase().includes(lower)) ||
+    (c.preferred_name && c.preferred_name.toLowerCase().includes(lower)) ||
+    (c.alias && c.alias.toLowerCase().includes(lower)) ||
+    (c.last_name && c.last_name.toLowerCase().includes(lower))
+  );
+  if (matched) {
+    currentChildId = matched.id;
+    const select = document.getElementById('childSelect');
+    if (select) select.value = currentChildId;
+    updatePlacedChildBadge();
+    renderChildSnapshot();
+  }
+}
+
 async function launchPersonaReview(persona) {
   closePersonaLauncherModal();
   closeReviewModeConsoleModal();
@@ -8631,26 +8649,28 @@ async function launchPersonaReview(persona) {
   localStorage.setItem('sproutMode', 'sample');
 
   if (persona === 'foster') {
-    // 1. Foster Caregiver View (Sarah Jenkins • Established Foster Home)
+    // 1. Foster Caregiver View (Sarah Jenkins -> Liam Brooks)
     activeCaregiverUser = 'Sample Caregiver (Sarah Jenkins)';
     localStorage.setItem('caregiverUser', activeCaregiverUser);
     populateCaregiverDropdown();
     updateWorkspaceToggleUI();
     updateSproutTheme();
     await loadChildren();
+    setCanonicalChildForPersona('Liam');
     switchMainSection('mission_control');
   } else if (persona === 'kinship') {
-    // 2. Kinship Caregiver View (Eleanor & Arthur Vance • Grandparents)
+    // 2. Kinship Caregiver View (Eleanor & Arthur Vance -> Emma Vance)
     activeCaregiverUser = 'Sample Caregiver (Eleanor & Arthur Vance)';
     localStorage.setItem('caregiverUser', activeCaregiverUser);
     populateCaregiverDropdown();
     updateWorkspaceToggleUI();
     updateSproutTheme();
     await loadChildren();
+    setCanonicalChildForPersona('Emma');
     switchMainSection('mission_control');
     setTimeout(() => openKinshipFastTrackModal(), 300);
   } else if (persona === 'parent') {
-    // 3. Parent Participant View (Angela Davis • Reunification Roadmap)
+    // 3. Parent Participant View (Angela Davis -> Emma Vance)
     activeCaregiverUser = 'Parent Participant (Angela Davis)';
     localStorage.setItem('caregiverUser', activeCaregiverUser);
     populateCaregiverDropdown();
@@ -8658,13 +8678,14 @@ async function launchPersonaReview(persona) {
     updateSproutTheme();
     switchMainSection('parent');
   } else if (persona === 'respite') {
-    // 4. Respite Provider View (Samantha Price & Jordan Taylor • Weekend Care)
+    // 4. Respite Provider View (Samantha Price & Jordan Taylor -> Liam Brooks)
     activeCaregiverUser = 'Sample Caregiver (Samantha Price & Jordan Taylor)';
     localStorage.setItem('caregiverUser', activeCaregiverUser);
     populateCaregiverDropdown();
     updateWorkspaceToggleUI();
     updateSproutTheme();
     await loadChildren();
+    setCanonicalChildForPersona('Liam');
     switchMainSection('mission_control');
     setTimeout(() => openEmergencyHandoffCard(), 300);
   }
