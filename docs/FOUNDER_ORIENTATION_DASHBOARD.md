@@ -32,6 +32,7 @@ You are standing in **Sprout v3.2 Foundation Approved (Development Freeze Active
 - **Founder Review Finding #002 Resolved (PASS):** Restored and surfaced the complete **Persona Launcher** across both the global modal (`#founderReviewModal`) and directly embedded as the primary section on the Training Hub screen (`#trainingPersonaLauncher`), presenting all 5 personas with 1-click launch actions (Founder Overview, Foster Caregiver, Kinship Caregiver, Parent Participant, Respite Provider).
 - **Role-Based Training Validation Completed (PASS):** Executed comprehensive cognitive understanding walkthrough across **10 key roles** (Candy/Founder, Foster Parent, Kinship Caregiver, Respite Provider, Adoptive Family, DCF Caseworker, DCF Supervisor, Trainer, New User, Demo/Evaluator) across all 12 core domains. Full report published in [`TRAINING_VALIDATION_REPORT.md`](file:///c:/Users/candy/OneDrive/Documents/01_PERSONAL_&_FAMILY/Davis%20&%20VTDCF%20Shared%20Folder/foster-portal/docs/TRAINING_VALIDATION_REPORT.md). Zero critical cognitive blocks (0 P0 items). System achieves self-teaching design with average orientation score of 9.28/10, confidence of 9.54/10, and ease-of-use of 9.34/10.
 - **Sandbox Orientation Review Completed (CONDITIONAL PASS):** Thorough orientation audit evaluating the sandbox entry experience through Candy's eyes. Addresses all 4 Special Review Items (separating Founder from training personas, moving Child in Placement to sticky top header, structuring Training Hub into curriculum hierarchy, and providing explicit Sandbox welcome/safety banner to eliminate 35+ button choice paralysis). Full report published in [`SANDBOX_ORIENTATION_REPORT.md`](file:///c:/Users/candy/OneDrive/Documents/01_PERSONAL_&_FAMILY/Davis%20&%20VTDCF%20Shared%20Folder/foster-portal/docs/SANDBOX_ORIENTATION_REPORT.md). Prioritized action backlog defined (3 P0, 5 P1, 3 P2 items).
+- **Sandbox Journey Mapping Completed (PASS):** Using orientation and training validation findings, defined the complete intended sandbox experience without modifying UI (freeze respected). Established the 3-step cognitive onboarding sequence (Grounding, Anchoring, Proof), detailed 8-role journey blueprints (Trainer, Evaluator, Legislator, New Caregiver, Kinship Caregiver, Respite Provider, DCF Worker, Candy), and defined the 6-screen taxonomy (Orientation, Launch, Training, Validation, Review, Administrative). Full specification published in [`SANDBOX_JOURNEY_MAP.md`](file:///c:/Users/candy/OneDrive/Documents/01_PERSONAL_&_FAMILY/Davis%20&%20VTDCF%20Shared%20Folder/foster-portal/docs/SANDBOX_JOURNEY_MAP.md).
 
 ---
 
@@ -40,7 +41,7 @@ You are standing in **Sprout v3.2 Foundation Approved (Development Freeze Active
 **Operating Rule:** ⛔ No new feature development | ⛔ No architecture changes | ⛔ No governance changes | ⛔ No role changes | ⛔ No database schema changes.
 
 | Evaluated Dimension | Status | Verified Operating Reality |
-| :--- | :---: | :--- |
+| :--- | :--- | :--- |
 | **Caregiver Cognitive Load** | **PASS** | 15-second routine logging, 1-click DCF monthly report, 5-click atomic emergency intake. |
 | **Kinship Cognitive Load** | **PASS** | 1-tap plain-English benefits triage ($350 fund, Reach Up, Dr. Dynasaur) & welfare acronym decoder. |
 | **Parent Cognitive Load** | **PASS** | Isolated 4-module dignity workspace (roadmap, shared moments, check-in, certificates). Zero state claims/licensing. |
@@ -50,6 +51,7 @@ You are standing in **Sprout v3.2 Foundation Approved (Development Freeze Active
 | **Founder Sandbox Review** | **READY (16/16 Passed, Findings #001 & #002 Resolved)** | Complete Persona Launcher accessible globally via modal and embedded directly on Training Hub screen. |
 | **Role-Based Training Validation** | **PASS (10/10 Roles Scored, 0 P0s)** | Comprehensive cognitive audit across 10 roles & 12 domains; 0 critical blocks; 9.34/10 ease-of-use. |
 | **Sandbox Orientation Review** | **CONDITIONAL PASS (P0 Backlog Prioritized)** | 4 Special Review Items audited; Founder separated; Child placement repositioned; 3 P0, 5 P1, 3 P2 backlog. |
+| **Sandbox Journey Mapping** | **PASS (8/8 Roles Mapped, Taxonomy Defined)** | 3-step sequence (Grounding, Anchoring, Proof), 8 role blueprints, 6 screen archetypes. Development freeze honored. |
 
 ---
 
@@ -67,7 +69,8 @@ Only two things matter right now:
 These are the only active workstreams currently in motion:
 
 | Workstream | Scope | Target File(s) | Status |
-| :--- | :--- | :--- | :---: |
+| :--- | :--- | :--- | :--- |
+| **Sandbox Journey Mapping** | Architectural mapping of 3-step entry, 8 role blueprints, and screen taxonomy. | `docs/SANDBOX_JOURNEY_MAP.md` | **COMPLETE & SPECIFIED (PASS)** |
 | **Role-Based Training Validation** | Cognitive understanding audit of 10 user archetypes across all 12 domains. | `docs/TRAINING_VALIDATION_REPORT.md` | **COMPLETE & VALIDATED (0 P0s)** |
 | **Sandbox Orientation Review** | Evaluation of entry experience, 4 special review items, and orientation backlog. | `docs/SANDBOX_ORIENTATION_REPORT.md` | **COMPLETE & AUDITED (3 P0, 5 P1, 3 P2)** |
 | **Founder Sandbox Walkthrough** | Guided 5-persona self-review and feedback capture without developer assistance. | `app/static/index.html`, `app/static/app.js`, `app/server.py` | **ACTIVE & READY** |

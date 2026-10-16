@@ -27,6 +27,7 @@
 | **Founder Sandbox Review Readiness** | **READY & VERIFIED (16/16 Passed)** | [`PROJECT_STATE.md`](PROJECT_STATE.md) | 5 Review Personas & Local Feedback Mounted |
 | **Role-Based Training Validation** | **PASS (10/10 Roles Scored, 0 P0s)** | [`TRAINING_VALIDATION_REPORT.md`](TRAINING_VALIDATION_REPORT.md) | 10 Archetypes / 12 Domains Audited |
 | **Sandbox Orientation Review** | **CONDITIONAL PASS (P0 Backlog Prioritized)** | [`SANDBOX_ORIENTATION_REPORT.md`](SANDBOX_ORIENTATION_REPORT.md) | 4 Special Items & 11 Backlog Items Audited |
+| **Sandbox Journey Mapping** | **PASS (8/8 Roles Mapped, Taxonomy Defined)** | [`SANDBOX_JOURNEY_MAP.md`](SANDBOX_JOURNEY_MAP.md) | 3-Step Sequence & 6 Archetypes |
 
 ---
 
@@ -104,6 +105,7 @@
   - **Global Modal Persona Launcher:** Retitled and reinforced the global Review Mode modal (`#founderReviewModal`) to explicitly feature **PERSONA LAUNCHER • SPROUT REVIEW MODE** with instant 1-click launch actions across all 5 personas from any screen.
 - [x] **Role-Based Training Validation Across 10 Personas (`docs/TRAINING_VALIDATION_REPORT.md`):** Complete day-in-the-life walkthrough for Candy (Founder), Foster Parent, Kinship Caregiver, Respite Provider, Adoptive Family, DCF Caseworker, DCF Supervisor, Trainer, New User, and Demo/Evaluator across all 12 system domains. Confirmed 0 critical cognitive blockers (0 P0), 9.28/10 average orientation, 9.54/10 average confidence, and 9.34/10 average ease-of-use.
 - [x] **Sandbox Orientation Review Across Entry Surfaces (`docs/SANDBOX_ORIENTATION_REPORT.md`):** Evaluated sandbox entry, Persona Launcher, Training Hub, and Mission Control through Candy's eyes. Analyzed 4 Special Review Items: (1) Founder separated from training personas, (2) Active child promoted to permanent sticky header, (3) Training Hub organized into 4 sequential curriculum tabs, and (4) Mission Control entry provided with explicit synthetic sandbox welcome and single "Start Here" hero action. Prioritized 3 P0, 5 P1, and 3 P2 backlog items.
+- [x] **Sandbox Journey Mapping Across 8 Roles (`docs/SANDBOX_JOURNEY_MAP.md`):** Complete intended experience design defining the 3-step cognitive onboarding sequence (Grounding, Anchoring, Proof), detailed 8-role journey blueprints (Trainer, Evaluator, Legislator, New Caregiver, Kinship Caregiver, Respite Provider, DCF Worker, Candy), and 6-screen taxonomy (Orientation, Launch, Training, Validation, Review, Administrative). Development freeze strictly preserved.
 
 ---
 
@@ -544,7 +546,41 @@ All 16 core functional areas were verified operational in the local sandbox:
 
 ---
 
-## 10. Maintenance Protocol (Founder Home Mandate)
+## 10. Sandbox Journey Mapping Ledger
+
+### Mapping Summary
+- **Auditor:** Founder Operating System Experience Design Suite
+- **Date:** 2026-10-16
+- **Result:** **PASS (Complete 8-Role Experience Mapped)**
+- **Governing Specification:** [`SANDBOX_JOURNEY_MAP.md`](SANDBOX_JOURNEY_MAP.md)
+- **Constraint Preserved:** Strict Development Freeze honored (0 UI edits, 0 code churn).
+
+### The Three-Step Cognitive Onboarding Sequence
+1. **First (Grounding & Psychological Safety):** Explicit safety declaration ("100% Synthetic • Consequence-Free") + 3 Clear Doorways (Door A: 5-Min Guided Tour, Door B: Practice Role, Door C: System Capabilities), cutting 35+ competing links down to 3 high-contrast choices.
+2. **Second (Context & Anchoring):** Atomically locks caregiver to canonical child (Foster &rarr; Sarah + Liam, Kinship &rarr; Eleanor + Emma, Respite &rarr; Samantha + Liam) and displays high-contrast "Flight Plan" briefing card with 1 recommended click.
+3. **Third (Hands-on Execution & Success Proof):** 1-tap action completed in <30 seconds with immediate cryptographic and visual proof of success (e.g., "Saved in 11s", "Found $350 emergency fund", "DCF .docx generated").
+
+### Role-by-Role Journey Blueprints (8 Roles Mapped)
+1. **Trainer (VCWTP):** 15-Minute Cohort Simulation &rarr; Demonstrates daily logging &rarr; proves parent privacy barrier.
+2. **Evaluator (Foundation / State IT):** Governance & Audit Walkthrough &rarr; inspects 178 tests, SHA-256 chain, EXIF scrub.
+3. **Legislator / Stakeholder:** 5-Minute Executive Story Tour &rarr; late-night intake, 20-sec care sheet, parent dignity, DCF export.
+4. **New Caregiver:** First Evening Routine &rarr; `+ 15-Sec Log` &rarr; bedtime routine saved in 14s & pediatrician phone at hand.
+5. **Kinship Caregiver:** Days 1–3 Relative Triage &rarr; `Kinship Fast-Track Guide` &rarr; $350 emergency fund & welfare decoder.
+6. **Respite Provider:** 48-Hour Weekend Intake &rarr; `Care Sheet` &rarr; allergies, meds, routines in <30s without case file leak.
+7. **DCF Worker:** Monthly Progress & Court Affidavit &rarr; `Export Month` &rarr; verified .docx with private journal filtered out.
+8. **Candy (Founder):** Sandbox QA & Multi-Persona Switching &rarr; `Review Mode` &rarr; 1-click role swapping & persistent feedback.
+
+### Screen Taxonomy (6 Archetypes)
+- **1. Orientation Screens:** Sandbox Gateway, Mission Control Banner, Kinship Welcome.
+- **2. Launch Screens:** Persona Launcher, 5-Min Tour Hero Card, Quick Action Dock.
+- **3. Training Screens:** Training Hub Flight Simulator, 6 Practice Scenarios, Smart Logger, Emergency Intake Wizard.
+- **4. Validation Screens:** Caregiver Competency Checks, DCF Monthly Report (.docx), Lifebook (.docx), 178 Test Board.
+- **5. Review Screens:** Global Review Mode Modal, Floating Feedback Modal, Role Journey Modals.
+- **6. Administrative Screens:** Real Family Workspace (`local`), SQLite Backup Harness, FS-221A Licensure Audit.
+
+---
+
+## 11. Maintenance Protocol (Founder Home Mandate)
 
 > **PRIMARY PROJECT HOME:** `FOUNDER_ORIENTATION_DASHBOARD.md` and `PROJECT_STATE.md` are the single source of truth.
 >
