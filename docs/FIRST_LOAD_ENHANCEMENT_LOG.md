@@ -91,3 +91,11 @@ All 7 regression and compliance suites passed cleanly (243/243 tests, 100%):
 - **Curriculum Stage Bar Action:** Added a high-contrast `[ 👥 Select Role & Dataset (Day 0, 1, 90, Reset) ]` button in `#trainingCurriculumStage` right next to the 5-minute tour button.
 - **1-Click Local Caregiver Switch:** Added a dedicated card inside `personaLauncherModal` for `Production Caregiver: Candy Chevalier (Local Household)` allowing instant 1-click switching into local production mode with live data.
 
+### 3. Training Look & Feel Default (October 2026)
+- **Problem:** Desktop icon startup always opened `mission_control` which assumed an active foster care shift for Sarah Jenkins with Liam Brooks, confusing trainers who needed a clear training flight simulator front door.
+- **Resolution:**
+  - `initialSection` now defaults to **`training`** (Training Hub) on sample/training boot instead of `mission_control`.
+  - Added primary **`[ 🎓 Training Hub ]`** tab front-and-center in `mainNavigationContainer`.
+  - On startup and on the Training Hub, header context displays `Caregiver: Training Simulator | Child: Select Practice Role (4 Personas)` until the presenter explicitly launches a role (Act 1 Day 0, Act 2 Sarah & Liam, Act 3 Day 90, or Act 4 15 Homes).
+  - Repaired nested HTML in `renderTrainingSimulatorView` and hidden redundant snapshot cards on training view.
+

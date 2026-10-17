@@ -289,8 +289,14 @@
     <div id="mainNavigationContainer" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-2.5">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <div class="flex items-center bg-slate-100/90 p-1 rounded-xl border border-slate-200 space-x-1 shadow-2xs">
-          <!-- Hub 1: Mission Control & Training Front Door -->
-          <button onclick="switchMainSection('mission_control')" id="navBtn-mission_control" class="main-nav-btn active px-4 py-2 rounded-lg transition flex items-center gap-1.5 font-bold text-xs bg-white text-emerald-800 shadow-sm border border-emerald-200/80" title="Sprout Mission Control & Training Front Door">
+          <!-- Hub 0: Training Simulator & Caregiver Flight Simulator -->
+          <button onclick="switchMainSection('training')" id="navBtn-training" class="main-nav-btn active px-4 py-2 rounded-lg transition flex items-center gap-1.5 font-bold text-xs bg-white text-blue-900 shadow-sm border border-blue-200/80" title="Caregiver Flight Simulator & Training Command Center">
+            <i data-lucide="graduation-cap" class="w-4 h-4 text-blue-600"></i>
+            <span>Training Hub</span>
+          </button>
+
+          <!-- Hub 1: Mission Control -->
+          <button onclick="switchMainSection('mission_control')" id="navBtn-mission_control" class="main-nav-btn px-4 py-2 rounded-lg transition text-slate-700 hover:bg-white flex items-center gap-1.5 font-semibold text-xs" title="Sprout Mission Control">
             <i data-lucide="compass" class="w-4 h-4 text-emerald-600"></i>
             <span>Mission Control</span>
           </button>

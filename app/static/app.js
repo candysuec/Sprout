@@ -69,10 +69,10 @@ function sanitizeStartupState() {
     const isDynamicSample = caregiver.startsWith('Sample Caregiver') && !caregiver.includes('Grace & Lydia Holloway');
     const isValid = isSamplePreset || isParent || isDynamicSample;
 
-    // If empty, invalid, or unplaced orphan (e.g. Grace Holloway HH-115), self-heal to Sarah Jenkins
+    // Do NOT force Sarah Jenkins on startup if user is in Training Simulator mode
     if (!isValid || caregiver.includes('Grace & Lydia Holloway')) {
-      caregiver = 'Sample Caregiver (Sarah Jenkins)';
-      localStorage.setItem('caregiverUser', caregiver);
+      caregiver = '';
+      localStorage.removeItem('caregiverUser');
     }
   } else {
     const valid = LOCAL_CAREGIVERS.find(c => c.id === caregiver || c.name === caregiver);
@@ -114,7 +114,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   applyPrivacyBlurState();
 
   await loadChildren();
-  const initialSection = localStorage.getItem('mainSection') || 'mission_control';
+  let initialSection = localStorage.getItem('mainSection');
+  if (!initialSection || initialSection === 'mission_control') {
+    initialSection = (currentSproutMode === 'sample') ? 'training' : 'dashboard';
+  }
   switchMainSection(initialSection);
   updateActCardsActiveState();
   updatePlacedChildBadge();
@@ -546,21 +549,26 @@ function updatePlacedChildBadge() {
 
   // Sync Top Header Caregiver and Child Context Displays
   const headerChild = document.getElementById('headerChildDisplay');
-  if (headerChild) {
-    if (activeChild) {
-      const cName = activeChild.preferred_name || `${activeChild.first_name || ''} ${activeChild.last_name || ''}`.trim() || activeChild.alias;
-      const cRel = activeChild.relationship_type || 'Foster Care';
-      headerChild.textContent = `${cName} (${activeChild.alias || 'LB'} • ${cRel})`;
-    } else {
-      headerChild.textContent = 'No Child Currently Placed';
-    }
-  }
-
   const headerCaregiver = document.getElementById('headerCaregiverDisplay');
-  if (headerCaregiver) {
-    const rawUser = activeCaregiverUser || getActiveCaregiver() || (currentSproutMode === 'local' ? 'Candy Chevalier' : 'Sarah Jenkins');
-    const cleanUser = rawUser.replace(/^(Sample Caregiver \(|Parent Participant \(|\))/g, '');
-    headerCaregiver.textContent = cleanUser;
+
+  if (currentMainSection === 'training' && (!activeCaregiverUser || activeCaregiverUser.includes('Sarah Jenkins'))) {
+    if (headerCaregiver) headerCaregiver.textContent = 'Training Simulator';
+    if (headerChild) headerChild.textContent = 'Select Practice Role (4 Personas)';
+  } else {
+    if (headerChild) {
+      if (activeChild) {
+        const cName = activeChild.preferred_name || `${activeChild.first_name || ''} ${activeChild.last_name || ''}`.trim() || activeChild.alias;
+        const cRel = activeChild.relationship_type || 'Foster Care';
+        headerChild.textContent = `${cName} (${activeChild.alias || 'LB'} • ${cRel})`;
+      } else {
+        headerChild.textContent = 'No Child Currently Placed';
+      }
+    }
+    if (headerCaregiver) {
+      const rawUser = activeCaregiverUser || getActiveCaregiver() || (currentSproutMode === 'local' ? 'Candy Chevalier' : 'Training Simulator');
+      const cleanUser = rawUser.replace(/^(Sample Caregiver \(|Parent Participant \(|\))/g, '');
+      headerCaregiver.textContent = cleanUser;
+    }
   }
 }
 
@@ -652,8 +660,8 @@ async function renderChildSnapshot() {
   const card = document.getElementById('snapshotCard');
   if (!card) return;
 
-  // On the main Dashboard or Mission Control, keep the view clean and un-redundant (they have their own comprehensive layouts)
-  if (currentMainSection === 'dashboard' || currentMainSection === 'mission_control') {
+  // On Dashboard, Mission Control, or Training Hub, keep the view clean and un-redundant
+  if (currentMainSection === 'dashboard' || currentMainSection === 'mission_control' || currentMainSection === 'training') {
     card.classList.add('hidden');
     card.innerHTML = '';
     return;
@@ -5994,19 +6002,6 @@ async function renderTrainingSimulatorView(container) {
             </div>
             <button onclick="launchPersonaReview('respite')" class="w-full py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
               <span>Launch Respite Role</span>
-              <i data-lucide="arrow-right" class="w-4 h-4"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-              <div class="mt-2.5 flex flex-wrap gap-1.5 text-[11px] text-slate-400">
-                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Care & Safety Sheet</span>
-                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Safety Information</span>
-                <span class="px-2 py-0.5 bg-slate-900 rounded-md">Return Summary</span>
-              </div>
-            </div>
-            <button onclick="launchPersonaReview('respite')" class="w-full py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
-              <span>Launch Respite Provider View</span>
               <i data-lucide="arrow-right" class="w-4 h-4"></i>
             </button>
           </div>
