@@ -4088,7 +4088,8 @@ async function loadComplianceAndReimbursementWidgets() {
 
         // Contextual Vermont DCF regulatory guidance for caregivers
         let dcfWhyNote = '';
-        const titleLower = (it.title || '').toLowerCase();
+        const itemName = it.item_name || it.title || 'Compliance Milestone';
+        const titleLower = itemName.toLowerCase();
         if (titleLower.includes('fingerprint') || titleLower.includes('background')) {
           dcfWhyNote = 'Required under VT DCF FS-221A within 90 days for all household adults before full licensing.';
         } else if (titleLower.includes('water') || titleLower.includes('well')) {
@@ -4101,14 +4102,17 @@ async function loadComplianceAndReimbursementWidgets() {
           dcfWhyNote = 'Vermont Child Welfare Training Partnership (VCWTP) foundational pre-service hours.';
         }
 
+        const dateStr = it.due_date ? `• <strong>Due:</strong> ${it.due_date}` : (it.target_date ? `• <strong>Target:</strong> ${it.target_date}` : (it.completed_date ? `• <strong>Done:</strong> ${it.completed_date}` : ''));
+
         return `
           <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 text-sm gap-3">
             <div class="space-y-1">
               <div class="flex flex-wrap items-center gap-2">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">${it.category}</span>
-                <span class="font-bold text-slate-900 text-sm">${it.title}</span>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">${it.category || 'General'}</span>
+                <span class="font-bold text-slate-900 text-sm">${itemName}</span>
+                ${it.standard_code ? `<span class="text-[10px] text-teal-800 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200 font-mono">${it.standard_code}</span>` : ''}
               </div>
-              <p class="text-xs text-slate-600">${it.notes || ''} ${it.target_date ? `• <strong>Target Date:</strong> ${it.target_date}` : ''}</p>
+              <p class="text-xs text-slate-600">${it.notes || ''} ${dateStr}</p>
               ${dcfWhyNote ? `
                 <div class="flex items-center gap-1.5 text-xs text-emerald-800 bg-emerald-50/80 px-2.5 py-1 rounded-lg border border-emerald-200/60 mt-1">
                   <i data-lucide="info" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
