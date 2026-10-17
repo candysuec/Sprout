@@ -9041,3 +9041,419 @@ async function toggleDatasetModeHeader() {
     await loadTabContent();
   }
 }
+
+// =============================================================================
+// GUIDED ONBOARDING WALKTHROUGH CONTROLLERS (DAY 1 ONBOARDING ACROSS 4 ROLES)
+// =============================================================================
+let guidedCurrentRole = 'foster';
+let guidedCurrentStep = 1;
+
+function openGuidedOnboardingModal(role) {
+  closePersonaLauncherModal();
+  closeReviewModeConsoleModal();
+  closeFounderReviewModal();
+
+  guidedCurrentRole = role || 'foster';
+  guidedCurrentStep = 1;
+
+  // Set default placement date to today
+  const placementDateInput = document.getElementById('gwPlacementDate');
+  if (placementDateInput && !placementDateInput.value) {
+    placementDateInput.value = new Date().toISOString().split('T')[0];
+  }
+
+  setGuidedRole(guidedCurrentRole);
+  setGuidedStep(1);
+
+  const modal = document.getElementById('guidedOnboardingModal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    if (window.lucide) lucide.createIcons();
+  }
+}
+
+function closeGuidedOnboardingModal() {
+  const modal = document.getElementById('guidedOnboardingModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function setGuidedRole(role) {
+  guidedCurrentRole = role || 'foster';
+
+  const btnFoster = document.getElementById('btnRoleFoster');
+  const btnKinship = document.getElementById('btnRoleKinship');
+  const btnRespite = document.getElementById('btnRoleRespite');
+  const btnParent = document.getElementById('btnRoleParent');
+  const badge = document.getElementById('guidedRoleBadge');
+
+  const inactiveClass = "px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white border border-slate-700 cursor-pointer transition flex items-center gap-1.5 shrink-0";
+  if (btnFoster) btnFoster.className = inactiveClass;
+  if (btnKinship) btnKinship.className = inactiveClass;
+  if (btnRespite) btnRespite.className = inactiveClass;
+  if (btnParent) btnParent.className = inactiveClass;
+
+  if (role === 'foster') {
+    if (btnFoster) btnFoster.className = "px-3 py-1.5 rounded-xl bg-blue-600 text-white border border-blue-400 shadow-xs cursor-pointer transition flex items-center gap-1.5 shrink-0";
+    if (badge) {
+      badge.textContent = "1. Foster Role";
+      badge.className = "text-[10px] sm:text-xs px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider bg-blue-500/20 text-blue-300 border border-blue-400/40";
+    }
+  } else if (role === 'kinship') {
+    if (btnKinship) btnKinship.className = "px-3 py-1.5 rounded-xl bg-teal-600 text-white border border-teal-400 shadow-xs cursor-pointer transition flex items-center gap-1.5 shrink-0";
+    if (badge) {
+      badge.textContent = "2. Kinship Role";
+      badge.className = "text-[10px] sm:text-xs px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider bg-teal-500/20 text-teal-300 border border-teal-400/40";
+    }
+  } else if (role === 'respite') {
+    if (btnRespite) btnRespite.className = "px-3 py-1.5 rounded-xl bg-rose-600 text-white border border-rose-400 shadow-xs cursor-pointer transition flex items-center gap-1.5 shrink-0";
+    if (badge) {
+      badge.textContent = "3. Respite Role";
+      badge.className = "text-[10px] sm:text-xs px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider bg-rose-500/20 text-rose-300 border border-rose-400/40";
+    }
+  } else if (role === 'parent') {
+    if (btnParent) btnParent.className = "px-3 py-1.5 rounded-xl bg-indigo-600 text-white border border-indigo-400 shadow-xs cursor-pointer transition flex items-center gap-1.5 shrink-0";
+    if (badge) {
+      badge.textContent = "4. Parent Role";
+      badge.className = "text-[10px] sm:text-xs px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-400/40";
+    }
+  }
+
+  const rfFoster = document.getElementById('roleFieldsFoster');
+  const rfKinship = document.getElementById('roleFieldsKinship');
+  const rfRespite = document.getElementById('roleFieldsRespite');
+  const rfParent = document.getElementById('roleFieldsParent');
+
+  if (rfFoster) rfFoster.classList.toggle('hidden', role !== 'foster');
+  if (rfKinship) rfKinship.classList.toggle('hidden', role !== 'kinship');
+  if (rfRespite) rfRespite.classList.toggle('hidden', role !== 'respite');
+  if (rfParent) rfParent.classList.toggle('hidden', role !== 'parent');
+
+  if (guidedCurrentStep === 4) {
+    updateGuidedReviewCard();
+  }
+  if (window.lucide) lucide.createIcons();
+}
+
+function setGuidedStep(step) {
+  guidedCurrentStep = step;
+
+  const s1 = document.getElementById('guidedStep1');
+  const s2 = document.getElementById('guidedStep2');
+  const s3 = document.getElementById('guidedStep3');
+  const s4 = document.getElementById('guidedStep4');
+
+  if (s1) s1.classList.toggle('hidden', step !== 1);
+  if (s2) s2.classList.toggle('hidden', step !== 2);
+  if (s3) s3.classList.toggle('hidden', step !== 3);
+  if (s4) s4.classList.toggle('hidden', step !== 4);
+
+  const b1 = document.getElementById('stepBadge1');
+  const b2 = document.getElementById('stepBadge2');
+  const b3 = document.getElementById('stepBadge3');
+  const b4 = document.getElementById('stepBadge4');
+  const pageLabel = document.getElementById('stepPageNumber');
+  if (pageLabel) pageLabel.textContent = `Step ${step} of 4`;
+
+  const activeBadgeClass = "px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold";
+  const inactiveBadgeClass = "px-2.5 py-1 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 font-bold";
+
+  if (b1) b1.className = (step >= 1) ? activeBadgeClass : inactiveBadgeClass;
+  if (b2) b2.className = (step >= 2) ? activeBadgeClass : inactiveBadgeClass;
+  if (b3) b3.className = (step >= 3) ? activeBadgeClass : inactiveBadgeClass;
+  if (b4) b4.className = (step >= 4) ? activeBadgeClass : inactiveBadgeClass;
+
+  const btnPrev = document.getElementById('btnGwPrev');
+  const btnNext = document.getElementById('btnGwNext');
+  const btnSubmit = document.getElementById('btnGwSubmit');
+
+  if (btnPrev) {
+    if (step === 1) {
+      btnPrev.disabled = true;
+      btnPrev.classList.add('opacity-50', 'cursor-not-allowed');
+    } else {
+      btnPrev.disabled = false;
+      btnPrev.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+  }
+
+  if (btnNext && btnSubmit) {
+    if (step === 4) {
+      btnNext.classList.add('hidden');
+      btnSubmit.classList.remove('hidden');
+      updateGuidedReviewCard();
+    } else {
+      btnNext.classList.remove('hidden');
+      btnSubmit.classList.add('hidden');
+      const nextLabels = {
+        1: "Next: Placed Child",
+        2: "Next: Role Safety",
+        3: "Next: Review & Start"
+      };
+      const labelSpan = btnNext.querySelector('span');
+      if (labelSpan) labelSpan.textContent = nextLabels[step] || "Next";
+    }
+  }
+
+  if (window.lucide) lucide.createIcons();
+}
+
+function nextGuidedStep() {
+  const errEl = document.getElementById('gwErrorMessage');
+  if (errEl) errEl.classList.add('hidden');
+
+  if (guidedCurrentStep === 1) {
+    const cgName = (document.getElementById('gwCaregiverName')?.value || '').trim();
+    const address = (document.getElementById('gwAddress')?.value || '').trim();
+    const town = (document.getElementById('gwTown')?.value || '').trim();
+    if (!cgName) {
+      alert("Please enter your name (caregiver / participant).");
+      return;
+    }
+    if (!address || !town) {
+      alert("Please enter your residence street address and town.");
+      return;
+    }
+  } else if (guidedCurrentStep === 2) {
+    const chName = (document.getElementById('gwChildName')?.value || '').trim();
+    if (!chName) {
+      alert("Please enter the child's preferred name or privacy initials.");
+      return;
+    }
+  }
+
+  if (guidedCurrentStep < 4) {
+    setGuidedStep(guidedCurrentStep + 1);
+  }
+}
+
+function prevGuidedStep() {
+  if (guidedCurrentStep > 1) {
+    setGuidedStep(guidedCurrentStep - 1);
+  }
+}
+
+function setGuidedAllergy(val) {
+  const el = document.getElementById('gwChildAllergies');
+  if (!el) return;
+  if (!el.value || el.value === 'No known allergies') {
+    el.value = val;
+  } else if (!el.value.includes(val)) {
+    el.value = `${el.value}, ${val}`;
+  }
+}
+
+function updateGuidedReviewCard() {
+  const cgName = (document.getElementById('gwCaregiverName')?.value || '').trim() || 'New Caregiver';
+  const hhName = (document.getElementById('gwHouseholdName')?.value || '').trim() || `${cgName.split(' ').pop()} Home`;
+  const hhStructure = document.getElementById('gwHouseholdStructure')?.value || 'Single Adult';
+  const address = (document.getElementById('gwAddress')?.value || '').trim() || '123 Green Mountain Way';
+  const town = (document.getElementById('gwTown')?.value || '').trim() || 'Burlington';
+  const zip = (document.getElementById('gwZip')?.value || '').trim() || '05401';
+
+  const chName = (document.getElementById('gwChildName')?.value || '').trim() || 'Child';
+  const chAge = (document.getElementById('gwChildAge')?.value || '').trim() || '3';
+  const chGender = document.getElementById('gwChildGender')?.value || 'Female';
+  const allergies = (document.getElementById('gwChildAllergies')?.value || '').trim() || 'No known allergies';
+
+  const badgeEl = document.getElementById('reviewRoleBadge');
+  const cgEl = document.getElementById('reviewCaregiverName');
+  const addrEl = document.getElementById('reviewAddress');
+  const hhEl = document.getElementById('reviewHousehold');
+  const chEl = document.getElementById('reviewChildName');
+  const chDetEl = document.getElementById('reviewChildDetails');
+  const allEl = document.getElementById('reviewAllergies');
+  const pkgEl = document.getElementById('reviewRolePackage');
+
+  if (cgEl) cgEl.textContent = cgName;
+  if (addrEl) addrEl.textContent = `${address}, ${town}, VT ${zip}`;
+  if (hhEl) hhEl.textContent = `${hhName} (${hhStructure})`;
+  if (chEl) chEl.textContent = chName;
+  if (chDetEl) chDetEl.textContent = `Age ${chAge} • ${chGender} • Day 1 Intake`;
+  if (allEl) allEl.textContent = `Allergies: ${allergies}`;
+
+  if (guidedCurrentRole === 'foster') {
+    if (badgeEl) {
+      badgeEl.textContent = "Foster Caregiver • Day 1";
+      badgeEl.className = "text-xs font-black uppercase tracking-wider text-blue-400 bg-blue-950/80 border border-blue-600/50 px-3 py-1 rounded-full";
+    }
+    if (pkgEl) {
+      pkgEl.innerHTML = "<strong>Foster Day 1 Package:</strong> Statutory 30-Day EPSDT Health Assessment clock (30 days remaining), DCF caseworker linkage, and initial safety compliance checklist.";
+    }
+  } else if (guidedCurrentRole === 'kinship') {
+    if (badgeEl) {
+      badgeEl.textContent = "Kinship Caregiver • Day 1";
+      badgeEl.className = "text-xs font-black uppercase tracking-wider text-teal-400 bg-teal-950/80 border border-teal-600/50 px-3 py-1 rounded-full";
+    }
+    const rel = document.getElementById('gwKinshipRelation')?.value || 'Relative Caregiver';
+    if (pkgEl) {
+      pkgEl.innerHTML = `<strong>Kinship Day 1 Package:</strong> Emergency kinship placement (${rel}), pre-filled $350 Reach Up clothing grant triage, and plain-English Acronym Decoder.`;
+    }
+  } else if (guidedCurrentRole === 'respite') {
+    if (badgeEl) {
+      badgeEl.textContent = "Respite Provider • Day 1";
+      badgeEl.className = "text-xs font-black uppercase tracking-wider text-rose-400 bg-rose-950/80 border border-rose-600/50 px-3 py-1 rounded-full";
+    }
+    const dur = document.getElementById('gwRespiteDuration')?.value || '48-Hour Weekend Respite';
+    if (pkgEl) {
+      pkgEl.innerHTML = `<strong>Respite Day 1 Package:</strong> ${dur} stay, 1-page Care & Safety Sheet with bedtime soothing instructions, and clean Medication Administration Record (MAR).`;
+    }
+  } else if (guidedCurrentRole === 'parent') {
+    if (badgeEl) {
+      badgeEl.textContent = "Parent Participant • Day 1";
+      badgeEl.className = "text-xs font-black uppercase tracking-wider text-indigo-400 bg-indigo-950/80 border border-indigo-600/50 px-3 py-1 rounded-full";
+    }
+    const sched = (document.getElementById('gwParentVisitSchedule')?.value || '').trim() || 'Weekly Supervised Visits at Easterseals';
+    if (pkgEl) {
+      pkgEl.innerHTML = `<strong>Parent Day 1 Package:</strong> Provisional 30-Day Orientation status, transparent affirmative action roadmap (0% baseline), and supervised family visits: ${sched}.`;
+    }
+  }
+}
+
+async function submitGuidedOnboarding() {
+  const submitBtn = document.getElementById('btnGwSubmit');
+  const errEl = document.getElementById('gwErrorMessage');
+  if (errEl) errEl.classList.add('hidden');
+
+  const cgName = (document.getElementById('gwCaregiverName')?.value || '').trim();
+  const chName = (document.getElementById('gwChildName')?.value || '').trim();
+
+  if (!cgName || !chName) {
+    alert("Please ensure caregiver name and child preferred name are entered.");
+    return;
+  }
+
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Initializing Day 1 Sandbox...</span>`;
+    if (window.lucide) lucide.createIcons();
+  }
+
+  const payload = {
+    role_type: guidedCurrentRole,
+    caregiver_name: cgName,
+    caregiver_phone: (document.getElementById('gwCaregiverPhone')?.value || '').trim(),
+    caregiver_email: (document.getElementById('gwCaregiverEmail')?.value || '').trim(),
+    household_name: (document.getElementById('gwHouseholdName')?.value || '').trim(),
+    household_structure: document.getElementById('gwHouseholdStructure')?.value || 'Single Adult',
+    household_members: (document.getElementById('gwHouseholdMembers')?.value || '').trim(),
+    address: (document.getElementById('gwAddress')?.value || '').trim(),
+    town: (document.getElementById('gwTown')?.value || '').trim(),
+    zip_code: (document.getElementById('gwZip')?.value || '').trim(),
+    child_name: chName,
+    placement_date: document.getElementById('gwPlacementDate')?.value || new Date().toISOString().split('T')[0],
+    child_dob: document.getElementById('gwChildDob')?.value || '',
+    gender: document.getElementById('gwChildGender')?.value || 'Female',
+    allergies: (document.getElementById('gwChildAllergies')?.value || '').trim() || 'No known allergies',
+    comfort_items: (document.getElementById('gwChildComfort')?.value || '').trim(),
+    role_specific: {
+      dcf_office: document.getElementById('gwFosterDcfOffice')?.value || '',
+      caseworker_name: (document.getElementById('gwFosterCaseworker')?.value || '').trim(),
+      caseworker_phone: (document.getElementById('gwFosterCwPhone')?.value || '').trim(),
+      caseworker_email: (document.getElementById('gwFosterCwEmail')?.value || '').trim(),
+      kinship_relation: document.getElementById('gwKinshipRelation')?.value || '',
+      reach_up_applied: document.getElementById('gwKinshipGrant')?.checked ?? true,
+      respite_duration: document.getElementById('gwRespiteDuration')?.value || '',
+      respite_bedtime_routine: (document.getElementById('gwRespiteBedtime')?.value || '').trim(),
+      fsw_worker: (document.getElementById('gwParentWorker')?.value || '').trim(),
+      parent_visitation_schedule: (document.getElementById('gwParentVisitSchedule')?.value || '').trim(),
+      reunification_goal: document.getElementById('gwParentGoal')?.value || ''
+    }
+  };
+
+  try {
+    const res = await apiFetch('/api/onboarding/walkthrough', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.success) {
+      throw new Error(res.error || "Failed to create Day 1 profile");
+    }
+
+    const newEntry = {
+      id: res.caregiver_user,
+      name: `${res.caregiver_name} (${res.role_type.toUpperCase()} • Day 1 Onboarded)`,
+      initials: res.caregiver_initials || 'CG',
+      color: 'bg-emerald-600'
+    };
+    if (!SAMPLE_CAREGIVERS.some(c => c.id === newEntry.id)) {
+      SAMPLE_CAREGIVERS.unshift(newEntry);
+    }
+
+    currentSproutMode = 'sample';
+    currentSproutDataset = 'a';
+    activeCaregiverUser = res.caregiver_user;
+    localStorage.setItem('sproutMode', 'sample');
+    localStorage.setItem('sproutDataset', 'a');
+    localStorage.setItem('caregiverUser', activeCaregiverUser);
+
+    populateCaregiverDropdown();
+    updateWorkspaceToggleUI();
+    updateSproutTheme();
+    if (typeof updateDatasetBadgeUI === "function") updateDatasetBadgeUI();
+
+    await loadChildren();
+
+    currentChildId = res.child_id;
+    const select = document.getElementById('childSelect');
+    if (select) select.value = currentChildId;
+    updatePlacedChildBadge();
+    renderChildSnapshot();
+
+    closeGuidedOnboardingModal();
+    closePersonaLauncherModal();
+
+    switchMainSection(res.target_view || 'mission_control');
+
+    if (res.role_type === 'kinship') {
+      setTimeout(() => openKinshipFastTrackModal(), 400);
+    } else if (res.role_type === 'respite') {
+      setTimeout(() => openEmergencyHandoffCard(), 400);
+    }
+
+    showDayOneWelcomeBanner(res.caregiver_name, res.child_name, res.role_type);
+
+  } catch (err) {
+    console.error("Walkthrough submission error:", err);
+    if (errEl) {
+      errEl.textContent = `Error: ${err.message}`;
+      errEl.classList.remove('hidden');
+    } else {
+      alert(`Error creating Day 1 profile: ${err.message}`);
+    }
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `<i data-lucide="sparkles" class="w-4 h-4"></i><span>Launch Day 1 Sandbox</span>`;
+      if (window.lucide) lucide.createIcons();
+    }
+  }
+}
+
+function showDayOneWelcomeBanner(caregiverName, childName, roleType) {
+  const banner = document.createElement('div');
+  banner.className = "fixed bottom-6 right-6 z-[80] bg-slate-900 border-2 border-emerald-500 text-white rounded-2xl shadow-2xl p-4 max-w-md animate-fadeIn flex items-start gap-3.5";
+  banner.innerHTML = `
+    <div class="p-2 bg-emerald-500/20 text-emerald-400 rounded-xl border border-emerald-500/40 shrink-0 mt-0.5">
+      <i data-lucide="sparkles" class="w-5 h-5"></i>
+    </div>
+    <div class="flex-1">
+      <div class="flex items-center justify-between mb-1">
+        <strong class="font-black text-emerald-400 text-sm">Welcome to Sprout, ${caregiverName}!</strong>
+        <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Day 1 Active</span>
+      </div>
+      <p class="text-xs text-slate-300 leading-snug">
+        Your ${roleType.toUpperCase()} profile and Day 1 placement records for <strong>${childName}</strong> are live in the Practice Sandbox.
+      </p>
+    </div>
+    <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-white p-1 rounded-lg cursor-pointer">
+      <i data-lucide="x" class="w-4 h-4"></i>
+    </button>
+  `;
+  document.body.appendChild(banner);
+  if (window.lucide) lucide.createIcons();
+  setTimeout(() => {
+    if (banner.parentElement) banner.remove();
+  }, 9000);
+}

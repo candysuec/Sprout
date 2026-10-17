@@ -750,6 +750,284 @@ def add_child():
     return json_res({"id": new_id, "message": "Child profile created successfully"})
 
 
+@app.route('/api/onboarding/walkthrough', method=['POST'])
+def post_onboarding_walkthrough():
+    data = request.json or {}
+    role_type = (data.get('role_type') or 'foster').strip().lower()
+    caregiver_name = (data.get('caregiver_name') or '').strip()
+    if not caregiver_name:
+        return json_res({"error": "Caregiver name is required."}, 400)
+
+    caregiver_phone = (data.get('caregiver_phone') or '').strip()
+    caregiver_email = (data.get('caregiver_email') or '').strip()
+    address = (data.get('address') or '').strip() or "123 Green Mountain Way"
+    town = (data.get('town') or '').strip() or "Burlington"
+    zip_code = (data.get('zip_code') or '').strip() or "05401"
+    household_name = (data.get('household_name') or '').strip() or f"{caregiver_name.split()[-1]} Home"
+    household_structure = (data.get('household_structure') or 'Single Adult').strip()
+    household_members = (data.get('household_members') or '').strip()
+
+    child_name = (data.get('child_name') or '').strip()
+    if not child_name:
+        return json_res({"error": "Child preferred name or initials required."}, 400)
+
+    alias = _derive_alias({"first_name": child_name, "last_name": ""})
+    if not alias:
+        alias = "".join([part[0] for part in child_name.split()[:2]]).upper()
+    if not alias or len(alias) > 4:
+        alias = alias[:4].upper()
+    if not ALIAS_RE.match(alias):
+        alias = "CD"
+
+    today_str = datetime.date.today().isoformat()
+    child_dob = (data.get('child_dob') or '').strip()
+    if not child_dob:
+        child_dob = (datetime.date.today() - datetime.timedelta(days=365 * 3)).isoformat()
+
+    placement_date = (data.get('placement_date') or '').strip() or today_str
+    gender = (data.get('gender') or 'Female').strip()
+    allergies = (data.get('allergies') or '').strip() or "No known allergies"
+    special_needs = (data.get('special_needs') or '').strip()
+    comfort_items = (data.get('comfort_items') or '').strip()
+    role_specific = data.get('role_specific') or {}
+
+    try:
+        b_year = int(child_dob.split('-')[0])
+        age = max(0, datetime.date.today().year - b_year)
+    except Exception:
+        age = 3
+
+    if age <= 1:
+        age_bracket = "Infant"
+    elif age <= 4:
+        age_bracket = "Toddler"
+    elif age <= 11:
+        age_bracket = "Elementary"
+    elif age <= 17:
+        age_bracket = "Teen"
+    else:
+        age_bracket = "Young Adult"
+
+    import sample_dataset as sd
+
+    existing_hh_nums = [int(h['HouseholdID'].replace('HH-', '')) for h in sd.HOUSEHOLDS if h['HouseholdID'].replace('HH-', '').isdigit()]
+    next_hh_num = max(existing_hh_nums + [900]) + 1
+    new_hh_id = f"HH-{next_hh_num}"
+
+    existing_ch_nums = [int(c['ChildID'].replace('CH-', '')) for c in sd.CHILDREN if c['ChildID'].replace('CH-', '').isdigit()]
+    next_ch_num = max(existing_ch_nums + [900]) + 1
+    new_ch_id = f"CH-{next_ch_num}"
+    new_ch_int_id = next_ch_num
+
+    plc_num = len(sd.PLACEMENTS) + 500
+    new_plc_id = f"PLC-{plc_num}"
+
+    if role_type == 'foster':
+        placement_type = "Foster Care"
+        permanency_goal = "Reunification"
+        target_view = "mission_control"
+        certifications = ["Day 1 Statutory Intake", "Trauma-Informed Care (VCWTP In-Progress)"]
+    elif role_type == 'kinship':
+        placement_type = "Kinship Care"
+        permanency_goal = "Relative Guardianship"
+        target_view = "kinship"
+        certifications = ["Emergency Kinship Placement Clearance", "Reach Up Triage Registered"]
+    elif role_type == 'respite':
+        placement_type = "Respite Care"
+        permanency_goal = "Family Support"
+        target_view = "mission_control"
+        certifications = ["Certified Respite Provider", "Emergency Handoff Safety Certified"]
+    elif role_type == 'parent':
+        placement_type = "Parent Participant"
+        permanency_goal = "Reunification"
+        target_view = "parent"
+        certifications = ["Parent Participant", "30-Day Orientation Enrolled"]
+    else:
+        placement_type = "Foster Care"
+        permanency_goal = "Reunification"
+        target_view = "mission_control"
+        certifications = ["Day 1 Onboarded Caregiver"]
+
+    new_household = {
+        "HouseholdID": new_hh_id,
+        "HouseholdName": household_name,
+        "Address": f"{address}, {town}, VT {zip_code}",
+        "Status": "Active",
+        "Capacity": 2,
+        "OccupiedBeds": 1,
+        "OpenBeds": 1,
+        "HouseholdStructure": household_structure,
+        "CaregiverStage": "Newly Onboarded (Day 1)",
+        "Approvals": [placement_type],
+        "CurrentPlacements": 1,
+        "YearsWorkingWithDCF": 0.0,
+        "PlacementsCompleted": 0,
+        "AdoptionFinalizations": 0,
+        "SpecialCertifications": certifications
+    }
+    sd.HOUSEHOLDS.append(new_household)
+
+    new_adult = {
+        "AdultID": f"ADM-{new_hh_id}A",
+        "HouseholdID": new_hh_id,
+        "Name": caregiver_name,
+        "Role": "Primary Caregiver" if role_type != 'parent' else "Parent Participant",
+        "RelationshipCategory": household_structure,
+        "Email": caregiver_email,
+        "Phone": caregiver_phone
+    }
+    sd.ADULT_MEMBERS.append(new_adult)
+
+    new_child = {
+        "ChildID": new_ch_id,
+        "Initials": alias,
+        "FullName": child_name,
+        "DOB": child_dob,
+        "Age": age,
+        "AgeBracket": age_bracket,
+        "Gender": gender,
+        "PermanencyGoal": permanency_goal
+    }
+    sd.CHILDREN.append(new_child)
+
+    new_placement = {
+        "PlacementID": new_plc_id,
+        "ChildID": new_ch_id,
+        "HouseholdID": new_hh_id,
+        "PlacementType": placement_type,
+        "ProgramParticipation": ["Day 1 Intake", "KinCare OS Onboarding"],
+        "StartDate": placement_date,
+        "SpecialScenario": f"Day 1 onboarding for {child_name} with {caregiver_name}"
+    }
+    sd.PLACEMENTS.append(new_placement)
+
+    if hasattr(sd, 'SAMPLE_COMPLIANCE_DAY_ONE'):
+        if role_type == 'foster':
+            sd.SAMPLE_COMPLIANCE_DAY_ONE[new_hh_id] = [
+                {"id": 901, "standard_code": "FS-221A § 4.1", "item_name": "Initial Fire Safety & Evacuation Plan Drill", "category": "Safety", "status": "Pending Schedule", "due_date": "Within 30 Days", "completed_date": "", "notes": "Schedule and test with placed child."},
+                {"id": 902, "standard_code": "FS-221A § 6.2", "item_name": "VCWTP Annual Caregiver Training (15 Hours)", "category": "Training", "status": "Not Started", "due_date": "Year 1 Deadline", "completed_date": "", "notes": "0 of 15 required foundational hours completed."},
+                {"id": 903, "standard_code": "FS-221A § 1.1", "item_name": "Emergency Worker & Pediatrician Contact Card", "category": "Safety", "status": "In Progress", "due_date": "Day 1 Triage", "completed_date": "", "notes": "Post DCF after-hours numbers and clinic on refrigerator."}
+            ]
+        elif role_type == 'kinship':
+            sd.SAMPLE_COMPLIANCE_DAY_ONE[new_hh_id] = [
+                {"id": 904, "standard_code": "FS-221A § 1.2", "item_name": "Provisional Kinship Home Safety Walkthrough", "category": "Provisional", "status": "In Progress", "due_date": "Within 48 Hours", "completed_date": "", "notes": "Emergency safety checklist with family services worker."},
+                {"id": 905, "standard_code": "FS-221A § 2.1", "item_name": "Kinship Adult Background & Fingerprint Deadline", "category": "Licensing", "status": "Pending", "due_date": "Within 90 Days", "completed_date": "", "notes": "VCIC and FBI fingerprint cards submitted."},
+                {"id": 906, "standard_code": "Reach Up § 3.0", "item_name": "$350 Emergency Clothing Grant Triage", "category": "Financial", "status": "In Progress", "due_date": "Day 1 Triage", "completed_date": "", "notes": "Application generated for immediate clothing and supplies."}
+            ]
+        elif role_type == 'respite':
+            sd.SAMPLE_COMPLIANCE_DAY_ONE[new_hh_id] = [
+                {"id": 907, "standard_code": "FS-221A § 7.1", "item_name": "Respite Care & Safety Handoff Sheet Completed", "category": "Safety", "status": "Completed", "due_date": "Handoff", "completed_date": today_str, "notes": "Emergency contacts, bedtime routine, and allergies confirmed."},
+                {"id": 908, "standard_code": "FS-221A § 5.2", "item_name": "Medication Administration Record (MAR) Setup", "category": "Medical", "status": "In Progress", "due_date": "First Dose", "completed_date": "", "notes": "MAR verified against primary caregiver instructions."}
+            ]
+
+    conn = get_connection()
+    try:
+        c = conn.cursor()
+        c.execute("""
+            INSERT OR REPLACE INTO children (
+                id, first_name, last_name, alias, preferred_name, dob, placement_date,
+                gender, status, permanency_goal, allergies, emergency_notes,
+                relationship_type, episode_status, comfort_items, care_routines
+            ) VALUES (?, ?, '', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active Episode (Day 1)', ?, ?)
+        """, (
+            new_ch_int_id, alias, alias, f"{child_name} ({alias})", child_dob, placement_date,
+            gender, f"Active ({placement_type}) • Day 1", permanency_goal,
+            allergies, special_needs, placement_type, comfort_items,
+            role_specific.get('respite_bedtime_routine') or "Bedtime routine established at onboarding."
+        ))
+
+        cw_name = role_specific.get('caseworker_name') or role_specific.get('fsw_worker') or "DCF District Family Services Worker"
+        cw_phone = role_specific.get('caseworker_phone') or "(802) 863-7370"
+        cw_email = role_specific.get('caseworker_email') or "fosterkinship@vermont.gov"
+        c.execute("""
+            INSERT INTO contacts (child_id, role_type, full_name, phone, email, organization, is_emergency, notes)
+            VALUES (?, 'DCF Family Services Worker', ?, ?, ?, 'Vermont DCF', 1, ?)
+        """, (new_ch_int_id, cw_name, cw_phone, cw_email, f"Assigned DCF caseworker for {child_name}"))
+
+        c.execute("""
+            INSERT INTO timeline_records (
+                child_id, category, sub_type, title, event_date, summary,
+                classification, domain, sensitivity_level, retention_state
+            ) VALUES (?, 'official', 'placement_intake', ?, ?, ?, 'official', 'child', 'sensitive', 'Active')
+        """, (
+            new_ch_int_id,
+            f"Day 1 Placement Intake Completed: {child_name} ({placement_type})",
+            placement_date,
+            f"Caregiver {caregiver_name} onboarded into Sprout Day 1 Sandbox. Address: {address}, {town}, VT {zip_code}. Household: {household_name}."
+        ))
+
+        if role_type == 'foster':
+            dcf_office = role_specific.get('dcf_office') or "Burlington District Office"
+            c.execute("""
+                INSERT INTO timeline_records (
+                    child_id, category, sub_type, title, event_date, summary,
+                    classification, domain, sensitivity_level, retention_state
+                ) VALUES (?, 'medical', 'epsdt_clock', '30-Day EPSDT Health Assessment Clock Initialized', ?, ?, 'official', 'child', 'sensitive', 'Active')
+            """, (
+                new_ch_int_id,
+                placement_date,
+                f"Statutory 30-day health clock initiated on Day 1 (30 days remaining). DCF Office: {dcf_office}. Primary Caseworker: {cw_name}."
+            ))
+        elif role_type == 'kinship':
+            relation = role_specific.get('kinship_relation') or "Relative Caregiver"
+            c.execute("""
+                INSERT INTO timeline_records (
+                    child_id, category, sub_type, title, event_date, summary,
+                    classification, domain, sensitivity_level, retention_state
+                ) VALUES (?, 'financial', 'reach_up_grant', 'Vermont Reach Up & $350 Emergency Grant Triage Registered', ?, ?, 'official', 'child', 'sensitive', 'Active')
+            """, (
+                new_ch_int_id,
+                placement_date,
+                f"Kinship relationship confirmed: {relation}. Emergency Clothing & Supply Grant application ($350) initialized. Kinship Navigator active."
+            ))
+        elif role_type == 'respite':
+            duration = role_specific.get('respite_duration') or "48-Hour Weekend Respite"
+            c.execute("""
+                INSERT INTO timeline_records (
+                    child_id, category, sub_type, title, event_date, summary,
+                    classification, domain, sensitivity_level, retention_state
+                ) VALUES (?, 'official', 'respite_handoff', '48-Hour Respite Care & Safety Sheet Initialized', ?, ?, 'official', 'child', 'sensitive', 'Active')
+            """, (
+                new_ch_int_id,
+                placement_date,
+                f"Respite stay duration: {duration}. Bedtime soothe instructions and clean Medication Administration Record (MAR) verified."
+            ))
+        elif role_type == 'parent':
+            visit_sched = role_specific.get('parent_visitation_schedule') or "Weekly Supervised Visits at Easterseals Family Center"
+            c.execute("""
+                INSERT INTO timeline_records (
+                    child_id, category, sub_type, title, event_date, summary,
+                    classification, domain, sensitivity_level, retention_state
+                ) VALUES (?, 'parent', 'orientation', 'Day 1 Parent Portal Provisional Access Opened', ?, ?, 'shared_family', 'parent', 'standard', 'Active')
+            """, (
+                new_ch_int_id,
+                placement_date,
+                f"Provisional 30-Day orientation window active. First family time visit scheduled: {visit_sched}. Clean roadmap initialized."
+            ))
+
+        conn.commit()
+    finally:
+        conn.close()
+
+    caregiver_user = f"Sample Caregiver ({caregiver_name})" if role_type != 'parent' else f"Parent Participant ({caregiver_name} - Day 1)"
+    caregiver_initials = "".join([part[0] for part in caregiver_name.split()[:2]]).upper() or "CG"
+
+    return json_res({
+        "success": True,
+        "caregiver_user": caregiver_user,
+        "caregiver_name": caregiver_name,
+        "caregiver_initials": caregiver_initials,
+        "household_id": new_hh_id,
+        "household_name": household_name,
+        "child_id": new_ch_int_id,
+        "child_alias": alias,
+        "child_name": child_name,
+        "role_type": role_type,
+        "target_view": target_view,
+        "message": f"Welcome to Sprout! Day 1 onboarding complete for {caregiver_name} and {child_name}."
+    })
+
+
 @app.route('/api/children/<child_id:int>', method=['PUT'])
 def update_child(child_id):
     data = request.json or {}

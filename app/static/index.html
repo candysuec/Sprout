@@ -83,6 +83,12 @@
           <span>Switch Role</span>
         </button>
 
+        <!-- Guided Day 1 Onboarding Walkthrough Launcher Button (Founder Candy Request) -->
+        <button id="btnOpenGuidedOnboarding" onclick="openGuidedOnboardingModal()" class="flex items-center bg-blue-600 hover:bg-blue-500 text-white font-black rounded-xl px-3.5 py-1.5 text-xs transition shadow-md gap-1.5 cursor-pointer shrink-0 border border-blue-400" title="Start Guided Day 1 Walkthrough (Add New Caregiver, Household & Child)">
+          <i data-lucide="user-plus" class="w-3.5 h-3.5 text-white"></i>
+          <span>+ Day 1 Setup</span>
+        </button>
+
         <!-- Director / Review Mode Console Launcher Button (Layer 1: Meta-Layer) -->
         <button id="btnOpenReviewMode" onclick="openReviewModeConsoleModal()" class="flex items-center bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 text-slate-200 hover:text-white rounded-xl px-3 py-1.5 text-xs font-bold transition shadow-xs gap-1.5 cursor-pointer shrink-0" title="Open Director's Review Console & System Architecture">
           <i data-lucide="play-circle" class="w-3.5 h-3.5 text-emerald-400"></i>
@@ -253,6 +259,12 @@
           <button onclick="openPersonaLauncherModal()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs px-3.5 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5 shrink-0 cursor-pointer" title="Open Persona Launcher to switch practice caregivers">
             <i data-lucide="users" class="w-4 h-4 text-emerald-100"></i>
             <span>Switch Role</span>
+          </button>
+
+          <!-- Guided Day 1 Setup Quick Action (Candy Request) -->
+          <button onclick="openGuidedOnboardingModal()" class="bg-blue-600 hover:bg-blue-500 text-white font-black text-xs px-3.5 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5 shrink-0 cursor-pointer border border-blue-400" title="Start Guided Day 1 Walkthrough (Add New Caregiver, Household & Child)">
+            <i data-lucide="user-plus" class="w-4 h-4 text-blue-100"></i>
+            <span>+ Day 1 Setup</span>
           </button>
         </div>
 
@@ -1587,6 +1599,430 @@
   </div>
 
   <!-- ========================================================================= -->
+  <!-- GUIDED ONBOARDING WALKTHROUGH MODAL (DAY 1 ONBOARDING ACROSS 4 ROLES)   -->
+  <!-- ========================================================================= -->
+  <div id="guidedOnboardingModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[70] flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-slate-900 border border-emerald-500/70 rounded-3xl max-w-3xl w-full shadow-2xl overflow-hidden animate-fadeIn flex flex-col max-h-[92vh]">
+      
+      <!-- Top Modal Header -->
+      <div class="bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 p-5 sm:p-6 border-b border-emerald-700/50 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="p-2.5 sm:p-3 bg-emerald-500/20 text-emerald-400 rounded-2xl border border-emerald-500/40 shrink-0">
+            <i data-lucide="user-plus" class="w-6 h-6 sm:w-7 sm:h-7"></i>
+          </div>
+          <div>
+            <h2 class="text-lg sm:text-xl font-black text-white tracking-tight flex items-center gap-2">
+              <span>DAY 1 GUIDED ONBOARDING</span>
+              <span id="guidedRoleBadge" class="text-[10px] sm:text-xs px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider bg-blue-500/20 text-blue-300 border border-blue-400/40">Foster Role</span>
+            </h2>
+            <p class="text-xs text-emerald-300 font-medium">Add a new caregiver, household, and child from scratch into Sprout Day 1 Sandbox</p>
+          </div>
+        </div>
+        <button onclick="closeGuidedOnboardingModal()" class="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition cursor-pointer" title="Close Walkthrough">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Role Selector Strip -->
+      <div class="bg-slate-950/60 px-5 py-3 border-b border-slate-800 flex items-center justify-between gap-2 overflow-x-auto shrink-0">
+        <span class="text-[11px] font-black text-slate-400 uppercase tracking-wider shrink-0 flex items-center gap-1.5">
+          <i data-lucide="shield" class="w-3.5 h-3.5 text-emerald-400"></i> Role:
+        </span>
+        <div class="flex items-center gap-1.5 text-xs font-bold">
+          <button id="btnRoleFoster" onclick="setGuidedRole('foster')" class="px-3 py-1.5 rounded-xl bg-blue-600 text-white border border-blue-400 shadow-xs cursor-pointer transition flex items-center gap-1.5 shrink-0">
+            <i data-lucide="heart-handshake" class="w-3.5 h-3.5"></i>
+            <span>1. Foster Caregiver</span>
+          </button>
+          <button id="btnRoleKinship" onclick="setGuidedRole('kinship')" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white border border-slate-700 cursor-pointer transition flex items-center gap-1.5 shrink-0">
+            <i data-lucide="users-2" class="w-3.5 h-3.5"></i>
+            <span>2. Kinship Caregiver</span>
+          </button>
+          <button id="btnRoleRespite" onclick="setGuidedRole('respite')" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white border border-slate-700 cursor-pointer transition flex items-center gap-1.5 shrink-0">
+            <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
+            <span>3. Respite Provider</span>
+          </button>
+          <button id="btnRoleParent" onclick="setGuidedRole('parent')" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white border border-slate-700 cursor-pointer transition flex items-center gap-1.5 shrink-0">
+            <i data-lucide="heart" class="w-3.5 h-3.5"></i>
+            <span>4. Parent Participant</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Stepper Indicator -->
+      <div class="bg-slate-900/90 px-6 py-2.5 border-b border-slate-800 flex items-center justify-between text-xs font-bold shrink-0">
+        <div class="flex items-center gap-2" id="guidedStepIndicator">
+          <span id="stepBadge1" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">1. Home & Household</span>
+          <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-600"></i>
+          <span id="stepBadge2" class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-400 border border-slate-700">2. Placed Child</span>
+          <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-600"></i>
+          <span id="stepBadge3" class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-400 border border-slate-700">3. Role Setup & Safety</span>
+          <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-600"></i>
+          <span id="stepBadge4" class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-400 border border-slate-700">4. Review & Start</span>
+        </div>
+        <span id="stepPageNumber" class="text-[11px] text-slate-400">Step 1 of 4</span>
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div class="p-6 overflow-y-auto space-y-6 flex-1 text-slate-200">
+        
+        <!-- STEP 1: Home & Household ("Where do you live? Who is in your household?") -->
+        <div id="guidedStep1" class="space-y-4">
+          <div class="bg-blue-950/40 border border-blue-600/40 rounded-2xl p-4 text-xs text-blue-200 flex items-start gap-3">
+            <i data-lucide="home" class="w-5 h-5 text-blue-400 shrink-0 mt-0.5"></i>
+            <div>
+              <strong class="font-black text-white text-sm block mb-0.5">Step 1: Where do you live & Who are you?</strong>
+              <span>Enter your primary residence address, contact info, and who lives in your household. In Sprout, home addresses are safely masked when exported or shared with third parties.</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Your Full Name (Caregiver / User) *</label>
+              <input type="text" id="gwCaregiverName" placeholder="e.g. Mary Campbell" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-emerald-500 transition" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Household Name / Nickname</label>
+              <input type="text" id="gwHouseholdName" placeholder="e.g. Campbell Family Home" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-emerald-500 transition" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Phone Number</label>
+              <input type="tel" id="gwCaregiverPhone" placeholder="(802) 555-0199" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-emerald-500 transition" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Email Address</label>
+              <input type="email" id="gwCaregiverEmail" placeholder="caregiver@vermont.org" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-emerald-500 transition" />
+            </div>
+          </div>
+
+          <div class="space-y-3 pt-2 border-t border-slate-800">
+            <h4 class="text-xs font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+              <i data-lucide="map-pin" class="w-4 h-4"></i> Where Do You Live? (Vermont Residence)
+            </h4>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-bold text-slate-300 mb-1">Street Address *</label>
+                <input type="text" id="gwAddress" placeholder="e.g. 78 Maple Grove Road" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-emerald-500 transition" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">Town / City *</label>
+                <input type="text" id="gwTown" placeholder="e.g. Montpelier" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-emerald-500 transition" />
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">Vermont Zip Code</label>
+                <input type="text" id="gwZip" placeholder="05602" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-emerald-500 transition" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">Household Structure</label>
+                <select id="gwHouseholdStructure" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-emerald-500 transition">
+                  <option value="Single Adult">Single Adult Home</option>
+                  <option value="Married Couple">Married Couple</option>
+                  <option value="Domestic Partners">Domestic Partners</option>
+                  <option value="Relative / Kin">Grandparents / Relatives</option>
+                  <option value="Friends / Co-Caregivers">Co-Caregivers / Friends</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Who else lives in your household? (Other adults & children)</label>
+              <input type="text" id="gwHouseholdMembers" placeholder="e.g. Spouse Robert, biological son Jack (age 10)" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-emerald-500 transition" />
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2: The Placed Child ("Who is the child?") -->
+        <div id="guidedStep2" class="space-y-4 hidden">
+          <div class="bg-teal-950/40 border border-teal-600/40 rounded-2xl p-4 text-xs text-teal-200 flex items-start gap-3">
+            <i data-lucide="baby" class="w-5 h-5 text-teal-400 shrink-0 mt-0.5"></i>
+            <div>
+              <strong class="font-black text-white text-sm block mb-0.5">Step 2: Who is the child?</strong>
+              <span>Enter the child's preferred name or initials. Sprout uses privacy initials (e.g. LB, EV) to safeguard child identity in compliance with Vermont DCF standards.</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Child Preferred Name or Initials *</label>
+              <input type="text" id="gwChildName" placeholder="e.g. Aria Nelson (AN)" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-teal-500 transition" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Placement Date (Day 1) *</label>
+              <input type="date" id="gwPlacementDate" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-teal-500 transition" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Child Date of Birth</label>
+              <input type="date" id="gwChildDob" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-teal-500 transition" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Child Age (Years)</label>
+              <input type="number" id="gwChildAge" min="0" max="21" placeholder="3" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-teal-500 transition" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Gender</label>
+              <select id="gwChildGender" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-teal-500 transition">
+                <option value="Female">Female</option>
+                <option value="Male">Male</option>
+                <option value="Non-Binary">Non-Binary</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="space-y-3 pt-2 border-t border-slate-800">
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Known Allergies & Medical Alerts</label>
+              <input type="text" id="gwChildAllergies" placeholder="e.g. Penicillin, Peanuts, Strawberries" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-teal-500 transition" />
+              <div class="flex items-center gap-1.5 mt-1.5 text-[11px] text-slate-400">
+                <span class="text-[10px] text-slate-500">Quick insert:</span>
+                <button type="button" onclick="setGuidedAllergy('No known allergies')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded-md text-emerald-300 cursor-pointer">No known allergies</button>
+                <button type="button" onclick="setGuidedAllergy('Penicillin')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded-md text-rose-300 cursor-pointer">Penicillin</button>
+                <button type="button" onclick="setGuidedAllergy('Peanut allergy')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded-md text-amber-300 cursor-pointer">Peanuts</button>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Comfort Items & Special Needs (Soothing Routine)</label>
+              <input type="text" id="gwChildComfort" placeholder="e.g. Favorite stuffed bunny 'Bun-Bun', needs hallway night light on" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-teal-500 transition" />
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: Role Setup & Safety (Dynamic by Role) -->
+        <div id="guidedStep3" class="space-y-4 hidden">
+          
+          <!-- FOSTER ROLE SPECIFICS -->
+          <div id="roleFieldsFoster" class="space-y-4">
+            <div class="bg-blue-950/40 border border-blue-600/40 rounded-2xl p-4 text-xs text-blue-200 flex items-start gap-3">
+              <i data-lucide="shield-check" class="w-5 h-5 text-blue-400 shrink-0 mt-0.5"></i>
+              <div>
+                <strong class="font-black text-white text-sm block mb-0.5">Foster Role Setup: DCF Liaison & Statutory Health Clocks</strong>
+                <span>Vermont DCF requires a comprehensive EPSDT health assessment within 30 days of placement. Sprout automatically initializes this countdown clock on Day 1.</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">DCF District Office</label>
+                <select id="gwFosterDcfOffice" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-blue-500 transition">
+                  <option value="Burlington District Office">Burlington District Office (Chittenden)</option>
+                  <option value="Barre District Office">Barre District Office (Washington)</option>
+                  <option value="Rutland District Office">Rutland District Office (Rutland)</option>
+                  <option value="St. Albans District Office">St. Albans District Office (Franklin/Grand Isle)</option>
+                  <option value="Brattleboro District Office">Brattleboro District Office (Windham)</option>
+                  <option value="Middlebury District Office">Middlebury District Office (Addison)</option>
+                  <option value="St. Johnsbury District Office">St. Johnsbury District Office (Caledonia)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">Assigned Family Services Caseworker</label>
+                <input type="text" id="gwFosterCaseworker" placeholder="e.g. Sarah Collins, MSW" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-blue-500 transition" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">Caseworker Phone</label>
+                <input type="tel" id="gwFosterCwPhone" placeholder="(802) 863-7370" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-blue-500 transition" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">Caseworker Email</label>
+                <input type="email" id="gwFosterCwEmail" placeholder="sarah.collins@vermont.gov" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-blue-500 transition" />
+              </div>
+            </div>
+
+            <div class="p-3 bg-blue-900/30 border border-blue-700/50 rounded-xl flex items-center justify-between text-xs text-blue-200">
+              <span class="flex items-center gap-2">
+                <i data-lucide="clock" class="w-4 h-4 text-blue-400"></i>
+                <span>Statutory 30-Day EPSDT Health Clock: <strong>30 Days Remaining (Day 1)</strong></span>
+              </span>
+              <span class="text-[10px] bg-blue-500/20 text-blue-300 font-bold px-2 py-0.5 rounded">Initialized</span>
+            </div>
+          </div>
+
+          <!-- KINSHIP ROLE SPECIFICS -->
+          <div id="roleFieldsKinship" class="space-y-4 hidden">
+            <div class="bg-teal-950/40 border border-teal-600/40 rounded-2xl p-4 text-xs text-teal-200 flex items-start gap-3">
+              <i data-lucide="users-2" class="w-5 h-5 text-teal-400 shrink-0 mt-0.5"></i>
+              <div>
+                <strong class="font-black text-white text-sm block mb-0.5">Kinship Role Setup: Emergency Triage & $350 Reach Up Grant</strong>
+                <span>Relative caregivers accepting emergency placement qualify for immediate $350 clothing grants and plain-English jargon decoding.</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">Your Relationship to the Child *</label>
+                <select id="gwKinshipRelation" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-teal-500 transition">
+                  <option value="Maternal Grandmother">Maternal Grandmother</option>
+                  <option value="Maternal Grandfather">Maternal Grandfather</option>
+                  <option value="Paternal Grandparent">Paternal Grandparent</option>
+                  <option value="Maternal Aunt / Uncle">Maternal Aunt / Uncle</option>
+                  <option value="Paternal Aunt / Uncle">Paternal Aunt / Uncle</option>
+                  <option value="Adult Sibling">Adult Sibling</option>
+                  <option value="Fictive Kin / Family Friend">Fictive Kin / Close Family Friend</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">Kinship Navigator Status</label>
+                <input type="text" readonly value="Vermont Kinship Navigator Active (Plain-English Decoder)" class="w-full px-3.5 py-2 bg-slate-900 border border-slate-800 rounded-xl text-sm text-teal-300 cursor-not-allowed" />
+              </div>
+            </div>
+
+            <div class="p-4 bg-teal-900/30 border border-teal-700/50 rounded-2xl space-y-2">
+              <label class="flex items-start gap-2.5 cursor-pointer">
+                <input type="checkbox" id="gwKinshipGrant" checked class="mt-1 w-4 h-4 rounded text-teal-600 focus:ring-teal-500 bg-slate-950 border-slate-700" />
+                <div class="text-xs text-teal-200">
+                  <strong class="font-bold text-white block">Pre-fill Vermont $350 Emergency Clothing & Supply Grant</strong>
+                  <span>Automatically generates an emergency Reach Up grant application and Days 1–3 Survival Triage checklist.</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- RESPITE ROLE SPECIFICS -->
+          <div id="roleFieldsRespite" class="space-y-4 hidden">
+            <div class="bg-rose-950/40 border border-rose-600/40 rounded-2xl p-4 text-xs text-rose-200 flex items-start gap-3">
+              <i data-lucide="shield-alert" class="w-5 h-5 text-rose-400 shrink-0 mt-0.5"></i>
+              <div>
+                <strong class="font-black text-white text-sm block mb-0.5">Respite Role Setup: 48-Hour Care & Safety Sheet</strong>
+                <span>Respite providers receive a concise 1-page summary covering bedtime soothing, allergy alerts, and a clean Medication Administration Record (MAR).</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">Planned Stay Duration</label>
+                <select id="gwRespiteDuration" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-rose-500 transition">
+                  <option value="48-Hour Weekend Respite (Friday 5PM - Sunday 5PM)">48-Hour Weekend Respite (Fri 5PM - Sun 5PM)</option>
+                  <option value="24-Hour Overnight Relief">24-Hour Overnight Relief</option>
+                  <option value="72-Hour Extended Holiday Stay">72-Hour Extended Holiday Stay</option>
+                  <option value="Emergency 5-Day Respite Bridge">Emergency 5-Day Respite Bridge</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">Primary Caregiver Contact (for Handoff)</label>
+                <input type="text" id="gwRespitePrimaryContact" placeholder="e.g. Sarah Jenkins (802-555-0101)" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-rose-500 transition" />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Bedtime Routine & Soothing Instructions</label>
+              <textarea id="gwRespiteBedtime" rows="2" placeholder="e.g. Warm bath at 7:00 PM, reads 2 books, sleeps with stuffed animal and door cracked open." class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-rose-500 transition"></textarea>
+            </div>
+          </div>
+
+          <!-- PARENT ROLE SPECIFICS -->
+          <div id="roleFieldsParent" class="space-y-4 hidden">
+            <div class="bg-indigo-950/40 border border-indigo-600/40 rounded-2xl p-4 text-xs text-indigo-200 flex items-start gap-3">
+              <i data-lucide="heart" class="w-5 h-5 text-indigo-400 shrink-0 mt-0.5"></i>
+              <div>
+                <strong class="font-black text-white text-sm block mb-0.5">Parent Role Setup: Case Plan Roadmap & Supervised Visitation</strong>
+                <span>Sprout provides biological parents a transparent, provisional 30-day orientation dashboard, visit calendar, and affirmative action roadmap.</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">Family Services Worker / Attorney</label>
+                <input type="text" id="gwParentWorker" placeholder="e.g. David Martinez, FSW / Public Defender" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500 transition" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">Reunification Goal Target</label>
+                <select id="gwParentGoal" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500 transition">
+                  <option value="Full Family Reunification within 12 Months">Full Family Reunification within 12 Months</option>
+                  <option value="Shared Parenting / Co-Custody Transition">Shared Parenting / Co-Custody Transition</option>
+                  <option value="Relative Guardianship Support">Relative Guardianship Support</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Supervised Family Time Schedule (Facility & Hours)</label>
+              <input type="text" id="gwParentVisitSchedule" placeholder="e.g. Easterseals Family Center, Tuesdays & Thursdays 3:30 PM - 5:00 PM" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500 transition" />
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 4: Review & Start Day 1 -->
+        <div id="guidedStep4" class="space-y-4 hidden">
+          <div class="bg-emerald-950/50 border border-emerald-600/60 rounded-2xl p-4 text-xs text-emerald-200 flex items-start gap-3">
+            <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400 shrink-0 mt-0.5"></i>
+            <div>
+              <strong class="font-black text-white text-sm block mb-0.5">Step 4: Review & Launch Day 1 Sandbox</strong>
+              <span>Review your new caregiver profile and placed child information. Clicking "Launch Day 1" will add your records to Sprout and immediately switch you to your active role dashboard.</span>
+            </div>
+          </div>
+
+          <!-- Live Summary Card -->
+          <div class="bg-slate-950 border border-slate-700 rounded-2xl p-5 space-y-3">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+              <span id="reviewRoleBadge" class="text-xs font-black uppercase tracking-wider text-blue-400 bg-blue-950/80 border border-blue-600/50 px-3 py-1 rounded-full">
+                Foster Caregiver • Day 1
+              </span>
+              <span class="text-[11px] font-bold text-slate-400">Sandbox Mode: Dataset A</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              <div>
+                <span class="text-slate-500 font-bold block uppercase text-[10px]">Caregiver & Residence</span>
+                <strong id="reviewCaregiverName" class="text-white text-sm block">Mary Campbell</strong>
+                <span id="reviewAddress" class="text-slate-300 block">78 Maple Grove Road, Montpelier, VT 05602</span>
+                <span id="reviewHousehold" class="text-slate-400 text-[11px] block mt-0.5">Campbell Family Home (Single Adult)</span>
+              </div>
+              <div>
+                <span class="text-slate-500 font-bold block uppercase text-[10px]">Placed Child</span>
+                <strong id="reviewChildName" class="text-white text-sm block">Aria Nelson (AN)</strong>
+                <span id="reviewChildDetails" class="text-slate-300 block">Age 3 • Female • Day 1 Intake</span>
+                <span id="reviewAllergies" class="text-rose-400 text-[11px] block mt-0.5">Allergies: No known allergies</span>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-slate-800 text-xs">
+              <span class="text-slate-500 font-bold block uppercase text-[10px] mb-1">Role Package Ready to Initialize</span>
+              <div id="reviewRolePackage" class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 text-slate-300">
+                Statutory 30-day health clock, emergency intake quick log, and initial safety checklist.
+              </div>
+            </div>
+          </div>
+
+          <div id="gwErrorMessage" class="hidden p-3 bg-rose-950/80 border border-rose-600 text-rose-200 text-xs rounded-xl font-bold"></div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer Controls -->
+      <div class="bg-slate-950/90 p-4 sm:p-5 border-t border-slate-800 flex items-center justify-between shrink-0">
+        <button id="btnGwPrev" onclick="prevGuidedStep()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold rounded-xl text-xs transition cursor-pointer flex items-center gap-1.5 opacity-50 cursor-not-allowed" disabled>
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          <span>Previous</span>
+        </button>
+
+        <div class="flex items-center gap-2">
+          <button onclick="closeGuidedOnboardingModal()" class="px-3.5 py-2 bg-slate-800/80 hover:bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl text-xs transition cursor-pointer">
+            Cancel
+          </button>
+          
+          <button id="btnGwNext" onclick="nextGuidedStep()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-black rounded-xl text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer">
+            <span>Next: Placed Child</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+
+          <button id="btnGwSubmit" onclick="submitGuidedOnboarding()" class="hidden px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black rounded-xl text-xs transition shadow-lg flex items-center gap-2 cursor-pointer">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+            <span>Launch Day 1 Sandbox</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
   <!-- LAYER 3: PERSONA LAUNCHER MODAL (CAREGIVER FLIGHT SIMULATOR) -->
   <!-- ========================================================================= -->
   <div id="personaLauncherModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[60] flex items-center justify-center p-4 hidden">
@@ -1660,10 +2096,16 @@
                   <span class="px-2 py-0.5 bg-slate-900 rounded-md">15s Quick Log</span>
                 </div>
               </div>
-              <button onclick="launchPersonaReview('foster', 'a')" class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
-                <span>Launch New Foster (Day 1)</span>
-                <i data-lucide="arrow-right" class="w-4 h-4"></i>
-              </button>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <button onclick="launchPersonaReview('foster', 'a')" class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm">
+                  <span>Launch Preset (Day 1)</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="openGuidedOnboardingModal('foster')" class="w-full py-2 bg-blue-950/80 hover:bg-blue-900 border border-blue-500/60 text-blue-200 hover:text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-1 cursor-pointer shadow-sm" title="Add a brand new foster family and child from scratch">
+                  <i data-lucide="user-plus" class="w-3.5 h-3.5 text-blue-400"></i>
+                  <span>+ Add New Foster</span>
+                </button>
+              </div>
             </div>
 
             <!-- 2. New Kinship Caregiver (Eleanor Vance & Emma Vance - Toddler) -->
@@ -1682,10 +2124,16 @@
                   <span class="px-2 py-0.5 bg-slate-900 rounded-md">Jargon Decoder</span>
                 </div>
               </div>
-              <button onclick="launchPersonaReview('kinship', 'a')" class="w-full py-2 bg-teal-600 hover:bg-teal-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
-                <span>Launch New Kinship (Day 1)</span>
-                <i data-lucide="arrow-right" class="w-4 h-4"></i>
-              </button>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <button onclick="launchPersonaReview('kinship', 'a')" class="w-full py-2 bg-teal-600 hover:bg-teal-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm">
+                  <span>Launch Preset (Day 1)</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="openGuidedOnboardingModal('kinship')" class="w-full py-2 bg-teal-950/80 hover:bg-teal-900 border border-teal-500/60 text-teal-200 hover:text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-1 cursor-pointer shadow-sm" title="Add a brand new kinship family and child from scratch">
+                  <i data-lucide="user-plus" class="w-3.5 h-3.5 text-teal-400"></i>
+                  <span>+ Add New Kinship</span>
+                </button>
+              </div>
             </div>
 
             <!-- 3. New Parent Participant (Danielle Miller & Noah Miller) -->
@@ -1704,10 +2152,16 @@
                   <span class="px-2 py-0.5 bg-slate-900 rounded-md">First Visit Setup</span>
                 </div>
               </div>
-              <button onclick="launchPersonaReview('danielle', 'a')" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
-                <span>Launch New Parent (Day 1)</span>
-                <i data-lucide="arrow-right" class="w-4 h-4"></i>
-              </button>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <button onclick="launchPersonaReview('danielle', 'a')" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm">
+                  <span>Launch Preset (Day 1)</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="openGuidedOnboardingModal('parent')" class="w-full py-2 bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-500/60 text-indigo-200 hover:text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-1 cursor-pointer shadow-sm" title="Add a brand new parent participant from scratch">
+                  <i data-lucide="user-plus" class="w-3.5 h-3.5 text-indigo-400"></i>
+                  <span>+ Add New Parent</span>
+                </button>
+              </div>
             </div>
 
             <!-- 4. New Respite Provider (Samantha Price & Liam Brooks - Infant) -->
@@ -1726,10 +2180,16 @@
                   <span class="px-2 py-0.5 bg-slate-900 rounded-md">Clean MAR Ready</span>
                 </div>
               </div>
-              <button onclick="launchPersonaReview('respite', 'a')" class="w-full py-2 bg-rose-600 hover:bg-rose-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
-                <span>Launch New Respite (Day 1)</span>
-                <i data-lucide="arrow-right" class="w-4 h-4"></i>
-              </button>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <button onclick="launchPersonaReview('respite', 'a')" class="w-full py-2 bg-rose-600 hover:bg-rose-500 text-white font-black rounded-xl text-xs transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm">
+                  <span>Launch Preset (Day 1)</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="openGuidedOnboardingModal('respite')" class="w-full py-2 bg-rose-950/80 hover:bg-rose-900 border border-rose-500/60 text-rose-200 hover:text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-1 cursor-pointer shadow-sm" title="Add a brand new respite provider and child from scratch">
+                  <i data-lucide="user-plus" class="w-3.5 h-3.5 text-rose-400"></i>
+                  <span>+ Add New Respite</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
