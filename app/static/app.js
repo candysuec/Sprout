@@ -213,6 +213,7 @@ function updateSproutTheme() {
 }
 
 function updateWorkspaceToggleUI() {
+  if (typeof updateDatasetBadgeUI === "function") updateDatasetBadgeUI();
   const toggleBtn = document.getElementById('btnToggleWorkspaceMode');
   const labelEl = document.getElementById('workspaceToggleLabel');
   const displayEl = document.getElementById('activeCaregiverDisplay');
@@ -8703,6 +8704,7 @@ function switchDatasetMode(dataset) {
 }
 
 function renderDatasetToggleUI() {
+  updateDatasetBadgeUI();
   const btnA = document.getElementById('btnDatasetA');
   const btnB = document.getElementById('btnDatasetB');
   const containerA = document.getElementById('datasetACards');
@@ -8811,6 +8813,7 @@ async function launchPersonaReview(persona, dataset) {
   if (dataset) {
     currentSproutDataset = dataset;
     localStorage.setItem('sproutDataset', dataset);
+    if (typeof updateDatasetBadgeUI === "function") updateDatasetBadgeUI();
   }
 
   // Enforce synthetic Practice Sandbox containment
@@ -8987,3 +8990,54 @@ window.purgeAppCachesAndReload = async function() {
 
 
 
+
+// AUD-01: Persistent Header Dataset Badge UI & 1-Click Toggle
+function updateDatasetBadgeUI() {
+  const btn = document.getElementById('btnToggleDatasetHeader');
+  const label = document.getElementById('datasetHeaderLabel');
+  const icon = document.getElementById('datasetHeaderIcon');
+  const tag = document.getElementById('datasetHeaderTag');
+  
+  if (!btn || !label) return;
+
+  if (currentSproutMode === 'local') {
+    // Hide dataset toggle in Real Family Workspace because datasets only apply to Practice Sandbox
+    btn.classList.add('hidden');
+    return;
+  } else {
+    btn.classList.remove('hidden');
+  }
+
+  if (currentSproutDataset === 'a') {
+    btn.className = "flex items-center bg-emerald-950/90 hover:bg-emerald-900 border border-emerald-500/80 rounded-xl px-2.5 py-1.5 text-xs font-bold transition shadow-xs gap-1.5 text-emerald-200 cursor-pointer shrink-0";
+    label.textContent = "Dataset A: Day 1";
+    label.className = "text-emerald-100 font-black";
+    if (tag) {
+      tag.textContent = "Day 1";
+      tag.className = "text-[9px] bg-emerald-600/80 text-emerald-100 px-1.5 py-0.2 rounded font-black uppercase";
+    }
+    if (icon) icon.setAttribute('data-lucide', 'sparkles');
+  } else {
+    btn.className = "flex items-center bg-indigo-950/90 hover:bg-indigo-900 border border-indigo-500/80 rounded-xl px-2.5 py-1.5 text-xs font-bold transition shadow-xs gap-1.5 text-indigo-200 cursor-pointer shrink-0";
+    label.textContent = "Dataset B: 90-Day";
+    label.className = "text-indigo-100 font-black";
+    if (tag) {
+      tag.textContent = "90-Day";
+      tag.className = "text-[9px] bg-indigo-600/80 text-indigo-100 px-1.5 py-0.2 rounded font-black uppercase";
+    }
+    if (icon) icon.setAttribute('data-lucide', 'bar-chart-2');
+  }
+  if (window.lucide) lucide.createIcons();
+}
+
+async function toggleDatasetModeHeader() {
+  const nextDataset = (currentSproutDataset === 'a') ? 'b' : 'a';
+  currentSproutDataset = nextDataset;
+  localStorage.setItem('sproutDataset', nextDataset);
+  updateDatasetBadgeUI();
+  renderDatasetToggleUI();
+  await loadChildren();
+  if (currentMainSection === 'dashboard' || currentMainSection === 'children' || currentMainSection === 'households') {
+    await loadTabContent();
+  }
+}

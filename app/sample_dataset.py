@@ -910,6 +910,23 @@ SAMPLE_RECORDS = [
 # ==============================================================================
 # 8. SYNTHETIC FS-221A LICENSING & COMPLIANCE ITEMS (By Household Stage)
 # ==============================================================================
+# Day 1 Initial Licensing & Safety Milestones (Dataset A - Uncompleted / Initial Placement Triage)
+SAMPLE_COMPLIANCE_DAY_ONE = {
+    "HH-101": [
+        {"id": 101, "standard_code": "FS-221A § 4.1", "item_name": "Initial Fire Safety & Two-Exit Evacuation Plan", "category": "Safety", "status": "Pending Schedule", "due_date": "Within 30 Days", "completed_date": "", "notes": "Must be scheduled and tested with placed child."},
+        {"id": 102, "standard_code": "FS-221A § 6.2", "item_name": "VCWTP Annual Caregiver Training (15 Hours)", "category": "Training", "status": "Not Started", "due_date": "Year 1 Deadline", "completed_date": "", "notes": "0 of 15 required foundational hours completed."},
+        {"id": 103, "standard_code": "FS-221A § 1.1", "item_name": "Emergency Worker & Pediatrician Contact Card", "category": "Safety", "status": "In Progress", "due_date": "Day 1 Triage", "completed_date": "", "notes": "Post DCF after-hours numbers and clinic on refrigerator."}
+    ],
+    "HH-113": [
+        {"id": 104, "standard_code": "FS-221A § 1.2", "item_name": "Provisional Kinship Home Safety Walkthrough", "category": "Provisional", "status": "In Progress", "due_date": "Within 48 Hours", "completed_date": "", "notes": "Emergency safety checklist with family services worker."},
+        {"id": 105, "standard_code": "FS-221A § 2.1", "item_name": "Kinship Adult Background & Fingerprint Deadline", "category": "Licensing", "status": "Pending", "due_date": "Within 90 Days", "completed_date": "", "notes": "VCIC and FBI fingerprint cards submitted."}
+    ],
+    "DEFAULT": [
+        {"id": 106, "standard_code": "FS-221A § 1.1", "item_name": "Initial Placement Safety & First Aid Kit Triage", "category": "Safety", "status": "In Progress", "due_date": "Within 7 Days", "completed_date": "", "notes": "Review first aid kit and emergency medications."},
+        {"id": 107, "standard_code": "FS-221A § 6.0", "item_name": "VCWTP Foundational Pre-Service Orientation", "category": "Training", "status": "Not Started", "due_date": "Within 60 Days", "completed_date": "", "notes": "Enroll in Vermont Child Welfare Training Partnership modules."}
+    ]
+}
+
 SAMPLE_COMPLIANCE = {
     "HH-101": [
         {"id": 1, "standard_code": "FS-221A § 4.1", "item_name": "Annual Fire Safety & Evacuation Plan Drill", "category": "Safety", "status": "Completed", "due_date": "2026-09-01", "completed_date": "2026-03-01", "notes": "Two-exit escape route tested with child."},

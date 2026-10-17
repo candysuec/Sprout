@@ -381,6 +381,7 @@ def update_household(hh_id):
 def get_compliance_items():
     caregiver = (request.headers.get('X-Caregiver') or '').strip()
     sprout_mode = (request.headers.get('X-Sprout-Mode') or 'local').strip().lower()
+    dataset_mode = (request.headers.get('X-Sprout-Dataset') or request.query.dataset or 'a').strip().lower()
     is_sample = ('Sample' in caregiver) or (sprout_mode == 'sample')
     
     if is_sample:
@@ -394,7 +395,14 @@ def get_compliance_items():
                 break
         if not selected_hh_id:
             selected_hh_id = "HH-101"
-        return json_res(sd.SAMPLE_COMPLIANCE.get(selected_hh_id, sd.SAMPLE_COMPLIANCE.get("DEFAULT", [])))
+
+        is_dataset_b = (dataset_mode in ('b', 'dataset_b', '90days', 'established'))
+        if is_dataset_b:
+            compliance_source = sd.SAMPLE_COMPLIANCE
+        else:
+            compliance_source = getattr(sd, 'SAMPLE_COMPLIANCE_DAY_ONE', sd.SAMPLE_COMPLIANCE)
+
+        return json_res(compliance_source.get(selected_hh_id, compliance_source.get("DEFAULT", [])))
 
     conn = get_connection()
     rows = [dict(r) for r in conn.execute("SELECT * FROM compliance_items ORDER BY id ASC")]
@@ -421,7 +429,13 @@ def update_compliance_item(item_id):
 @app.route('/api/reimbursements/summary', method=['GET'])
 def get_reimbursement_summary():
     sprout_mode = (request.headers.get('X-Sprout-Mode') or 'local').strip().lower()
+    dataset_mode = (request.headers.get('X-Sprout-Dataset') or request.query.dataset or 'a').strip().lower()
+    is_dataset_b = (dataset_mode in ('b', 'dataset_b', '90days', 'established'))
+    
     if sprout_mode == 'sample':
+        if not is_dataset_b:
+            # Dataset A: Day 1 New User has zero historical mileage claims
+            return json_res([])
         return json_res([
             {"month": "2026-03", "trip_count": 4, "total_miles": 78.5, "estimated_reimbursement": 52.60},
             {"month": "2026-02", "trip_count": 2, "total_miles": 42.0, "estimated_reimbursement": 28.14}

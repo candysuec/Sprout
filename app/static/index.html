@@ -96,6 +96,13 @@
           <span class="text-[10px] bg-blue-700/80 text-blue-200 px-1.5 py-0.2 rounded font-semibold uppercase">Switch</span>
         </button>
 
+        <!-- 1-Click Dataset Mode Indicator & Switcher (AUD-01 Persistent Header Anchoring) -->
+        <button id="btnToggleDatasetHeader" onclick="toggleDatasetModeHeader()" class="flex items-center bg-emerald-950/90 hover:bg-emerald-900 border border-emerald-500/80 rounded-xl px-2.5 py-1.5 text-xs font-bold transition shadow-xs gap-1.5 text-emerald-200 cursor-pointer shrink-0" title="Click to toggle between Dataset A (Day 1 Onboarding) and Dataset B (90-Day Established)">
+          <i id="datasetHeaderIcon" data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-400"></i>
+          <span id="datasetHeaderLabel" class="text-emerald-100 font-black">Dataset A: Day 1</span>
+          <span id="datasetHeaderTag" class="text-[9px] bg-emerald-600/80 text-emerald-100 px-1.5 py-0.2 rounded font-black uppercase">Day 1</span>
+        </button>
+
         <!-- Privacy Shield / Blur Mode Toggle (Phase 7 Privacy Hardening) -->
         <button id="btnTogglePrivacyBlur" onclick="togglePrivacyBlurMode()" class="flex items-center bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 rounded-xl px-2.5 py-1.5 text-xs font-bold transition shadow-xs gap-1.5 text-slate-200" title="Toggle Privacy Blur Mode (Shield sensitive child info for screenshots/demos)">
           <i id="privacyShieldIcon" data-lucide="eye" class="w-3.5 h-3.5 text-emerald-400"></i>
