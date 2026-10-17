@@ -7209,28 +7209,33 @@ async function renderMissionControlView(container) {
     <div class="space-y-6 animate-fadeIn pb-12">
 
       <!-- ===================================================================== -->
-      <!-- LAYER 2: SANDBOX GATEWAY AIRLOCK (SYNTHETIC SAFETY & 3 DOORS)         -->
+      <!-- LAYER 2: TRAINING & SHIFT LAUNCHPAD (DAY 0, DAY 1, 15 MODEL HOMES)   -->
       <!-- ===================================================================== -->
       ${isSample ? `
-      <div id="sandboxGatewayAirlock" class="bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 rounded-3xl p-6 sm:p-7 text-white shadow-xl border-2 border-blue-500/70 relative overflow-hidden space-y-5">
+      <div id="sandboxGatewayAirlock" class="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 rounded-3xl p-6 sm:p-7 text-white shadow-xl border-2 border-emerald-500/50 relative overflow-hidden space-y-5">
         <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-blue-800/60 pb-4">
           <div class="space-y-1">
             <div class="flex items-center gap-2">
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-500/20 text-blue-300 border border-blue-400/30 flex items-center gap-1">
-                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-blue-400"></i> Sandbox Gateway • Layer 2
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 flex items-center gap-1">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i> Practice Sandbox • 100% Synthetic
               </span>
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                100% Synthetic • Consequence-Free
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-500/20 text-blue-200 border border-blue-400/30">
+                Consequence-Free • Safe to Click
               </span>
             </div>
-            <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">
-              Practice Sandbox Gateway
+            <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+              <span>Welcome, ${activeCaregiverUser || 'Sarah Jenkins'}</span>
+              <span class="text-sm font-semibold text-emerald-300">• Day 1 with ${activeChildName}</span>
             </h2>
             <p class="text-xs text-blue-200 leading-relaxed max-w-2xl">
-              You are in the Sprout Practice Sandbox. All records and children are simulated. Explore without hesitation—nothing you click can harm real families, alter state records, or compromise privacy.
+              Vermont Kinship & Placement Command Center. Use the quick launchpads below to demonstrate Day 0 setup, review Day 1 baseline child care, or explore the 15 model placement households.
             </p>
           </div>
           <div class="flex items-center gap-2 shrink-0">
+            <button onclick="launchQuickStartTour(5)" class="px-3.5 py-2 bg-blue-900/60 hover:bg-blue-800 text-blue-200 hover:text-white font-bold rounded-xl text-xs border border-blue-600/60 transition flex items-center gap-1.5 cursor-pointer" title="5-Minute Guided Tour">
+              <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-400"></i>
+              <span>5-Min Tour</span>
+            </button>
             <button onclick="openReviewModeConsoleModal()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs border border-slate-700 transition flex items-center gap-1.5 cursor-pointer" title="Open Director Review Console">
               <i data-lucide="compass" class="w-3.5 h-3.5 text-emerald-400"></i>
               <span>Director Console</span>
@@ -7238,52 +7243,70 @@ async function renderMissionControlView(container) {
           </div>
         </div>
 
-        <!-- The Three Doorways (Door A, Door B, Door C) -->
+        <!-- The 3 Training & Shift Launchpads (Day 0 Clean Slate, Day 1 Baseline Care Sheet, 15 Model Households) -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-          <!-- Door A: 5-Minute Tour -->
-          <div onclick="launchQuickStartTour(5)" class="bg-blue-900/40 hover:bg-blue-900/70 border border-blue-600/50 hover:border-blue-400 p-4 rounded-2xl cursor-pointer transition flex flex-col justify-between gap-3 shadow-sm group">
+          <!-- Act 1: Day 0 - Clean Slate Setup Wizard -->
+          <div onclick="openGuidedOnboardingModal('foster')" class="bg-emerald-950/50 hover:bg-emerald-950/80 border-2 border-emerald-500/60 hover:border-emerald-400 p-4.5 rounded-2xl cursor-pointer transition flex flex-col justify-between gap-3 shadow-md group">
             <div>
-              <div class="flex items-center justify-between mb-1">
-                <span class="text-[10px] font-black uppercase tracking-wider text-blue-300 bg-blue-500/20 px-2 py-0.5 rounded-md">Door A • 5 Mins</span>
-                <i data-lucide="zap" class="w-4 h-4 text-amber-400 group-hover:scale-110 transition"></i>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[10px] font-black uppercase tracking-wider text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-md flex items-center gap-1">
+                  <i data-lucide="sparkles" class="w-3 h-3 text-emerald-400"></i> Act 1 • Day 0 Setup
+                </span>
+                <span class="text-[10px] font-black text-emerald-400 group-hover:scale-110 transition">Add New</span>
               </div>
-              <h3 class="font-bold text-white text-xs">5-Minute Guided Tour</h3>
-              <p class="text-[11px] text-blue-200/80 leading-snug mt-1">For stakeholders, donors, and first-time guests. See how Sprout eliminates caregiver friction in 4 clicks.</p>
+              <h3 class="font-black text-white text-sm flex items-center gap-1.5">
+                <span>+ Set Up New Placement</span>
+              </h3>
+              <p class="text-[11px] text-emerald-200/90 leading-snug mt-1">
+                4-step walkthrough for a brand-new caregiver: role selection, child intake, urgent allergy check, and first-day priority.
+              </p>
             </div>
-            <div class="text-[11px] font-black text-blue-300 flex items-center gap-1 group-hover:text-white transition">
-              <span>Launch Tour</span>
+            <div class="text-xs font-black text-emerald-300 flex items-center gap-1 group-hover:text-white transition pt-1 border-t border-emerald-800/50">
+              <span>Start Day 0 Wizard</span>
               <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
             </div>
           </div>
 
-          <!-- Door B: Practice Role -->
-          <div onclick="openPersonaLauncherModal()" class="bg-emerald-950/40 hover:bg-emerald-950/70 border border-emerald-600/50 hover:border-emerald-400 p-4 rounded-2xl cursor-pointer transition flex flex-col justify-between gap-3 shadow-sm group">
+          <!-- Act 2: Day 1 - Liam's 24-Hour Care Sheet -->
+          <div onclick="openEmergencyHandoffCard()" class="bg-blue-950/50 hover:bg-blue-950/80 border border-blue-500/60 hover:border-blue-400 p-4.5 rounded-2xl cursor-pointer transition flex flex-col justify-between gap-3 shadow-md group">
             <div>
-              <div class="flex items-center justify-between mb-1">
-                <span class="text-[10px] font-black uppercase tracking-wider text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-md">Door B • Trainee</span>
-                <i data-lucide="users" class="w-4 h-4 text-emerald-400 group-hover:scale-110 transition"></i>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[10px] font-black uppercase tracking-wider text-blue-300 bg-blue-500/20 px-2 py-0.5 rounded-md flex items-center gap-1">
+                  <i data-lucide="file-text" class="w-3 h-3 text-blue-400"></i> Act 2 • Day 1 Baseline
+                </span>
+                <span class="text-[10px] font-bold text-blue-300">Active: Liam</span>
               </div>
-              <h3 class="font-bold text-white text-xs">Choose a Practice Role</h3>
-              <p class="text-[11px] text-emerald-200/80 leading-snug mt-1">Step into the shoes of Sarah (Foster), Eleanor (Kinship), Angela (Parent), or Samantha (Respite).</p>
+              <h3 class="font-black text-white text-sm flex items-center gap-1.5">
+                <span>Liam's 24-Hr Care Sheet</span>
+              </h3>
+              <p class="text-[11px] text-blue-200/90 leading-snug mt-1">
+                Instant 1-page printable summary with pediatrician contacts, allergy protocols, soothing habits, and bedtime routine.
+              </p>
             </div>
-            <div class="text-[11px] font-black text-emerald-300 flex items-center gap-1 group-hover:text-white transition">
-              <span>Open Role Rig</span>
+            <div class="text-xs font-black text-blue-300 flex items-center gap-1 group-hover:text-white transition pt-1 border-t border-blue-800/50">
+              <span>View Care Sheet & Meds</span>
               <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
             </div>
           </div>
 
-          <!-- Door C: System Capabilities -->
-          <div onclick="switchMainSection('training')" class="bg-indigo-950/40 hover:bg-indigo-950/70 border border-indigo-600/50 hover:border-indigo-400 p-4 rounded-2xl cursor-pointer transition flex flex-col justify-between gap-3 shadow-sm group">
+          <!-- Act 3 & 4: 15 Model Households Gallery -->
+          <div onclick="openCaregiverProfilesModal()" class="bg-indigo-950/50 hover:bg-indigo-950/80 border border-indigo-500/60 hover:border-indigo-400 p-4.5 rounded-2xl cursor-pointer transition flex flex-col justify-between gap-3 shadow-md group">
             <div>
-              <div class="flex items-center justify-between mb-1">
-                <span class="text-[10px] font-black uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-md">Door C • Evaluator</span>
-                <i data-lucide="graduation-cap" class="w-4 h-4 text-indigo-400 group-hover:scale-110 transition"></i>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[10px] font-black uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-md flex items-center gap-1">
+                  <i data-lucide="users" class="w-3 h-3 text-indigo-400"></i> Act 3 & 4 • 15 Homes
+                </span>
+                <span class="text-[10px] font-bold text-indigo-300">4 Roles</span>
               </div>
-              <h3 class="font-bold text-white text-xs">Explore Flight School</h3>
-              <p class="text-[11px] text-indigo-200/80 leading-snug mt-1">For supervisors and instructors. Review formal VCWTP competencies, scenario drills, and 15 model homes.</p>
+              <h3 class="font-black text-white text-sm flex items-center gap-1.5">
+                <span>15 Model Placement Homes</span>
+              </h3>
+              <p class="text-[11px] text-indigo-200/90 leading-snug mt-1">
+                Pre-populated Vermont scenarios: Kinship grandparents, 48-hr Respite care, and Bio-Parent reunification timelines.
+              </p>
             </div>
-            <div class="text-[11px] font-black text-indigo-300 flex items-center gap-1 group-hover:text-white transition">
-              <span>Open Training Hub</span>
+            <div class="text-xs font-black text-indigo-300 flex items-center gap-1 group-hover:text-white transition pt-1 border-t border-indigo-800/50">
+              <span>Browse 15 Scenarios</span>
               <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
             </div>
           </div>
@@ -7314,12 +7337,20 @@ async function renderMissionControlView(container) {
           </div>
         </div>
         <div class="flex items-center gap-2 w-full sm:w-auto shrink-0">
-          <button onclick="switchMainSection('children')" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer">
-            <i data-lucide="user" class="w-3.5 h-3.5 text-slate-600"></i>
-            <span>Child Profile</span>
+          <button onclick="openRecordModal()" class="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-xl text-xs shadow-sm transition flex items-center gap-1.5 cursor-pointer" title="Log a quick observation in 15 seconds">
+            <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+            <span>+ 15-Sec Note</span>
           </button>
-          <button onclick="switchMainSection('dashboard')" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl text-xs shadow-sm transition flex items-center gap-1.5 cursor-pointer">
-            <i data-lucide="sun" class="w-3.5 h-3.5"></i>
+          <button onclick="openEmergencyHandoffCard()" class="px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold rounded-xl text-xs border border-blue-200 transition flex items-center gap-1.5 cursor-pointer" title="Print/View 1-Page Care Sheet for Liam">
+            <i data-lucide="file-text" class="w-3.5 h-3.5 text-blue-600"></i>
+            <span>Care Sheet</span>
+          </button>
+          <button onclick="switchMainSection('children')" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer">
+            <i data-lucide="user" class="w-3.5 h-3.5 text-slate-600"></i>
+            <span>Profile</span>
+          </button>
+          <button onclick="switchMainSection('dashboard')" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer">
+            <i data-lucide="sun" class="w-3.5 h-3.5 text-emerald-600"></i>
             <span>Today's Priorities</span>
           </button>
         </div>
