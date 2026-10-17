@@ -112,9 +112,9 @@ try {
     }
 
     # -------------------------------------------------------------
-    # STEP 4: Launch default browser to http://127.0.0.1:5858
+    # STEP 4: Launch default browser to http://127.0.0.1:5858/#training
     # -------------------------------------------------------------
-    Start-Process "http://127.0.0.1:5858"
+    Start-Process "http://127.0.0.1:5858/#training"
     exit 0
 
 } catch {

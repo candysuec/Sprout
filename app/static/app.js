@@ -2,10 +2,10 @@ let currentChildId = null;
 let currentTab = 'training';
 let childrenList = [];
 
-// Sprout Environment State (Defaults to 'sample' Practice Sandbox and Sarah Jenkins)
+// Sprout Environment State (Defaults to 'sample' Practice Sandbox & Training Hub front door)
 let currentSproutMode = 'sample';
 let isPrivacyBlurActive = false;
-let activeCaregiverUser = 'Sample Caregiver (Sarah Jenkins)';
+let activeCaregiverUser = '';
 let currentSproutDataset = 'a';
 
 const LOCAL_CAREGIVERS = [
@@ -62,17 +62,23 @@ function sanitizeStartupState() {
   // 3. Privacy Blur Invariant
   isPrivacyBlurActive = localStorage.getItem('privacyBlur') === 'true';
 
-  // 4. Caregiver User Invariant (Auto-heal away from orphan/dead states without wiping valid choices)
+  // 4. Caregiver User Invariant: When in sample mode, DO NOT default or lock into Sarah Jenkins on startup.
+  // The user must land on the Training Hub / Flight Simulator front door with a clean, unselected state
+  // to choose their practice persona (Foster, Kinship, Parent, Respite) or scenario.
   if (mode === 'sample') {
-    const isSamplePreset = SAMPLE_CAREGIVERS.some(c => c.id === caregiver || c.name === caregiver);
-    const isParent = caregiver.startsWith('Parent Participant');
-    const isDynamicSample = caregiver.startsWith('Sample Caregiver') && !caregiver.includes('Grace & Lydia Holloway');
-    const isValid = isSamplePreset || isParent || isDynamicSample;
-
-    // Do NOT force Sarah Jenkins on startup if user is in Training Simulator mode
-    if (!isValid || caregiver.includes('Grace & Lydia Holloway')) {
+    const currentHash = (window.location.hash || '').replace('#', '').trim();
+    if (!caregiver || caregiver.includes('Sarah Jenkins') || caregiver.includes('Grace & Lydia Holloway') || currentHash === 'training' || !currentHash) {
       caregiver = '';
       localStorage.removeItem('caregiverUser');
+    } else {
+      const isSamplePreset = SAMPLE_CAREGIVERS.some(c => c.id === caregiver || c.name === caregiver);
+      const isParent = caregiver.startsWith('Parent Participant');
+      const isDynamicSample = caregiver.startsWith('Sample Caregiver');
+      const isValid = isSamplePreset || isParent || isDynamicSample;
+      if (!isValid) {
+        caregiver = '';
+        localStorage.removeItem('caregiverUser');
+      }
     }
   } else {
     const valid = LOCAL_CAREGIVERS.find(c => c.id === caregiver || c.name === caregiver);
@@ -158,11 +164,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       initialSection = initialHash;
     }
   } else {
-    const stored = localStorage.getItem('mainSection');
-    if (stored && stored !== 'mission_control') {
-      initialSection = stored;
+    // In sample practice mode, ALWAYS boot into the Training Hub main page by default
+    if (currentSproutMode === 'sample') {
+      initialSection = 'training';
     } else {
-      initialSection = (currentSproutMode === 'sample') ? 'training' : 'dashboard';
+      const stored = localStorage.getItem('mainSection');
+      initialSection = (stored && stored !== 'mission_control') ? stored : 'dashboard';
     }
   }
 
@@ -170,6 +177,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (window.history && window.history.replaceState) {
     const initHash = initialSubTab ? `#children/${initialSubTab}` : `#${initialSection}`;
     window.history.replaceState({ section: initialSection, subTab: initialSubTab }, '', initHash);
+  }
+
+  if (initialSection === 'training' && currentSproutMode === 'sample') {
+    activeCaregiverUser = '';
+    localStorage.removeItem('caregiverUser');
+    populateCaregiverDropdown();
   }
 
   switchMainSection(initialSection, false);
@@ -186,8 +199,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const dateInput = document.getElementById('recDate');
   if (dateInput) dateInput.value = today;
 
-  // Register Service Worker for Offline Field & Mobile Support (PWA) with immediate update check
-  if ('serviceWorker' in navigator) {
+  // Register Service Worker for Offline Field & Mobile Support (PWA) outside of local development
+  if ('serviceWorker' in navigator && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/static/sw.js').then((reg) => {
         if (reg) reg.update().catch(() => {});
@@ -321,13 +334,15 @@ function updateWorkspaceToggleUI() {
 function toggleSproutWorkspaceMode() {
   if (currentSproutMode === 'local') {
     currentSproutMode = 'sample';
-    activeCaregiverUser = 'Sample Caregiver (Sarah Jenkins)';
+    activeCaregiverUser = '';
+    localStorage.removeItem('caregiverUser');
+    switchMainSection('training');
   } else {
     currentSproutMode = 'local';
     activeCaregiverUser = 'Candy Chevalier';
+    localStorage.setItem('caregiverUser', activeCaregiverUser);
   }
   localStorage.setItem('sproutMode', currentSproutMode);
-  localStorage.setItem('caregiverUser', activeCaregiverUser);
 
   populateCaregiverDropdown();
   updateWorkspaceToggleUI();
@@ -480,10 +495,16 @@ async function onCaregiverUserChange() {
   if (select) {
     activeCaregiverUser = (select.value || '').trim();
     if (!activeCaregiverUser) {
-      activeCaregiverUser = currentSproutMode === 'sample' ? 'Sample Caregiver (Sarah Jenkins)' : 'Candy Chevalier';
-      select.value = activeCaregiverUser;
+      if (currentSproutMode === 'local') {
+        activeCaregiverUser = 'Candy Chevalier';
+        select.value = activeCaregiverUser;
+        localStorage.setItem('caregiverUser', activeCaregiverUser);
+      } else {
+        localStorage.removeItem('caregiverUser');
+      }
+    } else {
+      localStorage.setItem('caregiverUser', activeCaregiverUser);
     }
-    localStorage.setItem('caregiverUser', activeCaregiverUser);
   }
   updateCaregiverAvatarDisplay(activeCaregiverUser);
 
