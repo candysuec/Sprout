@@ -11,12 +11,15 @@ services:
       - HOST=0.0.0.0
       - PORT=5858
       - CCC_DATA_DIR=/data
+      - SHARED_ROOT=/shared_docs
       - PYTHONUNBUFFERED=1
     volumes:
       # Persistent storage volume for SQLite DB, backups, exports, and uploads
       - sprout-data:/data
       # Source directory bind mount for zero-rebuild live updates
       - ./:/home/gemi/projects/Sprout
+      # Read-only mount of parent folder for State DCF documents and licensing guides
+      - ../:/shared_docs:ro
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5858/').read()"]

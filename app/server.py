@@ -44,7 +44,7 @@ UPLOAD_EXTS = {".pdf", ".docx", ".doc", ".xlsx", ".jpg", ".jpeg", ".png", ".heic
 
 BASE_DIR = os.path.dirname(__file__)
 STATIC_DIR = os.path.join(BASE_DIR, "static")
-SHARED_ROOT = os.path.dirname(os.path.dirname(BASE_DIR))
+SHARED_ROOT = os.environ.get("SHARED_ROOT") or os.path.dirname(os.path.dirname(BASE_DIR))
 
 
 def json_res(data, status=200):
@@ -215,9 +215,23 @@ def open_local_doc():
     if os.path.commonpath([root, full_path]) != root:
         return json_res({"error": "Path not allowed"}, 403)
     if os.path.isfile(full_path):
-        os.startfile(full_path)
-        return json_res({"success": True})
+        if hasattr(os, 'startfile'):
+            os.startfile(full_path)
+            return json_res({"success": True})
+        else:
+            return json_res({"success": True, "url": f"/api/documents/file?path={rel_path}"})
     return json_res({"error": "File not found"}, 404)
+
+
+@app.route('/api/documents/file', method=['GET'])
+def serve_shared_doc():
+    rel_path = request.query.path or ''
+    root = os.path.realpath(SHARED_ROOT)
+    full_path = os.path.realpath(os.path.join(root, rel_path))
+    if os.path.commonpath([root, full_path]) != root or not os.path.isfile(full_path):
+        abort(404, "File not found")
+    filename = os.path.basename(full_path)
+    return static_file(filename, root=os.path.dirname(full_path), download=False)
 
 
 @app.route('/api/households', method=['GET'])

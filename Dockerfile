@@ -16,7 +16,7 @@ WORKDIR /home/gemi/projects/Sprout
 RUN ln -s /home/gemi/projects/Sprout /app
 
 # Ensure persistent data directory structures exist with appropriate permissions
-RUN mkdir -p /data/data /data/uploads /data/exports /data/backups
+RUN mkdir -p /data/data /data/uploads /data/exports /data/backups /shared_docs
 
 # Copy dependency definition and install
 COPY requirements.txt .

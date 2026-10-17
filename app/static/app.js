@@ -105,7 +105,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   applyPrivacyBlurState();
 
   await loadChildren();
-  switchMainSection('mission_control');
+  const initialSection = localStorage.getItem('mainSection') || 'dashboard';
+  switchMainSection(initialSection);
   lucide.createIcons();
   
   // Set default date picker to today
@@ -714,6 +715,7 @@ let currentChildSubTab = 'overview';
 function switchMainSection(sectionKey) {
   currentMainSection = sectionKey;
   currentTab = sectionKey; // backwards compatibility for helpers
+  try { localStorage.setItem('mainSection', sectionKey); } catch(e) {}
 
   const isSample = currentSproutMode === 'sample';
   const activeColorClass = (isSample || sectionKey === 'training') ? 'text-blue-900' : 'text-emerald-800';
@@ -861,12 +863,12 @@ async function loadTabContent() {
     return;
   }
 
-  // Hide operational toolbar on Mission Control (root launchpad) so it remains clean
+  // Operational navigation toolbar is visible across all caregiver views
+  if (mainNav) mainNav.classList.remove('hidden');
+
   if (currentMainSection === 'mission_control') {
-    if (mainNav) mainNav.classList.add('hidden');
     await renderMissionControlView(container);
   } else {
-    if (mainNav) mainNav.classList.remove('hidden');
     if (currentMainSection === 'dashboard') {
       await renderDashboardView(container);
     } else if (currentMainSection === 'households') {
@@ -2064,6 +2066,8 @@ async function openLocalDocument(relPath) {
     const data = await res.json();
     if (!data.success) {
       alert("Could not open file: " + (data.error || "File not found"));
+    } else if (data.url) {
+      window.open(data.url, '_blank');
     }
   } catch (err) {
     console.error("Open document error:", err);

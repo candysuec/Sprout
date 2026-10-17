@@ -607,6 +607,15 @@ def _backup_before_migration(conn, from_version):
 
 
 def init_db():
+    seed_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "seed_foster_binder.db")
+    if (not os.path.exists(DB_PATH) or os.path.getsize(DB_PATH) == 0) and os.path.exists(seed_path):
+        import shutil
+        os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+        try:
+            shutil.copy2(seed_path, DB_PATH)
+        except Exception as e:
+            print("Warning: could not seed database:", e)
+
     conn = sqlite3.connect(DB_PATH)
     conn.isolation_level = None  # manage transactions explicitly
     try:
