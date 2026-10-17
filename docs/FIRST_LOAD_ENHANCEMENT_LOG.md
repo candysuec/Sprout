@@ -99,3 +99,39 @@ All 7 regression and compliance suites passed cleanly (243/243 tests, 100%):
   - On startup and on the Training Hub, header context displays `Caregiver: Training Simulator | Child: Select Practice Role (4 Personas)` until the presenter explicitly launches a role (Act 1 Day 0, Act 2 Sarah & Liam, Act 3 Day 90, or Act 4 15 Homes).
   - Repaired nested HTML in `renderTrainingSimulatorView` and hidden redundant snapshot cards on training view.
 
+---
+
+## Phase 3: Screen Recording Feedback & UX Friction Resolution (2026-10-17)
+
+### 1. Context-Sensitive Header Buttons
+- **Problem:** Buttons for `[ Care Sheet ]` and `[ + 15-Sec Note ]` appeared globally on the Training Hub when no child was in active observation.
+- **Resolution:** In `switchMainSection()`, header buttons are automatically hidden on `#training` and `#mission_control`, appearing only on child-centered views (`#dashboard`, `#children`).
+
+### 2. Elimination of Duplicate 4-Act Airlock
+- **Problem:** Mission Control repeated the top 4-Act Curriculum presentation bar in `#sandboxGatewayAirlock`, forcing users to view the same 4 cards twice.
+- **Resolution:** Deleted `#sandboxGatewayAirlock` from `renderMissionControlView`. The top `#trainingCurriculumStage` bar is now the single presentation control.
+
+### 3. Dynamic Act Graying Out & Scenario Identification
+- **Problem:** Users could not tell which act was running, and non-active acts remained brightly colored.
+- **Resolution:** In `updateActCardsActiveState()`, non-active acts are dimmed (`opacity-40 grayscale-50`) with explicit status pills (`Day 0 (Not Active)`, `Day 1 (Not Active)`), while the active scenario is prominently highlighted (`✓ ACTIVE SCENARIO: DAY 90 (Emma Vance)` or `✓ ACTIVE SCENARIO: DAY 1 BASELINE (Liam Brooks)`).
+
+### 4. Quarantining Production Caregiver from Persona Launcher
+- **Problem:** A prominent green card for "Production Caregiver: Candy Chevalier" appeared inside the synthetic flight simulator modal.
+- **Resolution:** Removed the production card from `#personaLauncherModal`, placing a discreet switch link in the footer.
+
+### 5. Nested Onboarding Modal Back-Navigation
+- **Problem:** Exiting Guided Onboarding closed the Persona Launcher, dropping the user onto the background page.
+- **Resolution:** Added `onboardingOpenedFromLauncher` tracking so closing `#guidedOnboardingModal` smoothly re-opens `#personaLauncherModal`.
+
+### 6. Direct Placed Child Navigation
+- **Problem:** Launching a persona defaulted to Mission Control rather than child records.
+- **Resolution:** Selecting Foster, Kinship, or Respite personas now switches directly to `#children`. Added a high-visibility `[ Child Records & Profile ]` button to the Dashboard hero.
+
+### 7. Prominent Household & Care Team Roster
+- **Problem:** Household members could not be viewed, added, or removed.
+- **Resolution:** Created `household_members` table and REST endpoints (`GET/POST/DELETE /api/households/<id>/members`). Added the **"🏠 Household & Care Team Roster"** card on the Dashboard and `#householdMembersModal`.
+
+### 8. Regression Verification Gate
+- All 8 test suites passing **261 / 261 tests (100%)**, including dedicated `test_household_members.py` (18/18).
+
+

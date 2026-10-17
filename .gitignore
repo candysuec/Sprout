@@ -51,4 +51,4 @@ venv/
 Thumbs.db
 desktop.ini
 *.bak*
-app/static/archive/
+app/static/archive/*.pre-*
