@@ -114,11 +114,69 @@ document.addEventListener('DOMContentLoaded', async () => {
   applyPrivacyBlurState();
 
   await loadChildren();
-  let initialSection = localStorage.getItem('mainSection');
-  if (!initialSection || initialSection === 'mission_control') {
-    initialSection = (currentSproutMode === 'sample') ? 'training' : 'dashboard';
+
+  // Native Browser History & Back/Forward Navigation Handler
+  window.addEventListener('popstate', (event) => {
+    const state = event.state;
+    if (state && state.section) {
+      if (state.section === 'children' && state.subTab) {
+        currentChildSubTab = state.subTab;
+      }
+      switchMainSection(state.section, false);
+      if (state.section === 'children' && state.subTab) {
+        switchChildTab(state.subTab, false);
+      }
+      return;
+    }
+
+    // Fallback to URL hash routing if state is null
+    const hash = (window.location.hash || '').replace('#', '').trim();
+    if (hash) {
+      if (hash.startsWith('children/')) {
+        const sub = hash.split('/')[1];
+        currentChildSubTab = sub || 'overview';
+        switchMainSection('children', false);
+        switchChildTab(currentChildSubTab, false);
+      } else {
+        switchMainSection(hash, false);
+      }
+    } else {
+      switchMainSection(currentSproutMode === 'sample' ? 'training' : 'dashboard', false);
+    }
+  });
+
+  // Deep-link routing from URL hash or fallback to storage/training default
+  const initialHash = (window.location.hash || '').replace('#', '').trim();
+  let initialSection = 'training';
+  let initialSubTab = null;
+
+  if (initialHash) {
+    if (initialHash.startsWith('children/')) {
+      initialSection = 'children';
+      initialSubTab = initialHash.split('/')[1];
+    } else {
+      initialSection = initialHash;
+    }
+  } else {
+    const stored = localStorage.getItem('mainSection');
+    if (stored && stored !== 'mission_control') {
+      initialSection = stored;
+    } else {
+      initialSection = (currentSproutMode === 'sample') ? 'training' : 'dashboard';
+    }
   }
-  switchMainSection(initialSection);
+
+  // Anchor initial clean state in browser history
+  if (window.history && window.history.replaceState) {
+    const initHash = initialSubTab ? `#children/${initialSubTab}` : `#${initialSection}`;
+    window.history.replaceState({ section: initialSection, subTab: initialSubTab }, '', initHash);
+  }
+
+  switchMainSection(initialSection, false);
+  if (initialSubTab) {
+    switchChildTab(initialSubTab, false);
+  }
+
   updateActCardsActiveState();
   updatePlacedChildBadge();
   lucide.createIcons();
@@ -846,10 +904,18 @@ async function renderChildSnapshot() {
 let currentMainSection = 'mission_control';
 let currentChildSubTab = 'overview';
 
-function switchMainSection(sectionKey) {
+function switchMainSection(sectionKey, pushHistory = true) {
   currentMainSection = sectionKey;
   currentTab = sectionKey; // backwards compatibility for helpers
   try { localStorage.setItem('mainSection', sectionKey); } catch(e) {}
+
+  // Synchronize browser URL bar and History stack for Back/Forward navigation
+  if (pushHistory && window.history && window.history.pushState) {
+    const targetHash = '#' + sectionKey;
+    if (window.location.hash !== targetHash) {
+      window.history.pushState({ section: sectionKey }, '', targetHash);
+    }
+  }
 
   const isSample = currentSproutMode === 'sample';
   const activeColorClass = (isSample || sectionKey === 'training') ? 'text-blue-900' : 'text-emerald-800';
@@ -904,8 +970,17 @@ function switchChildDomain(domainKey) {
   loadTabContent();
 }
 
-function switchChildTab(subTabKey) {
+function switchChildTab(subTabKey, pushHistory = true) {
   currentChildSubTab = subTabKey;
+
+  // Synchronize browser URL bar and History stack for child subtabs
+  if (pushHistory && window.history && window.history.pushState) {
+    const targetHash = `#children/${subTabKey}`;
+    if (window.location.hash !== targetHash) {
+      window.history.pushState({ section: 'children', subTab: subTabKey }, '', targetHash);
+    }
+  }
+
   // Sync domain button highlighting
   if (['medical', 'posc', 'benefits'].includes(subTabKey)) {
     currentChildDomain = 'health';
