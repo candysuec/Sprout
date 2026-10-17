@@ -1,9 +1,9 @@
 // Service Worker for Sprout KinCare OS (Offline Field Logging Support)
-const CACHE_NAME = 'sprout-kincare-v3';
+const CACHE_NAME = 'sprout-kincare-v3.2.1';
 const STATIC_ASSETS = [
   '/',
   '/static/index.html',
-  '/static/app.js?v=mc2',
+  '/static/app.js?v=3.2.1',
   '/static/manifest.json'
 ];
 
@@ -22,6 +22,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         keys.map((key) => {
           if (key !== CACHE_NAME) {
+            console.log('[SW] Purging outdated cache:', key);
             return caches.delete(key);
           }
         })
@@ -35,11 +36,12 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
 
-  // Network-first for dynamic API routes, cache-fallback for assets
+  // Dynamic API routes are strictly network-first, no-cache
   if (url.pathname.startsWith('/api/')) {
     return;
   }
 
+  // Network-first with cache fallback
   event.respondWith(
     fetch(event.request)
       .then((networkResponse) => {

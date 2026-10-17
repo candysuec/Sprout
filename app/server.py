@@ -61,9 +61,13 @@ def security_headers():
     response.headers['X-Frame-Options'] = 'DENY'
     response.headers['Referrer-Policy'] = 'no-referrer'
     if request.path.startswith('/api/'):
-        response.headers['Cache-Control'] = 'no-store'
-    elif request.path.endswith('.html') or request.path.endswith('.js') or request.path == '/':
-        response.headers['Cache-Control'] = 'no-cache, must-revalidate'
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+    elif request.path.endswith('.html') or request.path.endswith('.js') or request.path == '/' or request.path.endswith('.json'):
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
     if request.path.startswith('/uploads/'):
         response.headers['Content-Security-Policy'] = 'sandbox'
 

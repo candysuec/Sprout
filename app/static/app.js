@@ -57,20 +57,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   const dateInput = document.getElementById('recDate');
   if (dateInput) dateInput.value = today;
 
-  // Register Service Worker for Offline Field & Mobile Support (PWA)
+  // Register Service Worker for Offline Field & Mobile Support (PWA) with immediate update check
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/static/sw.js').catch(() => {});
+      navigator.serviceWorker.register('/static/sw.js').then((reg) => {
+        if (reg) reg.update().catch(() => {});
+      }).catch(() => {});
     });
   }
 
-  // Auto-prompt Founder Review Modal when in sandbox mode on session launch
-  const hasSeenReviewPrompt = sessionStorage.getItem('hasSeenReviewPrompt');
-  if (!hasSeenReviewPrompt && currentSproutMode === 'sample') {
-    setTimeout(() => {
-      openFounderReviewModal();
-      sessionStorage.setItem('hasSeenReviewPrompt', 'true');
-    }, 450);
+  // Deterministic Launch Routing (Query Parameter Shortcuts: ?review=1 or ?launcher=1)
+  // Replaces fragile sessionStorage auto-popup so Normal Chrome and Incognito behave identically
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('review') === '1' || urlParams.get('console') === '1') {
+    setTimeout(() => openReviewModeConsoleModal(), 250);
+  } else if (urlParams.get('launcher') === '1' || urlParams.get('role') === '1') {
+    setTimeout(() => openPersonaLauncherModal(), 250);
   }
 });
 
@@ -8891,6 +8893,32 @@ async function submitFounderFeedback(e) {
     alert("Review feedback saved to local storage! (Offline backup).");
   }
 }
+
+// 1-Click Browser Cache, Storage, and Service Worker Purge
+// Ensures normal browser sessions can cleanly resync with live application state
+window.purgeAppCachesAndReload = async function() {
+  try {
+    if ('serviceWorker' in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      for (const r of registrations) {
+        await r.unregister();
+      }
+    }
+    if ('caches' in window) {
+      const keys = await caches.keys();
+      for (const k of keys) {
+        await caches.delete(k);
+      }
+    }
+  } catch (e) {
+    console.warn("Purge cache warning:", e);
+  }
+  sessionStorage.clear();
+  localStorage.removeItem('caregiverUser');
+  localStorage.removeItem('sproutMode');
+  localStorage.removeItem('sproutDataset');
+  window.location.href = window.location.pathname + '?resync=' + Date.now();
+};
 
 
 
