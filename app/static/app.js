@@ -7209,121 +7209,18 @@ async function renderMissionControlView(container) {
     <div class="space-y-6 animate-fadeIn pb-12">
 
       <!-- ===================================================================== -->
-      <!-- LAYER 2: TRAINING & SHIFT LAUNCHPAD (DAY 0, DAY 1, 15 MODEL HOMES)   -->
+      <!-- SECTION 1: ACTIVE CHILD & PLACEMENT CONTEXT COCKPIT                   -->
       <!-- ===================================================================== -->
-      ${isSample ? `
-      <div id="sandboxGatewayAirlock" class="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 rounded-3xl p-6 sm:p-7 text-white shadow-xl border-2 border-emerald-500/50 relative overflow-hidden space-y-5">
-        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-blue-800/60 pb-4">
-          <div class="space-y-1">
-            <div class="flex items-center gap-2">
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 flex items-center gap-1">
-                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i> Practice Sandbox • 100% Synthetic
-              </span>
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-500/20 text-blue-200 border border-blue-400/30">
-                Consequence-Free • Safe to Click
-              </span>
-            </div>
-            <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
-              <span>Welcome, ${activeCaregiverUser || 'Sarah Jenkins'}</span>
-              <span class="text-sm font-semibold text-emerald-300">• Day 1 with ${activeChildName}</span>
-            </h2>
-            <p class="text-xs text-blue-200 leading-relaxed max-w-2xl">
-              Vermont Kinship & Placement Command Center. Use the quick launchpads below to demonstrate Day 0 setup, review Day 1 baseline child care, or explore the 15 model placement households.
-            </p>
-          </div>
-          <div class="flex items-center gap-2 shrink-0">
-            <button onclick="launchQuickStartTour(5)" class="px-3.5 py-2 bg-blue-900/60 hover:bg-blue-800 text-blue-200 hover:text-white font-bold rounded-xl text-xs border border-blue-600/60 transition flex items-center gap-1.5 cursor-pointer" title="5-Minute Guided Tour">
-              <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-400"></i>
-              <span>5-Min Tour</span>
-            </button>
-            <button onclick="openReviewModeConsoleModal()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs border border-slate-700 transition flex items-center gap-1.5 cursor-pointer" title="Open Director Review Console">
-              <i data-lucide="compass" class="w-3.5 h-3.5 text-emerald-400"></i>
-              <span>Director Console</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- The 3 Training & Shift Launchpads (Day 0 Clean Slate, Day 1 Baseline Care Sheet, 15 Model Households) -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-          <!-- Act 1: Day 0 - Clean Slate Setup Wizard -->
-          <div onclick="openGuidedOnboardingModal('foster')" class="bg-emerald-950/50 hover:bg-emerald-950/80 border-2 border-emerald-500/60 hover:border-emerald-400 p-4.5 rounded-2xl cursor-pointer transition flex flex-col justify-between gap-3 shadow-md group">
-            <div>
-              <div class="flex items-center justify-between mb-1.5">
-                <span class="text-[10px] font-black uppercase tracking-wider text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-md flex items-center gap-1">
-                  <i data-lucide="sparkles" class="w-3 h-3 text-emerald-400"></i> Act 1 • Day 0 Setup
-                </span>
-                <span class="text-[10px] font-black text-emerald-400 group-hover:scale-110 transition">Add New</span>
-              </div>
-              <h3 class="font-black text-white text-sm flex items-center gap-1.5">
-                <span>+ Set Up New Placement</span>
-              </h3>
-              <p class="text-[11px] text-emerald-200/90 leading-snug mt-1">
-                4-step walkthrough for a brand-new caregiver: role selection, child intake, urgent allergy check, and first-day priority.
-              </p>
-            </div>
-            <div class="text-xs font-black text-emerald-300 flex items-center gap-1 group-hover:text-white transition pt-1 border-t border-emerald-800/50">
-              <span>Start Day 0 Wizard</span>
-              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-            </div>
-          </div>
-
-          <!-- Act 2: Day 1 - Liam's 24-Hour Care Sheet -->
-          <div onclick="openEmergencyHandoffCard()" class="bg-blue-950/50 hover:bg-blue-950/80 border border-blue-500/60 hover:border-blue-400 p-4.5 rounded-2xl cursor-pointer transition flex flex-col justify-between gap-3 shadow-md group">
-            <div>
-              <div class="flex items-center justify-between mb-1.5">
-                <span class="text-[10px] font-black uppercase tracking-wider text-blue-300 bg-blue-500/20 px-2 py-0.5 rounded-md flex items-center gap-1">
-                  <i data-lucide="file-text" class="w-3 h-3 text-blue-400"></i> Act 2 • Day 1 Baseline
-                </span>
-                <span class="text-[10px] font-bold text-blue-300">Active: Liam</span>
-              </div>
-              <h3 class="font-black text-white text-sm flex items-center gap-1.5">
-                <span>Liam's 24-Hr Care Sheet</span>
-              </h3>
-              <p class="text-[11px] text-blue-200/90 leading-snug mt-1">
-                Instant 1-page printable summary with pediatrician contacts, allergy protocols, soothing habits, and bedtime routine.
-              </p>
-            </div>
-            <div class="text-xs font-black text-blue-300 flex items-center gap-1 group-hover:text-white transition pt-1 border-t border-blue-800/50">
-              <span>View Care Sheet & Meds</span>
-              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-            </div>
-          </div>
-
-          <!-- Act 3 & 4: 15 Model Households Gallery -->
-          <div onclick="openCaregiverProfilesModal()" class="bg-indigo-950/50 hover:bg-indigo-950/80 border border-indigo-500/60 hover:border-indigo-400 p-4.5 rounded-2xl cursor-pointer transition flex flex-col justify-between gap-3 shadow-md group">
-            <div>
-              <div class="flex items-center justify-between mb-1.5">
-                <span class="text-[10px] font-black uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-md flex items-center gap-1">
-                  <i data-lucide="users" class="w-3 h-3 text-indigo-400"></i> Act 3 & 4 • 15 Homes
-                </span>
-                <span class="text-[10px] font-bold text-indigo-300">4 Roles</span>
-              </div>
-              <h3 class="font-black text-white text-sm flex items-center gap-1.5">
-                <span>15 Model Placement Homes</span>
-              </h3>
-              <p class="text-[11px] text-indigo-200/90 leading-snug mt-1">
-                Pre-populated Vermont scenarios: Kinship grandparents, 48-hr Respite care, and Bio-Parent reunification timelines.
-              </p>
-            </div>
-            <div class="text-xs font-black text-indigo-300 flex items-center gap-1 group-hover:text-white transition pt-1 border-t border-indigo-800/50">
-              <span>Browse 15 Scenarios</span>
-              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-            </div>
-          </div>
-        </div>
-      </div>
-      ` : ''}
-
-      <!-- ===================================================================== -->
-      <!-- LAYER 4: ACTIVE PLACED CHILD COCKPIT HEADER                           -->
-      <!-- ===================================================================== -->
-      <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div class="flex items-center gap-3.5">
           <div class="w-12 h-12 rounded-2xl bg-emerald-700 text-white font-black text-base flex items-center justify-center shrink-0 shadow-sm privacy-sensitive">
             ${activeChildInitials}
           </div>
           <div>
             <div class="flex items-center gap-2">
+              <span class="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-900 border border-emerald-200">
+                Active Placement Context
+              </span>
               <h2 class="text-base font-extrabold text-slate-900 privacy-sensitive">
                 ${activeChildName}
               </h2>
@@ -7331,72 +7228,117 @@ async function renderMissionControlView(container) {
                 ${activeChildStatus}
               </span>
             </div>
-            <p class="text-xs text-slate-500 mt-0.5">
-              Caregiver Household: <strong class="text-slate-800">${activeCaregiverUser || 'Select Caregiver'}</strong> • Placement: <strong class="text-slate-800">${activeChildPlacedText}</strong>
+            <p class="text-xs text-slate-500 mt-1">
+              Caregiver: <strong class="text-slate-800">${activeCaregiverUser || 'Sarah Jenkins'}</strong> • Placement: <strong class="text-slate-800">${activeChildPlacedText}</strong>
             </p>
           </div>
         </div>
-        <div class="flex items-center gap-2 w-full sm:w-auto shrink-0">
-          <button onclick="openRecordModal()" class="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-xl text-xs shadow-sm transition flex items-center gap-1.5 cursor-pointer" title="Log a quick observation in 15 seconds">
-            <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+        <div class="flex flex-wrap items-center gap-2 w-full md:w-auto shrink-0">
+          <button onclick="openRecordModal()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl text-xs shadow-sm transition flex items-center gap-1.5 cursor-pointer" title="Log a quick observation in 15 seconds">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
             <span>+ 15-Sec Note</span>
           </button>
-          <button onclick="openEmergencyHandoffCard()" class="px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold rounded-xl text-xs border border-blue-200 transition flex items-center gap-1.5 cursor-pointer" title="Print/View 1-Page Care Sheet for Liam">
+          <button onclick="openEmergencyHandoffCard()" class="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold rounded-xl text-xs border border-blue-200 transition flex items-center gap-1.5 cursor-pointer" title="Print/View 1-Page Care Sheet for Liam">
             <i data-lucide="file-text" class="w-3.5 h-3.5 text-blue-600"></i>
             <span>Care Sheet</span>
           </button>
-          <button onclick="switchMainSection('children')" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer">
-            <i data-lucide="user" class="w-3.5 h-3.5 text-slate-600"></i>
-            <span>Profile</span>
+          <button onclick="openPersonaLauncherModal()" class="px-3 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black rounded-xl text-xs shadow-xs transition flex items-center gap-1.5 cursor-pointer border border-emerald-300" title="Switch Practice Role or Start Day 0">
+            <i data-lucide="users" class="w-3.5 h-3.5 text-slate-950"></i>
+            <span>Switch Role</span>
           </button>
-          <button onclick="switchMainSection('dashboard')" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer">
-            <i data-lucide="sun" class="w-3.5 h-3.5 text-emerald-600"></i>
-            <span>Today's Priorities</span>
+          <button onclick="switchMainSection('children')" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer">
+            <i data-lucide="user" class="w-3.5 h-3.5 text-slate-500"></i>
+            <span>Profile</span>
           </button>
         </div>
       </div>
 
       <!-- ===================================================================== -->
-      <!-- P0-1: MISSION CONTROL QUICK ACTION DOCK (6 CANONICAL ACTIONS ONLY)   -->
+      <!-- SECTION 2: 4 TRAINING & SHIFT LAUNCHPADS (DAY 0, DAY 1, 90D, 15 HOMES)-->
       <!-- ===================================================================== -->
-      <div class="bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 rounded-3xl p-5 shadow-xl border border-emerald-600/70 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-          <div class="p-3 bg-emerald-500/20 text-emerald-300 rounded-2xl border border-emerald-400/30 shrink-0">
-            <i data-lucide="zap" class="w-6 h-6 text-emerald-400"></i>
+      <div id="sandboxGatewayAirlock" class="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 rounded-3xl p-5 sm:p-6 text-white shadow-xl border-2 border-emerald-500/40 relative overflow-hidden space-y-4">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-blue-800/60 pb-3">
+          <div class="space-y-0.5">
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 flex items-center gap-1">
+                <i data-lucide="shield-check" class="w-3 h-3 text-emerald-400"></i> Practice Sandbox • 100% Synthetic
+              </span>
+              <span class="text-xs text-blue-200">Choose a starting point for your shift or training walkthrough:</span>
+            </div>
           </div>
-          <div>
-            <h3 class="text-white font-black text-base flex items-center gap-2">
-              Mission Control Quick Action Dock
-              <span class="text-[10px] font-bold bg-emerald-500/30 text-emerald-300 px-2.5 py-0.5 rounded-full border border-emerald-400/40 uppercase tracking-wide">Daily Care</span>
-            </h3>
-            <p class="text-xs text-emerald-200/80">Everyday caregiver actions: 15-second logs, intake wizard, emergency handoff, kinship guide, case closure, monthly export.</p>
+          <div class="flex items-center gap-2 shrink-0">
+            <button onclick="launchQuickStartTour(5)" class="px-3 py-1.5 bg-blue-900/60 hover:bg-blue-800 text-blue-200 hover:text-white font-bold rounded-xl text-xs border border-blue-600/60 transition flex items-center gap-1 cursor-pointer" title="5-Minute Quick Tour">
+              <i data-lucide="zap" class="w-3 h-3 text-amber-400"></i>
+              <span>5-Min Tour</span>
+            </button>
           </div>
         </div>
-        <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto shrink-0">
-          <button onclick="openRecordModal()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer" title="Log a routine observation in 15 seconds">
-            <i data-lucide="plus-circle" class="w-4 h-4"></i>
-            <span>+ 15-Sec Log</span>
-          </button>
-          <button onclick="openEmergencyPlacementWizard()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-rose-700 hover:bg-rose-600 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer" title="Launch 5-Step Guided Emergency Placement Wizard">
-            <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-300"></i>
-            <span>Emergency Intake</span>
-          </button>
-          <button onclick="openEmergencyHandoffCard()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer" title="Print/View 1-Click Care & Safety Sheet for Babysitter, Doctor, or Crisis ER">
-            <i data-lucide="shield-alert" class="w-4 h-4"></i>
-            <span>Care Sheet</span>
-          </button>
-          <button onclick="openKinshipFastTrackModal()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-teal-800 hover:bg-teal-700 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer" title="Open Plain-English Kinship Fast-Track Guide">
-            <i data-lucide="compass" class="w-4 h-4 text-teal-300"></i>
-            <span>Kinship Guide</span>
-          </button>
-          <button onclick="openPermanencyHandoverWizard()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-indigo-700 hover:bg-indigo-600 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer" title="Launch 5-Step Permanency & Handover Wizard">
-            <i data-lucide="flag" class="w-4 h-4 text-indigo-300"></i>
-            <span>Case Closure</span>
-          </button>
-          <button onclick="quickExportThisMonth()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-cyan-700 hover:bg-cyan-600 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer" title="Generate and download current month's official DCF progress report (.docx)">
-            <i data-lucide="file-down" class="w-4 h-4"></i>
-            <span>Export Month</span>
-          </button>
+
+        <!-- The 4 Training Pillars (Day 0, Day 1, Day 90, 15 Scenarios) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <!-- Act 1: Day 0 Setup -->
+          <div onclick="openGuidedOnboardingModal('foster')" class="bg-emerald-950/50 hover:bg-emerald-950/80 border-2 border-emerald-500/60 hover:border-emerald-400 p-3.5 rounded-2xl cursor-pointer transition flex flex-col justify-between gap-2.5 shadow-md group">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[9px] font-black uppercase tracking-wider text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-md">Act 1 • Clean Slate</span>
+                <span class="text-[9px] font-black text-emerald-400">Day 0</span>
+              </div>
+              <h3 class="font-black text-white text-xs">+ Set Up New Person</h3>
+              <p class="text-[10px] text-emerald-200/90 leading-tight mt-1">4-step wizard: Choose role, add child, verify allergies, set priority.</p>
+            </div>
+            <div class="text-[11px] font-black text-emerald-300 flex items-center gap-1 group-hover:text-white transition pt-1 border-t border-emerald-800/50">
+              <span>Start Day 0</span>
+              <i data-lucide="arrow-right" class="w-3 h-3"></i>
+            </div>
+          </div>
+
+          <!-- Act 2: Day 1 Shift -->
+          <div onclick="openEmergencyHandoffCard()" class="bg-blue-950/50 hover:bg-blue-950/80 border border-blue-500/60 hover:border-blue-400 p-3.5 rounded-2xl cursor-pointer transition flex flex-col justify-between gap-2.5 shadow-md group">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[9px] font-black uppercase tracking-wider text-blue-300 bg-blue-500/20 px-2 py-0.5 rounded-md">Act 2 • Foster Baseline</span>
+                <span class="text-[9px] font-bold text-blue-300">Day 1</span>
+              </div>
+              <h3 class="font-black text-white text-xs">Liam's 24-Hr Care Sheet</h3>
+              <p class="text-[10px] text-blue-200/90 leading-tight mt-1">Printable 1-page summary: meds, doctor, bedtime routine, soothing plan.</p>
+            </div>
+            <div class="text-[11px] font-black text-blue-300 flex items-center gap-1 group-hover:text-white transition pt-1 border-t border-blue-800/50">
+              <span>View Care Sheet</span>
+              <i data-lucide="arrow-right" class="w-3 h-3"></i>
+            </div>
+          </div>
+
+          <!-- Act 3: Day 90 Established Case -->
+          <div onclick="toggleDatasetModeHeader()" class="bg-teal-950/50 hover:bg-teal-950/80 border border-teal-500/60 hover:border-teal-400 p-3.5 rounded-2xl cursor-pointer transition flex flex-col justify-between gap-2.5 shadow-md group">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[9px] font-black uppercase tracking-wider text-teal-300 bg-teal-500/20 px-2 py-0.5 rounded-md">Act 3 • Established</span>
+                <span class="text-[9px] font-bold text-teal-300">Day 90</span>
+              </div>
+              <h3 class="font-black text-white text-xs">Dataset B: 90-Day Case</h3>
+              <p class="text-[10px] text-teal-200/90 leading-tight mt-1">3 months of medical history, school IEP progress, and court evidence.</p>
+            </div>
+            <div class="text-[11px] font-black text-teal-300 flex items-center gap-1 group-hover:text-white transition pt-1 border-t border-teal-800/50">
+              <span>Switch to 90 Days</span>
+              <i data-lucide="arrow-right" class="w-3 h-3"></i>
+            </div>
+          </div>
+
+          <!-- Act 4: 15 Scenarios Gallery -->
+          <div onclick="openCaregiverProfilesModal()" class="bg-indigo-950/50 hover:bg-indigo-950/80 border border-indigo-500/60 hover:border-indigo-400 p-3.5 rounded-2xl cursor-pointer transition flex flex-col justify-between gap-2.5 shadow-md group">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[9px] font-black uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-md">Act 4 • 4 Roles</span>
+                <span class="text-[9px] font-bold text-indigo-300">15 Homes</span>
+              </div>
+              <h3 class="font-black text-white text-xs">15 Model Households</h3>
+              <p class="text-[10px] text-indigo-200/90 leading-tight mt-1">Kinship grandparents, 48-hr Respite care, and Bio-Parent reunification cases.</p>
+            </div>
+            <div class="text-[11px] font-black text-indigo-300 flex items-center gap-1 group-hover:text-white transition pt-1 border-t border-indigo-800/50">
+              <span>Browse 15 Homes</span>
+              <i data-lucide="arrow-right" class="w-3 h-3"></i>
+            </div>
+          </div>
         </div>
       </div>
 

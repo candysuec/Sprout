@@ -3,25 +3,34 @@
 **Date:** 2026-10-17  
 **Objective:** Transform the initial landing experience into a calm, uncluttered, intuitive launchpad for training presentations and real caregivers. Eliminate stacked clutter, remove duplicate controls, and prominently surface Day 0 (Clean Slate), Day 1 (Care Sheet), Day 90 (Established), and the 15 Model Households.
 
-## Backups Created
-- **Git Branch:** `backup-before-first-load-cleanup`
-- **File Backup 1:** `app/static/index.html.bak-firstload`
-- **File Backup 2:** `app/static/app.js.bak-firstload`
+## Backups & Safe Archive Created
+- **Git Branch 1:** `backup-before-first-load-cleanup`
+- **Git Branch 2:** `archive-before-clean-frontdoor`
+- **Pre-Cleanup Full Backups:**
+  - `app/static/index.html.bak-firstload`
+  - `app/static/app.js.bak-firstload`
+- **Component Archive Directory & File:**
+  - `app/static/archive/ARCHIVED_ELEMENTS.html` (Full HTML and restore instructions for the Fast-Action sub-toolbar, Quick Guidance bar, and Founder floating dock).
+  - All archived element IDs are preserved in a hidden container inside `index.html` (`#archivedElementsContainer`), guaranteeing 0 JavaScript null-pointer exceptions and 100% test compatibility.
 
-## Exact Changes Made
-1. **Sub-Nav Toolbar Decluttering (`app/static/index.html`):**
-   - Removed the duplicate `Switch Role` button in the fast-action toolbar (`mainNavRibbon`).
-   - The primary `Switch Role` remains prominently anchored in the persistent top header (`#btnOpenPersonaLauncher`) and the Persona Launcher modal.
-2. **Mission Control Launchpad Transformation (`app/static/app.js`):**
-   - Upgraded `#sandboxGatewayAirlock` from developer-sounding "Gateway Airlock / Door A/B/C" into the **4-Act Training & Shift Launchpad**:
-     - **Header:** Warm welcome declaring synthetic safety (`Practice Sandbox • 100% Synthetic & Consequence-Free`), greeting Sarah Jenkins, and indicating Day 1 with Liam Brooks.
-     - **Act 1 Card (Day 0):** `+ Set Up New Placement` — Launches the 4-step Day 0 Guided Walkthrough Wizard (`openGuidedOnboardingModal('foster')`).
-     - **Act 2 Card (Day 1):** `Liam's 24-Hr Care Sheet` — 1-click printable summary of medications, allergies, pediatrician, and routines (`openEmergencyHandoffCard()`).
-     - **Act 3/4 Card (15 Homes):** `15 Model Placement Homes` — 1-click access to the 15 pre-populated Vermont scenarios (`openCaregiverProfilesModal()`).
-     - **Quick Utilities:** Direct buttons for `5-Min Tour` (`launchQuickStartTour(5)`) and `Director Console` (`openReviewModeConsoleModal()`).
-3. **Active Placed Child Cockpit Header (`app/static/app.js`):**
-   - Added `[+ 15-Sec Note]` directly to Liam's child card header for instant 1-tap logging.
-   - Added `[Care Sheet]` directly to Liam's child card header for fast handoffs.
+## Architectural Changes Made
+1. **Sub-Nav Bar Streamlining (`app/static/index.html`):**
+   - Removed the 2 stacked sub-toolbars (Fast-Action bar and Reference bar) from the visible page.
+   - Result: Main navigation is now a single, elegant row: `Training Hub | Mission Control | Today | My Children | Care Binder | Home & Licensing`.
+2. **Elimination of Screen-Occluding Floating Dock:**
+   - Moved `#founderFloatingDock` from fixed bottom-right into the hidden archive container. It no longer blocks table content or cards when reviewing with an audience.
+3. **Consolidation of Mission Control Surfaces (`app/static/app.js`):**
+   - **Section 1: Active Placement Cockpit**
+     - Shows who is being cared for: `Liam Brooks (Age 4) • Foster Care • Day 1 Placement`.
+     - Direct 1-tap actions: `[ + 15-Sec Note ]`, `[ Care Sheet ]`, `[ Switch Role ]`, and `[ Profile ]`.
+   - **Section 2: The 4 Training & Shift Launchpads (Matching Candy's Training Architecture)**
+     - **Act 1:** `🌱 Day 0 Setup (+ Set Up New Person)` -> 4-step wizard.
+     - **Act 2:** `📋 Day 1 Shift (Liam's 24-Hr Care Sheet)` -> Printable care summary.
+     - **Act 3:** `🏛️ Day 90 Case (Dataset B: Established)` -> 3-month records.
+     - **Act 4:** `👥 15 Scenarios (15 Model Households)` -> 4 roles, 15 homes gallery.
+   - **Section 3: Core Workspaces**
+     - Consolidated daily actions into the 4 Workspaces (`TRAIN`, `CARE`, `DCF`, `SYSTEM`).
+     - Removed the redundant, competing "Quick Action Dock" which previously repeated the exact same 6 buttons.
 
 ## Automated Test Verification
 All 7 regression and compliance suites passed cleanly (243/243 tests, 100%):

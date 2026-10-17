@@ -1,0 +1,94 @@
+<!-- 
+=============================================================================
+SPROUT KINCARE OS: ARCHIVED UI ELEMENTS REGISTER
+Date: 2026-10-17
+Reason: Archived to reduce cognitive load and eliminate the 7-band stacking on first load.
+Approved By: Candy (Founder Directive)
+Restore Instructions: Any block below can be restored into index.html by copying the respective snippet.
+=============================================================================
+-->
+
+<!-- ARCHIVED BLOCK 1: Integrated Fast-Action Toolbar (Sub-Nav Row 3) -->
+<!-- Originally located inside #mainNavigationContainer right below main nav hubs -->
+<div id="ARCHIVED_fastActionToolbar" class="flex items-center gap-2.5 shrink-0 pt-2 lg:pt-0 border-t lg:border-t-0 border-slate-100 hidden">
+  <!-- Search Bar with Ctrl+K shortcut -->
+  <div class="relative cursor-pointer" onclick="openOmnibarModal()">
+    <input type="text" id="globalSearchInput" readonly placeholder="Quick find... (Ctrl+K)" class="bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 text-xs rounded-xl pl-8 pr-12 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 w-48 transition-all cursor-pointer hover:bg-slate-100" />
+    <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-3 pointer-events-none"></i>
+    <span class="absolute right-2 top-2 px-1.5 py-0.5 rounded text-[10px] bg-slate-200/80 text-slate-600 font-bold border border-slate-300 pointer-events-none">Ctrl K</span>
+  </div>
+
+  <!-- Child Initials Placement Context Indicator -->
+  <div class="flex items-center bg-emerald-50 rounded-xl px-3 py-1.5 border border-emerald-300 shadow-2xs" title="Placed Child in Care">
+    <div class="w-5 h-5 rounded-full bg-emerald-700 text-white font-extrabold flex items-center justify-center text-[10px] mr-1.5 shrink-0">
+      👶
+    </div>
+    <span class="text-[10px] text-emerald-900 font-extrabold uppercase tracking-wider mr-1">Active:</span>
+    <span id="navPlacedChildInitials" class="text-emerald-950 font-black text-xs privacy-sensitive">Child In Care</span>
+  </div>
+
+  <!-- Quick Emergency Summary Mode (P1.8) -->
+  <button id="btnQuickEmergencySummary" onclick="openEmergencyHandoffCard()" class="bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-300 font-extrabold text-xs px-3 py-2 rounded-xl shadow-2xs transition flex items-center gap-1.5 shrink-0" title="1-Tap Emergency Summary for Hospital, Police, or Crisis Worker">
+    <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-rose-600"></i>
+    <span>Emergency Mode</span>
+  </button>
+
+  <!-- Quick Signature Capture Button -->
+  <button id="btnQuickSign" onclick="openSignatureModal()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold text-xs px-3 py-2 rounded-xl shadow-2xs transition flex items-center gap-1.5 shrink-0" title="Capture digital signature for handoff/transport">
+    <i data-lucide="pen-tool" class="w-3.5 h-3.5"></i>
+    <span>Sign</span>
+  </button>
+
+  <!-- Quick Log Action Button -->
+  <button id="btnFastLogNote" onclick="openRecordModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5 shrink-0">
+    <i data-lucide="plus" class="w-4 h-4"></i>
+    <span>Log Note</span>
+  </button>
+</div>
+
+
+<!-- ARCHIVED BLOCK 2: Quick Guidance & Help Toolbar (Sub-Nav Row 4) -->
+<div id="ARCHIVED_quickGuidanceToolbar" class="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs hidden">
+  <div class="flex items-center gap-2">
+    <span class="text-[10px] uppercase font-extrabold text-slate-400 tracking-wider flex items-center gap-1">
+      <i data-lucide="help-circle" class="w-3.5 h-3.5 text-blue-500"></i> Reference & Help:
+    </span>
+    <!-- Button 1: Caregiver Profiles Guide -->
+    <button id="btnNavCaregiverProfiles" onclick="openCaregiverProfilesModal()" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold rounded-lg border border-blue-200 shadow-2xs transition flex items-center gap-1.5">
+      <i data-lucide="users" class="w-3.5 h-3.5 text-blue-600"></i>
+      <span>1. Profiles of Caregivers</span>
+      <span class="text-[10px] px-1.5 py-0.2 bg-blue-200 text-blue-900 rounded-full font-extrabold">15 Homes</span>
+    </button>
+    <!-- Button 2: System Help -->
+    <button id="btnNavSystemHelp" onclick="openSystemHelpModal()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-lg border border-slate-300 shadow-2xs transition flex items-center gap-1.5">
+      <i data-lucide="book-marked" class="w-3.5 h-3.5 text-slate-600"></i>
+      <span>2. System Help & Instructions</span>
+    </button>
+  </div>
+  <div class="text-[11px] text-slate-400 italic">
+    Sprout Sphere: <span id="currentSphereIndicator" class="font-bold text-blue-700">Dev Sandbox Active</span>
+  </div>
+</div>
+
+
+<!-- ARCHIVED BLOCK 3: Persistent Floating Founder OS Dock (Global bottom-right pill) -->
+<!-- Obscured bottom-right content during presentation and increased cognitive noise -->
+<div id="ARCHIVED_founderFloatingDock" class="fixed bottom-5 right-5 z-50 flex items-center gap-2 bg-slate-950/85 backdrop-blur-md p-1.5 rounded-full border border-slate-700/80 shadow-2xl hidden">
+  <!-- 1-Click Director Review Console (Layer 1) -->
+  <button id="btnFloatingReviewMode" onclick="openReviewModeConsoleModal()" class="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black rounded-full shadow-md border border-emerald-300 transition transform hover:scale-105 cursor-pointer" title="Open Director Review Console (Layer 1)">
+    <i data-lucide="compass" class="w-4 h-4 text-slate-950"></i>
+    <span class="text-xs uppercase tracking-wider font-black">Review Console</span>
+  </button>
+
+  <!-- 1-Click Practice Simulator Roles (Layer 3) -->
+  <button id="btnFloatingPersonaLauncher" onclick="openPersonaLauncherModal()" class="flex items-center gap-2 px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-full shadow-md border border-blue-400 transition transform hover:scale-105 cursor-pointer" title="Switch Practice Simulator Role (Layer 3)">
+    <i data-lucide="users" class="w-4 h-4 text-white"></i>
+    <span class="text-xs uppercase tracking-wider font-bold">Practice Roles</span>
+  </button>
+
+  <!-- 1-Click Founder Feedback Capture -->
+  <button id="btnFloatingFeedback" onclick="openFounderFeedbackModal()" class="flex items-center gap-2 px-3.5 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-full shadow-md border border-amber-300 transition transform hover:scale-105 cursor-pointer" title="Share Founder Review Feedback on this screen">
+    <i data-lucide="message-square-heart" class="w-4 h-4 text-slate-950"></i>
+    <span class="text-xs uppercase tracking-wider font-black">Feedback</span>
+  </button>
+</div>
