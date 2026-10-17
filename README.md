@@ -16,6 +16,7 @@ Sprout is **NOT** a DCF case management system, state database, court management
 ## 🧭 Founder & Developer Cockpit (Orientation)
 
 If you are orienting to the project, start with these operational guides:
+- [**Founder Recovery, Parity & Backlog Master Plan**](docs/DATASET_A_DAY_ONE_ONBOARDING_PLAN.md): Authoritative governance and recovery roadmap restoring post-migration determinism, tracking REC-01 through REC-07, and gating Phase 3 behind 8-persona validation.
 - [**Founder Orientation Dashboard**](docs/FOUNDER_ORIENTATION_DASHBOARD.md): *Where am I? What matters? What is active? What is blocked? What is next? What can I ignore?*
 - [**Current Project State Ledger**](docs/PROJECT_STATE.md): Single source of truth for work status, complete milestones, and active dependencies.
 - [**Repository Map & Knowledge Directory**](docs/REPOSITORY_MAP.md): Cognitive filter categorizing all documents into *What Matters*, *Active Work*, *Reference*, and *Ignore*.
@@ -35,7 +36,7 @@ If you are orienting to the project, start with these operational guides:
 - **Two-Step Smart Logger**: High-speed journal, pediatric medical visit, school IEP conference, and family time visitation logging completed in under 15 seconds.
 - **Vermont Compliance (FS-221A & CHINS Stepper)**: Built-in milestone tracker for provisional home studies, annual safety drills, 90-day fingerprint deadlines, and Title 33 CHINS court hearing milestones.
 - **VCWTP Training & Mileage Tracking**: Real-time logging of Vermont Child Welfare Training Partnership hours and automated State Form FS-334B travel reimbursement generation at the official standard rate ($0.67/mi).
-- **Automated Verification Baseline**: **212 / 212 tests passing (100%)** across 5 automated test suites.
+- **Automated Verification Baseline**: **234 / 234 tests passing (100%)** across 6 automated test suites (Browser Determinism, Two-Dataset Trainer, E2E Flows, Operational Readiness, Phase 13B Governance, Parent Workspace).
 
 ---
 
@@ -69,33 +70,57 @@ Sprout normalizes caregiver management across real-world dimensions:
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Getting Started & Deployment
+
+Sprout runs as a 100% offline-first, local system. The canonical production deployment uses Docker & Docker Compose inside WSL2, backed by persistent Docker volumes.
 
 ### Prerequisites
 
-- Python 3.10+
-- Modern Web Browser (Chrome, Edge, Firefox, Safari)
+- Docker Desktop / Docker Engine & WSL2 (Ubuntu)
+- Modern Web Browser (Chrome, Edge, Firefox)
 
-### Installation & Launch
+### Canonical Production Deployment (Docker)
 
-1. **Clone the repository:**
+1. **Clone or pull the repository:**
    ```bash
    git clone https://github.com/candysuec/Sprout.git
-   cd Sprout/app
+   cd Sprout
    ```
 
-2. **Install dependencies:**
+2. **Ensure persistent volume exists:**
    ```bash
-   pip install -r requirements.txt
+   docker volume create sprout-data
    ```
 
-3. **Run the local server:**
+3. **Launch Sprout Stack:**
    ```bash
-   python server.py
+   docker compose up -d
    ```
 
 4. **Access Sprout:**
    Open your browser to `http://127.0.0.1:5858`
+
+5. **Windows 1-Click Desktop Launcher:**
+   Double-click `Launch_Foster_Portal.bat` on the Desktop. It automatically checks for port 5858 listeners, launches the Docker container if needed, and opens the default browser.
+
+### Local Development (Python Virtual Environment)
+
+1. **Activate environment & run:**
+   ```bash
+   cd Sprout
+   source .venv/bin/activate
+   cd app && python server.py
+   ```
+
+2. **Run the 234-Test Verification Battery:**
+   ```bash
+   python3 test_trainer_two_datasets.py
+   python3 test_browser_determinism.py
+   python3 test_phase13b_governance.py
+   python3 test_operational_readiness.py
+   python3 test_e2e_flows.py
+   python3 test_parent_workspace_integration.py
+   ```
 
 ---
 

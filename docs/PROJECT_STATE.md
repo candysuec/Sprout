@@ -1,8 +1,8 @@
 # PROJECT STATE
 **Initiative:** Sprout  
 **Project:** Child & Family Success Operating System  
-**Current Phase:** v3.2 Foundation Approved & Development Freeze Activated  
-**Target Version:** v3.2.0 Baseline (Frozen)  
+**Current Phase:** Phase 0 & Phase 1 Parity Verified • Phase 1A Backlog Active • Phase 2 Founder Validation Active • Phase 3 Gated  
+**Target Version:** v3.2.1 Parity & Recovery Baseline  
 **Last Synchronized:** 2026-10-16  
 
 ---
@@ -33,12 +33,28 @@
 | **Concept Governance** | **AUTHORITATIVE & SEALED (7 Categories)** | [`CONCEPT_GOVERNANCE_REGISTER.md`](CONCEPT_GOVERNANCE_REGISTER.md) | Audience ≠ Role, Tool ≠ Workspace, Workflow ≠ Role |
 | **Drift Accountability Review** | **AUTHORITATIVE & PRUNED (3 Core Truths, 10 Immutable Truths)** | [`DRIFT_ACCOUNTABILITY_REPORT.md`](DRIFT_ACCOUNTABILITY_REPORT.md) | Retired Audience/Purpose/Workflow; 7 figures reality check |
 | **Trainer Validation & Two Datasets** | **IMPLEMENTED, VERIFIED & COMMITTED (Commit `20dc1ac`)** | [`TRAINER_VALIDATION_REQUIREMENT.md`](TRAINER_VALIDATION_REQUIREMENT.md) | D-001..D-003 fixed; Dataset A & B live; Parent continuum live |
+| **WSL & Docker Deployment Architecture** | **CANONICAL & VERIFIED** | [`README.md`](../README.md) | `sprout-app` container, external `sprout-data` persistent volume, `/shared_docs` mount, port collision guard |
+| **Recovery & Parity Audit (REC-01..REC-07)** | **7/7 RESOLVED (100%)** | [`DATASET_A_DAY_ONE_ONBOARDING_PLAN.md`](DATASET_A_DAY_ONE_ONBOARDING_PLAN.md) | SyntaxError fixed, nav restored, role switch fixed, volume hydrated, port collision handled, compliance labels fixed, badge wrap fixed |
+| **Automated Verification Baseline** | **234 / 234 PASS (100%)** | 6 Verification Suites | `test_trainer_two_datasets.py`, `test_browser_determinism.py`, `test_phase13b_governance.py`, `test_operational_readiness.py`, `test_e2e_flows.py`, `test_parent_workspace_integration.py` |
+| **Phase 3 Dataset A Implementation Gate** | **STRICTLY GATED / LOCKED** | [`DATASET_A_DAY_ONE_ONBOARDING_PLAN.md`](DATASET_A_DAY_ONE_ONBOARDING_PLAN.md) | Blocked until Phase 0, 1, 1A, and 2 complete and approved by Founder |
 
 ---
 
 ## 2. Work Status Ledger
 
 ### ✅ Complete (Production Ready)
+- [x] **WSL2 & Canonical Docker Containerization:** Containerized Sprout into `sprout-app` (Python 3.11-slim, WSGI Bottle on port 5858) backed by external persistent volume `sprout-data` mounted to `/data` (188 KB SQLite DB `foster_binder.db` preserving 26 children, 4 households, 90 exports) and read-only host mount `/shared_docs` (34 state DCF documents and licensing guides).
+- [x] **Desktop 1-Click Launch Resilience:** Enhanced Windows launcher `Launch_Foster_Portal.bat` with netstat port 5858 collision detection, automatic Docker container startup, and browser launch.
+- [x] **Recovery & Parity Resolutions (Phase 1A Backlog REC-01 through REC-07):**
+  - `REC-01 (P0)`: Fixed fatal SyntaxError caused by duplicate `currentSproutDataset` in `app/static/app.js`.
+  - `REC-02 (P0)`: Eliminated rule hiding top navigation bar on Mission Control; navbar is permanently visible.
+  - `REC-03 (P0)`: Added route-exit guard in `onCaregiverUserChange()` to transition out of Parent Reunification Portal when selecting Respite.
+  - `REC-04 (P1)`: Fixed FS-221A licensure compliance milestone rendering to bind `item.item_name || item.title` and standard code, eliminating `SAFETY undefined`.
+  - `REC-05 (P1)`: Added `whitespace-nowrap` and `shrink-0` to 24/7 DCF hotline badge to eliminate 3-line wrap and child initials overlap.
+  - `REC-06 (P0)`: Hydrated persistent volume `sprout-data` with real SQLite database (188 KB) and 90 vault exports.
+  - `REC-07 (P0)`: Handled port 5858 collision error.
+- [x] **Master Plan & Governance Alignment (`docs/DATASET_A_DAY_ONE_ONBOARDING_PLAN.md`):** Updated Master Plan incorporating Live Program Status Dashboard, Founder Recovery Inventory (Phase 0, Section 5), Phase 1A Recovery Backlog as permanent system of record, Phase 2 Expected vs Actual persona validation worksheets, and strict Phase 3 implementation gate.
+- [x] **Automated Test Battery Expansion:** 234 / 234 automated tests passing (100%) across 6 test suites inside the Docker container.
 - [x] **Trainer Validation & Two-Dataset Architecture (`Commit 20dc1ac`):** Implemented Dataset A (New to Sprout / Day 1 Onboarding with clean clocks & tasks) and Dataset B (Established 90-Day User with rich multi-domain history & compliance). Fixed defects D-001 (PII shield leak on child names/avatars), D-002 (dead state lockout via atomic persona binding), and D-003 (parent workspace boundary leak). Expanded Parent Participant continuum (Danielle, Jason, Angela, Maria). Added 1-click sandbox reset (`/api/sample-dataset/reset`). Verified by `test_trainer_two_datasets.py` (212/212 passing across 5 suites) and pushed to GitHub main.
 - [x] **Drift Accountability Review:** Published authoritative report answering *"Why are we having the same conversation repeatedly?"*. Pruned 7 categories down to 3 real software decisions (Role, Workspace, State); retired Audience, Purpose, and Workflow from software taxonomy; conducted reality check on 7 figures; established The 10 Things Every Future AI Must Never Forget.
 - [x] **Foundational Strategic Constitution:** Redefined Sprout as Child & Family Success Operating System.
