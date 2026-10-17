@@ -73,3 +73,21 @@ All 7 regression and compliance suites passed cleanly (243/243 tests, 100%):
 ### 4. Zero Regressions Gate
 - All 7 verification test suites passing (243 / 243 tests, 100%).
 
+---
+
+## Update: Persistent Role Selection & Front-and-Center Role Launcher (October 2026)
+
+### 1. Root Cause Resolution: "Why was it defaulting to Sarah Jenkins?"
+- **The Culprit:** In `sanitizeStartupState()`, the boot logic checked `SAMPLE_CAREGIVERS.find(...)` whenever `sproutMode` was `sample` (the default). If the stored user was `Candy Chevalier` (or another local/parent user), `SAMPLE_CAREGIVERS.find` evaluated to `undefined`, which forcibly overwrote `caregiverUser` to `Sample Caregiver (Sarah Jenkins)` and wrote it to `localStorage` on every page load.
+- **Secondary Culprit in Dropdown:** In `populateCaregiverDropdown()`, any active user not explicitly matching the hardcoded sample array or Angela Davis had `activeCaregiverUser = ''`, which then triggered another fallback to Sarah Jenkins.
+- **The Fix:**
+  - `sanitizeStartupState()` now inspects `LOCAL_CAREGIVERS` and locks mode to `local` if `Candy Chevalier` or any local caregiver was chosen.
+  - Recognizes `Parent Participant (...)` and dynamically created sample caregivers from onboarding so user choices are never clobbered.
+  - Added dedicated fallback to `Candy Chevalier` in `updatePlacedChildBadge()` whenever in local mode.
+
+### 2. Front-and-Center Role & Dataset Launcher Buttons
+- **Top Header Action:** Added a glowing, prominent `[ 👥 Switch Role / Scenarios ]` button directly in the main header navigation (no longer buried inside the `Tools ▾` dropdown).
+- **Interactive Context Pill:** Made the header `Caregiver: ... | Child: ...` context pill directly clickable with a hover effect and tooltip to open the Persona & Role Launcher modal on demand.
+- **Curriculum Stage Bar Action:** Added a high-contrast `[ 👥 Select Role & Dataset (Day 0, 1, 90, Reset) ]` button in `#trainingCurriculumStage` right next to the 5-minute tour button.
+- **1-Click Local Caregiver Switch:** Added a dedicated card inside `personaLauncherModal` for `Production Caregiver: Candy Chevalier (Local Household)` allowing instant 1-click switching into local production mode with live data.
+

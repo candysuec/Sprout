@@ -37,12 +37,18 @@ const SAMPLE_CAREGIVERS = [
 // Ensures Normal Browser, Dirty Browser State, and Incognito show 100% identical boot.
 // =============================================================================
 function sanitizeStartupState() {
-  // 1. Sprout Mode Invariant
+  // 1. Caregiver User & Mode Invariant: Respect prior selection or local mode
+  let caregiver = (localStorage.getItem('caregiverUser') || '').trim();
   let mode = (localStorage.getItem('sproutMode') || '').trim();
-  if (mode !== 'sample' && mode !== 'local') {
+
+  // If stored caregiver matches any local caregiver (e.g. Candy Chevalier), respect local mode
+  const isLocalUser = LOCAL_CAREGIVERS.some(c => c.id === caregiver || c.name === caregiver);
+  if (isLocalUser) {
+    mode = 'local';
+  } else if (mode !== 'sample' && mode !== 'local') {
     mode = 'sample';
-    localStorage.setItem('sproutMode', mode);
   }
+  localStorage.setItem('sproutMode', mode);
   currentSproutMode = mode;
 
   // 2. Dataset Mode Invariant (Dataset A: Day 1 vs Dataset B: 90 Days)
@@ -56,12 +62,15 @@ function sanitizeStartupState() {
   // 3. Privacy Blur Invariant
   isPrivacyBlurActive = localStorage.getItem('privacyBlur') === 'true';
 
-  // 4. Caregiver User Invariant (Auto-heal away from orphan/dead states)
-  let caregiver = (localStorage.getItem('caregiverUser') || '').trim();
+  // 4. Caregiver User Invariant (Auto-heal away from orphan/dead states without wiping valid choices)
   if (mode === 'sample') {
-    const valid = SAMPLE_CAREGIVERS.find(c => c.id === caregiver || c.name === caregiver);
+    const isSamplePreset = SAMPLE_CAREGIVERS.some(c => c.id === caregiver || c.name === caregiver);
+    const isParent = caregiver.startsWith('Parent Participant');
+    const isDynamicSample = caregiver.startsWith('Sample Caregiver') && !caregiver.includes('Grace & Lydia Holloway');
+    const isValid = isSamplePreset || isParent || isDynamicSample;
+
     // If empty, invalid, or unplaced orphan (e.g. Grace Holloway HH-115), self-heal to Sarah Jenkins
-    if (!valid || caregiver.includes('Grace & Lydia Holloway')) {
+    if (!isValid || caregiver.includes('Grace & Lydia Holloway')) {
       caregiver = 'Sample Caregiver (Sarah Jenkins)';
       localStorage.setItem('caregiverUser', caregiver);
     }
@@ -266,6 +275,22 @@ function toggleSproutWorkspaceMode() {
   loadTabContent();
 }
 
+function activateLocalCaregiver(userName = 'Candy Chevalier') {
+  currentSproutMode = 'local';
+  activeCaregiverUser = userName;
+  localStorage.setItem('sproutMode', 'local');
+  localStorage.setItem('caregiverUser', activeCaregiverUser);
+
+  populateCaregiverDropdown();
+  updateWorkspaceToggleUI();
+  updateSproutTheme();
+  closePersonaLauncherModal();
+  loadChildren().then(() => {
+    updatePlacedChildBadge();
+    switchMainSection('mission_control');
+  });
+}
+
 function resetToHomeLanding() {
   switchMainSection('mission_control');
 }
@@ -338,10 +363,16 @@ function populateCaregiverDropdown() {
   parentOpt.className = 'bg-rose-900 text-rose-100 font-bold';
   select.appendChild(parentOpt);
 
-  // Verify activeCaregiverUser is in list or is parent, else set to empty
-  const exists = list.some(c => c.id === activeCaregiverUser) || activeCaregiverUser === 'Parent Participant (Angela Davis)';
-  if (!exists) {
-    activeCaregiverUser = '';
+  // Preserve activeCaregiverUser dynamically (e.g. other parents, onboarded caregivers)
+  if (activeCaregiverUser) {
+    const alreadyPresent = Array.from(select.options).some(o => o.value === activeCaregiverUser);
+    if (!alreadyPresent) {
+      const customOpt = document.createElement('option');
+      customOpt.value = activeCaregiverUser;
+      customOpt.textContent = activeCaregiverUser.replace(/^Sample Caregiver \(|\)$/g, '');
+      customOpt.className = activeCaregiverUser.includes('Parent') ? 'bg-rose-900 text-rose-100 font-bold' : 'bg-slate-800 text-white font-semibold';
+      select.appendChild(customOpt);
+    }
   }
 
   select.value = activeCaregiverUser;
@@ -527,7 +558,7 @@ function updatePlacedChildBadge() {
 
   const headerCaregiver = document.getElementById('headerCaregiverDisplay');
   if (headerCaregiver) {
-    const rawUser = activeCaregiverUser || getActiveCaregiver() || 'Sarah Jenkins';
+    const rawUser = activeCaregiverUser || getActiveCaregiver() || (currentSproutMode === 'local' ? 'Candy Chevalier' : 'Sarah Jenkins');
     const cleanUser = rawUser.replace(/^(Sample Caregiver \(|Parent Participant \(|\))/g, '');
     headerCaregiver.textContent = cleanUser;
   }
