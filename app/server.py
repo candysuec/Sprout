@@ -44,6 +44,7 @@ UPLOAD_EXTS = {".pdf", ".docx", ".doc", ".xlsx", ".jpg", ".jpeg", ".png", ".heic
 
 BASE_DIR = os.path.dirname(__file__)
 STATIC_DIR = os.path.join(BASE_DIR, "static")
+DOCS_DIR = os.path.join(os.path.dirname(BASE_DIR), "docs")
 SHARED_ROOT = os.environ.get("SHARED_ROOT") or os.path.dirname(os.path.dirname(BASE_DIR))
 
 
@@ -90,6 +91,11 @@ def security_headers():
 @app.route('/static/<filename:path>')
 def serve_static(filename):
     return static_file(filename, root=STATIC_DIR)
+
+
+@app.route('/docs/<filename:path>')
+def serve_docs(filename):
+    return static_file(filename, root=DOCS_DIR)
 
 
 @app.route('/uploads/<filename:path>')
