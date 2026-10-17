@@ -19,9 +19,23 @@ from auth_middleware import (
 
 app = Bottle()
 
-PORT = 5858
-ALLOWED_HOSTS = {f"127.0.0.1:{PORT}", f"localhost:{PORT}"}
-ALLOWED_ORIGINS = {f"http://127.0.0.1:{PORT}", f"http://localhost:{PORT}"}
+PORT = int(os.environ.get("PORT", 5858))
+HOST = os.environ.get("HOST", "127.0.0.1")
+ALLOWED_HOSTS = {
+    f"127.0.0.1:{PORT}",
+    f"localhost:{PORT}",
+    f"0.0.0.0:{PORT}",
+    f"sprout-app:{PORT}",
+    "127.0.0.1",
+    "localhost",
+    "sprout-app"
+}
+ALLOWED_ORIGINS = {
+    f"http://127.0.0.1:{PORT}",
+    f"http://localhost:{PORT}",
+    "http://127.0.0.1",
+    "http://localhost"
+}
 ALIAS_RE = re.compile(r"^[A-Z][A-Z0-9]{0,3}$")
 SEVERITIES = ("Routine", "Important", "Court Relevant", "Emergency")
 COMM_STATUSES = ("Sent", "Dismissed", "Draft Ready")
@@ -2157,5 +2171,5 @@ def list_founder_feedback():
 
 if __name__ == "__main__":
     init_db()
-    print(f"Serving Caregiver Command Center on http://127.0.0.1:{PORT}")
-    run(app, host='127.0.0.1', port=PORT, quiet=False)
+    print(f"Serving Caregiver Command Center on http://{HOST}:{PORT}")
+    run(app, host=HOST, port=PORT, quiet=False)

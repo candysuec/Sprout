@@ -1,0 +1,30 @@
+services:
+  sprout-app:
+    container_name: sprout-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sprout-app:canonical
+    ports:
+      - "5858:5858"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=5858
+      - CCC_DATA_DIR=/data
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # Persistent storage volume for SQLite DB, backups, exports, and uploads
+      - sprout-data:/data
+      # Source directory bind mount for zero-rebuild live updates
+      - ./:/home/gemi/projects/Sprout
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5858/').read()"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+volumes:
+  sprout-data:
+    name: sprout-data

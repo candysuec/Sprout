@@ -12,6 +12,8 @@ foster_care.db
 # Live Private User Documents, Uploads & Attachments
 uploads/
 exports/
+backups/
+*.tar.gz
 *.pdf
 *.docx
 *.doc

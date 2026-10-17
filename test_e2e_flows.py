@@ -140,6 +140,16 @@ def run_e2e_suite():
     # TEST GROUP 7: Calendar Sync & Horizon Automation
     print("\n--- 7. Testing Calendar Integration & Form Services ---")
     import services
+    conn = db.get_connection()
+    c = conn.cursor()
+    c.execute("SELECT id FROM children WHERE id = 1")
+    if not c.fetchone():
+        c.execute("""
+            INSERT INTO children (id, first_name, last_name, preferred_name, alias, dob, placement_date, gender, status, relationship_type)
+            VALUES (1, 'Test', 'Child', 'TC', 'TC', '2020-01-01', '2026-01-01', 'Female', 'Active Placement', 'Foster Care')
+        """)
+        conn.commit()
+    conn.close()
     ics_file = services.generate_child_calendar_ics(1)
     assert_test("iCalendar Export: RFC 5545 .ics schedule file generated", bool(ics_file and os.path.exists(os.path.join(services.EXPORT_DIR, ics_file))))
     if ics_file:
