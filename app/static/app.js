@@ -378,7 +378,7 @@ function getActiveCaregiver() {
   return select ? select.value : activeCaregiverUser;
 }
 
-let currentSproutDataset = localStorage.getItem('sproutDataset') || 'a';
+currentSproutDataset = localStorage.getItem('sproutDataset') || 'a';
 
 async function onCaregiverUserChange() {
   const select = document.getElementById('caregiverSelect');
