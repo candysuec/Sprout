@@ -3,8 +3,10 @@ let currentTab = 'training';
 let childrenList = [];
 
 // Sprout Environment State (Defaults to 'sample' Practice Sandbox and Sarah Jenkins)
-let currentSproutMode = localStorage.getItem('sproutMode') || 'sample';
-let isPrivacyBlurActive = localStorage.getItem('privacyBlur') === 'true';
+let currentSproutMode = 'sample';
+let isPrivacyBlurActive = false;
+let activeCaregiverUser = 'Sample Caregiver (Sarah Jenkins)';
+let currentSproutDataset = 'a';
 
 const LOCAL_CAREGIVERS = [
   { id: 'Candy Chevalier', name: 'Candy Chevalier (Primary Caregiver)', initials: 'CC', color: 'bg-emerald-700' },
@@ -30,16 +32,70 @@ const SAMPLE_CAREGIVERS = [
   { id: 'Sample Caregiver (Grace & Lydia Holloway)', name: 'Grace & Lydia Holloway (HH-115 • Multi-Generational • Closed/Retired)', initials: 'GH', color: 'bg-blue-700' }
 ];
 
-let activeCaregiverUser = localStorage.getItem('caregiverUser') || '';
+// =============================================================================
+// SYSTEM INVARIANT: DETERMINISTIC STARTUP STATE SANITATION
+// Ensures Normal Browser, Dirty Browser State, and Incognito show 100% identical boot.
+// =============================================================================
+function sanitizeStartupState() {
+  // 1. Sprout Mode Invariant
+  let mode = (localStorage.getItem('sproutMode') || '').trim();
+  if (mode !== 'sample' && mode !== 'local') {
+    mode = 'sample';
+    localStorage.setItem('sproutMode', mode);
+  }
+  currentSproutMode = mode;
 
-// If activeCaregiverUser is currently Sarah Jenkins from legacy session, reset it to prompt option for sandbox
-if (currentSproutMode === 'sample' && (!localStorage.getItem('caregiverUser') || localStorage.getItem('caregiverUser') === 'Sample Caregiver (Sarah Jenkins)')) {
-  activeCaregiverUser = '';
-  localStorage.removeItem('caregiverUser');
+  // 2. Dataset Mode Invariant (Dataset A: Day 1 vs Dataset B: 90 Days)
+  let dataset = (localStorage.getItem('sproutDataset') || '').trim().toLowerCase();
+  if (dataset !== 'a' && dataset !== 'b') {
+    dataset = 'a';
+    localStorage.setItem('sproutDataset', dataset);
+  }
+  currentSproutDataset = dataset;
+
+  // 3. Privacy Blur Invariant
+  isPrivacyBlurActive = localStorage.getItem('privacyBlur') === 'true';
+
+  // 4. Caregiver User Invariant (Auto-heal away from orphan/dead states)
+  let caregiver = (localStorage.getItem('caregiverUser') || '').trim();
+  if (mode === 'sample') {
+    const valid = SAMPLE_CAREGIVERS.find(c => c.id === caregiver || c.name === caregiver);
+    // If empty, invalid, or unplaced orphan (e.g. Grace Holloway HH-115), self-heal to Sarah Jenkins
+    if (!valid || caregiver.includes('Grace & Lydia Holloway')) {
+      caregiver = 'Sample Caregiver (Sarah Jenkins)';
+      localStorage.setItem('caregiverUser', caregiver);
+    }
+  } else {
+    const valid = LOCAL_CAREGIVERS.find(c => c.id === caregiver || c.name === caregiver);
+    if (!valid) {
+      caregiver = 'Candy Chevalier';
+      localStorage.setItem('caregiverUser', caregiver);
+    }
+  }
+  activeCaregiverUser = caregiver;
 }
 
 // Initialize app on load
 document.addEventListener('DOMContentLoaded', async () => {
+  // 1. Localhost Service Worker Invariant:
+  // On 127.0.0.1 / localhost, service worker caching creates dirty browser state drift.
+  // We actively neutralize any local service workers and purge Cache Storage buckets.
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        for (const reg of regs) reg.unregister().catch(() => {});
+      }).catch(() => {});
+    }
+    if ('caches' in window) {
+      caches.keys().then(keys => {
+        for (const k of keys) caches.delete(k).catch(() => {});
+      }).catch(() => {});
+    }
+  }
+
+  // 2. Run deterministic state sanitation before any UI rendering or network calls
+  sanitizeStartupState();
+
   const subNav = document.getElementById('childWorkspaceSubNav');
   if (subNav) subNav.classList.add('hidden');
 

@@ -1,6 +1,7 @@
 import os
 import re
 import json
+import time
 import datetime
 from bottle import Bottle, request, response, static_file, run, abort
 from db import (get_connection, init_db, UPLOAD_DIR, audit, diff_fields,
@@ -95,7 +96,17 @@ def serve_exports(filename):
 
 @app.route('/')
 def serve_index():
-    return static_file('index.html', root=STATIC_DIR)
+    index_path = os.path.join(STATIC_DIR, 'index.html')
+    with open(index_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+    # Inject live dynamic timestamp into app.js asset URL so browser never runs stale code
+    ts = int(time.time())
+    content = re.sub(r'/static/app\.js(\?v=[^\'"]*)?', f'/static/app.js?v={ts}', content)
+    response.headers['Content-Type'] = 'text/html; charset=utf-8'
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return content
 
 
 # --- CAREGIVER TEAM & SHARED DOCUMENTS API ---
@@ -527,15 +538,10 @@ def _derive_alias(data):
 @app.route('/api/children', method=['GET'])
 def get_children():
     caregiver = (request.headers.get('X-Caregiver') or '').strip()
-    sprout_mode = (request.headers.get('X-Sprout-Mode') or '').strip().lower()
+    sprout_mode = (request.headers.get('X-Sprout-Mode') or 'sample').strip().lower()
 
-    # UNSELECTED GUARD: When opening Sprout fresh or when no caregiver is selected, return zero records
-    if not sprout_mode or not caregiver:
-        return json_res([])
-
-    is_sample = ('Sample' in caregiver) or (sprout_mode == 'sample')
-    
-    if not is_sample:
+    # If explicitly local mode with real caregiver:
+    if sprout_mode == 'local' and any(c in caregiver for c in ['Candy', 'Robin', 'Mallory']):
         # Real Working Sphere (Candy Chevalier, Robin Davis, Mallory Wheeler):
         # NO children currently in care; CD is strictly a Potential Kinship Placement at 41 Elmwood
         conn = get_connection()
@@ -560,8 +566,11 @@ def get_children():
             selected_hh_id = adm['HouseholdID']
             break
     
+    # Self-healing fallback:
+    # If caregiver is not recognized, empty, or from a dirty browser state,
+    # fallback to HH-101 (Sarah Jenkins / Liam Brooks) so the user is NEVER locked into None Placed.
     if not selected_hh_id:
-        return json_res([])
+        selected_hh_id = 'HH-101'
 
     # Find placements in this household
     hh_placements = [p for p in sd.PLACEMENTS if p['HouseholdID'] == selected_hh_id]
@@ -570,9 +579,10 @@ def get_children():
     # Build response records matching this specific household's placed children
     import datetime
     dataset_mode = (request.headers.get('X-Sprout-Dataset') or request.query.dataset or 'a').strip().lower()
-    is_dataset_a = (dataset_mode in ('a', 'dataset_a', 'day1', 'new'))
+    is_dataset_b = (dataset_mode in ('b', 'dataset_b', '90days', 'established'))
+    is_dataset_a = not is_dataset_b
     today = datetime.date.today()
-    placement_date = today.isoformat() if is_dataset_a else (today - datetime.timedelta(days=90)).isoformat()
+    placement_date = (today - datetime.timedelta(days=90)).isoformat() if is_dataset_b else today.isoformat()
 
     sample_children = []
     for ch in sd.CHILDREN:
@@ -824,15 +834,16 @@ def get_records(child_id):
 
     actor, role = resolve_actor_and_role(request)
     caregiver = (request.headers.get('X-Caregiver') or actor or 'Candy Chevalier').strip()
-    sprout_mode = (request.headers.get('X-Sprout-Mode') or 'local').strip().lower()
-    is_sample = ('Sample' in caregiver) or (sprout_mode == 'sample')
+    sprout_mode = (request.headers.get('X-Sprout-Mode') or 'sample').strip().lower()
+    is_sample = (sprout_mode != 'local') or ('Candy' not in caregiver and 'Robin' not in caregiver and 'Mallory' not in caregiver)
     is_hc = is_high_conflict_active(request, child_id)
 
     if is_sample:
         import sample_dataset as sd
         import datetime
-        dataset_mode = (request.headers.get('X-Sprout-Dataset') or request.query.dataset or 'b').strip().lower()
-        is_dataset_a = (dataset_mode in ('a', 'dataset_a', 'day1', 'new'))
+        dataset_mode = (request.headers.get('X-Sprout-Dataset') or request.query.dataset or 'a').strip().lower()
+        is_dataset_b = (dataset_mode in ('b', 'dataset_b', '90days', 'established'))
+        is_dataset_a = not is_dataset_b
 
         if is_dataset_a:
             # DATASET A: New to Sprout (Day 1 Onboarding) - Clean slate, minimal intake record
