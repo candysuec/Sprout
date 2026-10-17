@@ -40,8 +40,10 @@ If you are orienting to the project, start with these operational guides:
 - **Life Journey & Milestone Center**: Trauma-informed child keepsake and achievement catalog preserving positive childhood milestones, artwork, reading progress, and portable care transition packets.
 - **Two-Step Smart Logger**: High-speed journal, pediatric medical visit, school IEP conference, and family time visitation logging completed in under 15 seconds.
 - **Vermont Compliance (FS-221A & CHINS Stepper)**: Built-in milestone tracker for provisional home studies, annual safety drills, 90-day fingerprint deadlines, and Title 33 CHINS court hearing milestones.
-- **VCWTP Training & Mileage Tracking**: Real-time logging of Vermont Child Welfare Training Partnership hours and automated State Form FS-334B travel reimbursement generation at the official standard rate ($0.67/mi).
-- **Automated Verification Baseline**: **243 / 243 tests passing (100%)** across 7 automated test suites (Guided Onboarding, Two-Dataset Trainer, Browser Determinism, E2E Flows, Operational Readiness, Phase 13B Governance, Parent Workspace).
+- **Household Members & Care Team Roster Management**: Full view, add, and remove lifecycle for all household residents, approved co-caregivers, and biological children living in the home. Powered by a dedicated SQLite `household_members` table and REST API (`GET`, `POST`, `DELETE /api/households/<id>/members`), dynamic dashboard roster cards, and interactive modal management.
+- **Dynamic 4-Act Graying Out & Scenario Clarity**: Instant visual distinction of active presentation act (`✓ ACTIVE SCENARIO: DAY 90 (Emma Vance)` or `✓ ACTIVE SCENARIO: DAY 1 BASELINE (Liam Brooks)`), with non-active acts gracefully dimmed and grayed out (`opacity-40 grayscale-50`) to eliminate cognitive confusion during training demonstrations.
+- **Context-Aware Header Actions & Clean Navigation**: Header actions (+15-Sec Note, Care Sheet) automatically hide when on the Training Hub / Mission Control pages and show only when a child-centered context (Dashboard or Child Workspace) is active. Seamless modal return navigation ensures closing the Onboarding Wizard returns the user directly to the Persona Launcher.
+- **Automated Verification Baseline**: **261 / 261 tests passing (100%)** across 8 automated test suites (Household Members Management, Guided Onboarding, Two-Dataset Trainer, Browser Determinism, E2E Flows, Operational Readiness, Phase 13B Governance, Parent Workspace).
 
 ---
 

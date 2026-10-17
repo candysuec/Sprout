@@ -55,6 +55,7 @@
 │ [x] Phase 16: 5-State Archive Governance & 1-Click Lifebook Keepsake Engine      │
 │ [x] Phase 17: Mental Model Enforcement (Review Mode ≠ Persona Launcher Split)    │
 │ [x] Phase 18: Trainer Two-Dataset Architecture (Day 1 vs 90-Day Sandboxes)       │
+│ [x] Phase 19: Screen Recording Enhancements & Household Members Roster (Live)     │
 └──────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -85,7 +86,8 @@
 | **Phase 14: Parent Workspace Integration** | **VERIFIED** | 2026-10-15 | Automated CI | Commit `e5b0547` (30/30 Tests Passing `test_parent_workspace_integration.py`) |
 | **Mental Model Enforcement & Persona Split** | **VERIFIED** | 2026-10-16 | Candy Chevalier | Commit `e5b0547` (MME-01..MME-04, Gateway Airlock) |
 | **Trainer Two-Dataset Architecture (Day 1 vs 90-Day)** | **VERIFIED & LIVE** | 2026-10-16 | Candy Chevalier | Commit `20dc1ac` (34/34 Tests Passing `test_trainer_two_datasets.py`) |
-| **Full Automated Verification Baseline** | **100% PASS**| 2026-10-16 | Automated CI | **212 / 212 Tests Passing** across all 5 test suites |
+| **Phase 19: Screen Recording Feedback & Household Members** | **VERIFIED & LIVE** | 2026-10-17 | Candy Chevalier | Commit `6632fd6` (18/18 Tests Passing `test_household_members.py`) |
+| **Full Automated Verification Baseline** | **100% PASS**| 2026-10-17 | Automated CI | **261 / 261 Tests Passing** across all 8 test suites |
 
 ---
 
@@ -158,6 +160,14 @@
 - **Data Sensitivity Classification:** Formalized 4-tier sensitivity hierarchy (Standard, Sensitive, Restricted, Protected) with field-level tagging (`docs/DATA_SENSITIVITY_CLASSIFICATION.md`).
 - **Child Voice Domain Discovery:** Exploratory architectural blueprint for future 5th domain (`docs/CHILD_VOICE_DOMAIN_DISCOVERY.md`).
 - **System Verification & Readiness:** Achieved 97.2/100 Composite Implementation Readiness Score with 73/73 tests passing.
+
+### Phase 19: Screen Recording Feedback & Household Members Management (Delivered)
+- **Household Members Roster & Management:** Implemented the dedicated `household_members` SQLite table and REST endpoints (`GET`, `POST`, `DELETE /api/households/<id>/members`), dynamic dashboard roster card, and interactive modal management for adding and removing residents.
+- **Dynamic 4-Act Graying Out:** Non-active acts in `#trainingCurriculumStage` are dimmed and grayed out (`opacity-40 grayscale-50`) with explicit status indicators (`Day 0 (Not Active)`, `Day 1 (Not Active)`), while active acts are highlighted (`✓ ACTIVE SCENARIO: DAY 90 (Emma Vance)` or `✓ ACTIVE SCENARIO: DAY 1 BASELINE (Liam Brooks)`).
+- **Clean Training Front Door:** Removed duplicate 4-act sandbox airlock container from Mission Control; hid irrelevant header action buttons (`[ Care Sheet ]`, `[ + 15-Sec Note ]`) on `#training` and `#mission_control`, displaying them only when in child-centered contexts (`#dashboard`, `#children`).
+- **Nested Modal Return Navigation:** Closing the Day 1 Guided Onboarding walkthrough now cleanly returns the user to the Persona Launcher modal instead of dumping them onto the background page.
+- **Direct Child Navigation:** Launching Foster, Kinship, or Respite personas in `#personaLauncherModal` and clicking Act 2/3 now navigates directly to the placed child's workspace (`#children`). Added a prominent **"Child Records & Profile"** hero button on the Dashboard.
+- **Automated Verification:** 261 / 261 automated tests passing (100%) across 8 test suites (`test_household_members.py` added).
 
 ---
 

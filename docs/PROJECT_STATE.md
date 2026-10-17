@@ -1,8 +1,8 @@
 # PROJECT STATE
 **Initiative:** Sprout  
 **Project:** Child & Family Success Operating System  
-**Current Phase:** Guided Day 1 Onboarding Complete (All 4 Roles) • Two-Dataset Architecture Verified • WSL2 & Docker Canonical  
-**Target Version:** v3.3.0 Guided Onboarding & Day 1 Sandbox Baseline  
+**Current Phase:** Screen Recording UX Enhancements Complete • Household Members Roster Live • Two-Dataset Architecture Verified • WSL2 & Docker Canonical  
+**Target Version:** v3.3.1 (Screen Recording Enhancements & Household Roster)  
 **Last Synchronized:** 2026-10-17  
 
 ---
@@ -15,12 +15,13 @@
 | **Governance** | **FROZEN / APPROVED** | [`GOVERNANCE_AND_SAFETY_FRAMEWORK.md`](GOVERNANCE_AND_SAFETY_FRAMEWORK.md) | 100% Locked |
 | **Security & Privacy** | **FROZEN / APPROVED** | [`DATA_SENSITIVITY_CLASSIFICATION.md`](DATA_SENSITIVITY_CLASSIFICATION.md) | 100% Locked |
 | **Data Dictionary** | **FROZEN / APPROVED** | [`SPROUT_SQLITE_DATA_GOVERNANCE_DICTIONARY.md`](SPROUT_SQLITE_DATA_GOVERNANCE_DICTIONARY.md) | 100% Locked |
-| **API Contracts** | **FROZEN / APPROVED** | [`API_GOVERNANCE_MATRIX.md`](API_GOVERNANCE_MATRIX.md) | 44 Endpoints Mapped |
+| **API Contracts** | **FROZEN / APPROVED** | [`API_GOVERNANCE_MATRIX.md`](API_GOVERNANCE_MATRIX.md) | 46 Endpoints Mapped |
+| **Household Members Roster** | **IMPLEMENTED & VERIFIED** | [`PROJECT_STATE.md`](PROJECT_STATE.md) | `GET/POST/DELETE /api/households/<id>/members` + SQLite Table |
 | **Guided Day 1 Onboarding** | **IMPLEMENTED & VERIFIED (All 4 Roles)** | [`PROJECT_STATE.md`](PROJECT_STATE.md) | `POST /api/onboarding/walkthrough` + 4-Step Wizard |
 | **Two-Dataset Engine** | **VERIFIED & OPERATIONAL** | [`DATASET_A_DAY_ONE_ONBOARDING_PLAN.md`](DATASET_A_DAY_ONE_ONBOARDING_PLAN.md) | Dataset A (Day 1) & B (90-Day) Live Switch |
 | **Role Permissions** | **FROZEN / APPROVED** | [`ROLE_PERMISSION_MATRIX_V2.md`](ROLE_PERMISSION_MATRIX_V2.md) | 8 Roles Mapped |
 | **Validation** | **VERIFIED** | [`PHASE_13B_IMPLEMENTATION_VALIDATION_REPORT.md`](PHASE_13B_IMPLEMENTATION_VALIDATION_REPORT.md) | 0 Contradictions |
-| **Automated Verification Baseline** | **243 / 243 PASS (100%)** | 7 Verification Suites | `test_guided_onboarding.py`, `test_trainer_two_datasets.py`, `test_operational_readiness.py`, `test_e2e_flows.py`, `test_browser_determinism.py`, `test_phase13b_governance.py`, `test_parent_workspace_integration.py` |
+| **Automated Verification Baseline** | **261 / 261 PASS (100%)** | 8 Verification Suites | `test_household_members.py`, `test_guided_onboarding.py`, `test_trainer_two_datasets.py`, `test_operational_readiness.py`, `test_e2e_flows.py`, `test_browser_determinism.py`, `test_phase13b_governance.py`, `test_parent_workspace_integration.py` |
 | **WSL & Docker Deployment Architecture** | **CANONICAL & VERIFIED** | [`README.md`](../README.md) | `sprout-app` container, external `sprout-data` persistent volume, `/shared_docs` mount, port collision guard |
 
 ---
@@ -28,6 +29,13 @@
 ## 2. Work Status Ledger
 
 ### ✅ Complete (Production Ready)
+- [x] **Screen Recording UX Enhancements & Household Members Management (Recording 2026-10-17 035303):**
+  - **Household Members Roster & Management:** Added `household_members` database table (`id`, `household_id`, `name`, `role`, `relationship`, `age`, `dob`, `phone`, `email`, `notes`), REST endpoints (`GET`, `POST`, `DELETE /api/households/<id>/members`), prominent Dashboard **"🏠 Household & Care Team Roster"** card, and `#householdMembersModal` for viewing, adding, and removing residents.
+  - **Dynamic 4-Act Graying Out:** Non-active acts in `#trainingCurriculumStage` are dimmed and grayed out (`opacity-40 grayscale-50`) with explicit status indicators (`Day 0 (Not Active)`, `Day 1 (Not Active)`), while active acts are highlighted (`✓ ACTIVE SCENARIO: DAY 90 (Emma Vance)` or `✓ ACTIVE SCENARIO: DAY 1 BASELINE (Liam Brooks)`).
+  - **Clean Training Front Door:** Removed duplicate 4-act sandbox airlock container from Mission Control; hid irrelevant header action buttons (`[ Care Sheet ]`, `[ + 15-Sec Note ]`) on `#training` and `#mission_control`, displaying them only when in child-centered contexts (`#dashboard`, `#children`).
+  - **Nested Modal Return Navigation:** Closing the Day 1 Guided Onboarding walkthrough now cleanly returns the user to the Persona Launcher modal instead of dumping them onto the background page.
+  - **Direct Child Navigation:** Launching Foster, Kinship, or Respite personas in `#personaLauncherModal` and clicking Act 2/3 now navigates directly to the placed child's workspace (`#children`). Added a prominent **"Child Records & Profile"** hero button on the Dashboard.
+  - **Verification:** Dedicated test suite `test_household_members.py` passing 18/18 tests, bringing automated test baseline to 261/261 tests (100%).
 - [x] **Guided Day 1 Onboarding Walkthrough Across All 4 Roles (Founder Candy Video Request):**
   - **4 Guided Role Workflows:** Foster Caregiver, Kinship Caregiver, Respite Provider, and Parent Participant.
   - **Interactive 4-Step Wizard (`#guidedOnboardingModal`):**
