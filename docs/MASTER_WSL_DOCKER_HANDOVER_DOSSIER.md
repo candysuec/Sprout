@@ -14,7 +14,7 @@
 | **Execution Environment** | Unmanaged background Windows Python processes with port collisions (8080, 8081, 5000) | Isolated, health-checked Docker container `sprout-app:canonical` on port **5858** |
 | **Database Stability** | OneDrive sync file locks triggering `sqlite3.OperationalError: database is locked` | High-performance ext4 Linux SQLite storage (`sprout_state.db`) with zero lock contention |
 | **Git Repositories** | Fragmented branches, untracked OneDrive sync conflicts | Canonical Git repo at `https://github.com/candysuec/Sprout.git`, clean on `wsl-main` & `main` |
-| **UI First-Load Experience** | 7 stacked horizontal bars, duplicate buttons, auto-locking Sarah Jenkins, screen-blocking floating pill | Single-row navigation, unified Child Cockpit, clean 4-Act Training Launchpad, zero occluding pills |
+| **UI First-Load Experience** | 7 stacked horizontal bars, duplicate buttons, auto-locking Sarah Jenkins, screen-blocking floating pill | Calm top header with discreet Tools menu, persistent 4-Act Curriculum Presentation Stage, spacious Day 1 Liam cockpit |
 | **Verification Baseline** | Manual testing, frequent regressions | **243 / 243 automated tests passing (100%)** across 7 regression and security suites |
 
 ---
