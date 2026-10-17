@@ -19,7 +19,7 @@
 | **Export Rules** | **FROZEN / APPROVED** | [`EXPORT_GOVERNANCE_MATRIX.md`](EXPORT_GOVERNANCE_MATRIX.md) | 9 Generators Filtered |
 | **Role Permissions** | **FROZEN / APPROVED** | [`ROLE_PERMISSION_MATRIX_V2.md`](ROLE_PERMISSION_MATRIX_V2.md) | 8 Roles Mapped |
 | **Validation** | **VERIFIED** | [`PHASE_13B_IMPLEMENTATION_VALIDATION_REPORT.md`](PHASE_13B_IMPLEMENTATION_VALIDATION_REPORT.md) | 0 Contradictions |
-| **Usability & Integration** | **RESOLVED & VERIFIED** | [`SPRINT_13C_USABILITY_EXECUTION_REPORT.md`](SPRINT_13C_USABILITY_EXECUTION_REPORT.md) | 178/178 Tests Passing (100%) |
+| **Usability & Integration** | **RESOLVED & VERIFIED** | [`SPRINT_13C_USABILITY_EXECUTION_REPORT.md`](SPRINT_13C_USABILITY_EXECUTION_REPORT.md) | 212/212 Tests Passing (100%) |
 | **Operational Reality** | **FULL OPERATIONAL READINESS (7 PASS, 0 WATCH, 0 FAIL)** | [`PROJECT_STATE.md`](PROJECT_STATE.md) | Real-world Personas Audited |
 | **Release Readiness** | **PASS (Foundation Release Candidate)** | [`PROJECT_STATE.md`](PROJECT_STATE.md) | 5 Cognitive Personas Verified |
 | **Human Walkthrough** | **PASS (Zero Detective Work)** | [`PROJECT_STATE.md`](PROJECT_STATE.md) | 4 Real-World Personas Walked Through |
@@ -29,17 +29,17 @@
 | **Sandbox Orientation Review** | **CONDITIONAL PASS (P0 Backlog Prioritized)** | [`SANDBOX_ORIENTATION_REPORT.md`](SANDBOX_ORIENTATION_REPORT.md) | 4 Special Items & 11 Backlog Items Audited |
 | **Sandbox Journey Mapping** | **PASS (8/8 Roles Mapped, Taxonomy Defined)** | [`SANDBOX_JOURNEY_MAP.md`](SANDBOX_JOURNEY_MAP.md) | 3-Step Sequence & 6 Archetypes |
 | **Sandbox Mental Model Decision** | **RESOLVED & ALIGNED (Meta vs Practice)** | [`SANDBOX_MENTAL_MODEL_DECISION.md`](SANDBOX_MENTAL_MODEL_DECISION.md) | Founder Removed from Personas |
-| **Mental Model Enforcement** | **ENFORCED & VERIFIED (MME-01 through MME-04)** | [`MENTAL_MODEL_ENFORCEMENT_BACKLOG.md`](MENTAL_MODEL_ENFORCEMENT_BACKLOG.md) | 4 P0 Tickets Implemented & 178 Tests Passing |
+| **Mental Model Enforcement** | **ENFORCED & VERIFIED (MME-01 through MME-04)** | [`MENTAL_MODEL_ENFORCEMENT_BACKLOG.md`](MENTAL_MODEL_ENFORCEMENT_BACKLOG.md) | 4 P0 Tickets Implemented & 212 Tests Passing |
 | **Concept Governance** | **AUTHORITATIVE & SEALED (7 Categories)** | [`CONCEPT_GOVERNANCE_REGISTER.md`](CONCEPT_GOVERNANCE_REGISTER.md) | Audience ≠ Role, Tool ≠ Workspace, Workflow ≠ Role |
 | **Drift Accountability Review** | **AUTHORITATIVE & PRUNED (3 Core Truths, 10 Immutable Truths)** | [`DRIFT_ACCOUNTABILITY_REPORT.md`](DRIFT_ACCOUNTABILITY_REPORT.md) | Retired Audience/Purpose/Workflow; 7 figures reality check |
-| **Trainer Validation & Walkthrough** | **REALITY RECONCILED (Two-Dataset Standard)** | [`TRAINER_VALIDATION_REQUIREMENT.md`](TRAINER_VALIDATION_REQUIREMENT.md) | D-001/D-002/D-003 audited; Dataset A (Day 1) & B (Day 90) |
+| **Trainer Validation & Two Datasets** | **IMPLEMENTED, VERIFIED & COMMITTED (Commit `20dc1ac`)** | [`TRAINER_VALIDATION_REQUIREMENT.md`](TRAINER_VALIDATION_REQUIREMENT.md) | D-001..D-003 fixed; Dataset A & B live; Parent continuum live |
 
 ---
 
 ## 2. Work Status Ledger
 
 ### ✅ Complete (Production Ready)
-- [x] **Trainer Validation & Video Walkthrough Audit:** Reconciled software against Founder video walkthrough (`Recording 2026-10-16 185103.mp4`). Captured defects D-001 (PII shield leak), D-002 (dead state lockout), D-003 (parent workspace contamination) and design findings F-001/F-002/F-003. Formulated the **Two-Dataset Training Standard** (Dataset A: Day 1 Onboarding vs. Dataset B: 90-Day Established) across Foster, Kinship, Parent, and Respite roles.
+- [x] **Trainer Validation & Two-Dataset Architecture (`Commit 20dc1ac`):** Implemented Dataset A (New to Sprout / Day 1 Onboarding with clean clocks & tasks) and Dataset B (Established 90-Day User with rich multi-domain history & compliance). Fixed defects D-001 (PII shield leak on child names/avatars), D-002 (dead state lockout via atomic persona binding), and D-003 (parent workspace boundary leak). Expanded Parent Participant continuum (Danielle, Jason, Angela, Maria). Added 1-click sandbox reset (`/api/sample-dataset/reset`). Verified by `test_trainer_two_datasets.py` (212/212 passing across 5 suites) and pushed to GitHub main.
 - [x] **Drift Accountability Review:** Published authoritative report answering *"Why are we having the same conversation repeatedly?"*. Pruned 7 categories down to 3 real software decisions (Role, Workspace, State); retired Audience, Purpose, and Workflow from software taxonomy; conducted reality check on 7 figures; established The 10 Things Every Future AI Must Never Forget.
 - [x] **Foundational Strategic Constitution:** Redefined Sprout as Child & Family Success Operating System.
 - [x] **Concept Governance Register:** Created authoritative vocabulary register across 7 categories (ROLE, AUDIENCE, TOOL, WORKSPACE, WORKFLOW, PURPOSE, STATE) with permanent concept invariant rules.

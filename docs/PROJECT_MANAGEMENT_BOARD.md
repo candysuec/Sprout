@@ -47,12 +47,14 @@
 │ [x] Phase 11: Longitudinal Child Milestone Storybook                             │
 │ [x] Phase 12: Mission Control Cockpit, Real-World Hardening & System State Audit │
 │ [x] Phase 13A: Pre-Implementation Governance Review & Specification Suite        │
-│ [ ] Phase 13B: Schema Migration & Classification Foundation (Next)               │
-│ [ ] Phase 13C: Report Safety & Export Controls (Preview, filtering, disclaimers) │
-│ [ ] Phase 14A: Parent Identity & Unlinked Access Engine (10-state lifecycle)      │
-│ [ ] Phase 14B: Parent Success Workspace & Structured Anti-Conflict Feed          │
-│ [ ] Phase 15: High-Conflict Mode & GPS/Exif Metadata Stripping                   │
-│ [ ] Phase 16: 5-State Archive Governance & 1-Click Lifebook Keepsake Engine      │
+│ [x] Phase 13B: Schema Migration & Classification Foundation (Delivered)          │
+│ [x] Phase 13C: Usability & Friction Elimination Gate (Delivered)                 │
+│ [x] Phase 14A: Parent Identity & Unlinked Access Engine (10-state lifecycle)      │
+│ [x] Phase 14B: Parent Success Workspace & Structured Anti-Conflict Feed (Live)   │
+│ [x] Phase 15: High-Conflict Mode & GPS/Exif Metadata Stripping (Delivered)       │
+│ [x] Phase 16: 5-State Archive Governance & 1-Click Lifebook Keepsake Engine      │
+│ [x] Phase 17: Mental Model Enforcement (Review Mode ≠ Persona Launcher Split)    │
+│ [x] Phase 18: Trainer Two-Dataset Architecture (Day 1 vs 90-Day Sandboxes)       │
 └──────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -78,7 +80,12 @@
 | **Child & Family Success Architecture (v3)** | **APPROVED** | 2026-10-14 | Candy Chevalier | Commit `8eb60dd` (`docs/CHILD_AND_FAMILY_SUCCESS_OPERATING_SYSTEM.md`)|
 | **Governance & Security Hardening (v3.1)** | **APPROVED** | 2026-10-14 | Candy Chevalier | Baseline Set (`docs/GOVERNANCE_AND_SAFETY_FRAMEWORK.md`)|
 | **Phase 13A: Pre-Implementation Governance Review** | **APPROVED** | 2026-10-14 | Candy Chevalier | Commit `7618a51` (7 Governance Matrices & Gap Reports) |
-| **Automated Verification Suite** | **100% PASS**| 2026-10-14 | Automated CI | 73 / 73 Tests Passing (`test_e2e_flows.py`) |
+| **Phase 13B: Governance Implementation & Verification** | **VERIFIED** | 2026-10-15 | Automated CI | Commit `e5b0547` (46/46 Tests Passing `test_phase13b_governance.py`) |
+| **Phase 13C: Operational Readiness Gate** | **VERIFIED** | 2026-10-15 | Automated CI | Commit `e5b0547` (29/29 Tests Passing `test_operational_readiness.py`) |
+| **Phase 14: Parent Workspace Integration** | **VERIFIED** | 2026-10-15 | Automated CI | Commit `e5b0547` (30/30 Tests Passing `test_parent_workspace_integration.py`) |
+| **Mental Model Enforcement & Persona Split** | **VERIFIED** | 2026-10-16 | Candy Chevalier | Commit `e5b0547` (MME-01..MME-04, Gateway Airlock) |
+| **Trainer Two-Dataset Architecture (Day 1 vs 90-Day)** | **VERIFIED & LIVE** | 2026-10-16 | Candy Chevalier | Commit `20dc1ac` (34/34 Tests Passing `test_trainer_two_datasets.py`) |
+| **Full Automated Verification Baseline** | **100% PASS**| 2026-10-16 | Automated CI | **212 / 212 Tests Passing** across all 5 test suites |
 
 ---
 

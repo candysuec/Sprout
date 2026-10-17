@@ -26,14 +26,16 @@ If you are orienting to the project, start with these operational guides:
 ## 🌟 Key Capabilities
 
 - **Strict Zero-Leakage Architecture**: Seamless dual-sphere operation between a complete **Practice Sandbox** (preloaded with 15 synthetic household models) and a **Real Family Workspace** with 100% offline local SQLite storage.
+- **Two-Dataset Training Architecture**: 1-click toggling between **Dataset A (New to Sprout / Day 1 Onboarding)** with clean clocks and intake tasks, and **Dataset B (Established 90-Day User)** with rich multi-domain history, EPSDT compliance, and mileage logs—featuring instant 1-click sandbox reset.
 - **Mission Control Launchpad**: Clean root landing cockpit with permanent Quick Action Dock (`+ 15-Sec Log`, `Care & Safety Sheet`, `Export This Month`), 4 operational quadrants (**TRAIN**, **CARE**, **DCF**, **SYSTEM**), and guided caregiver pathways.
-- **Dedicated Parent Participant Workspace**: Isolated, dignity-first parent portal for court-approved goal tracking, 1-tap evidence upload, visitation check-in, and strengths-based child milestones.
+- **Dedicated Parent Participant Workspace**: Isolated, dignity-first parent portal for court-approved goal tracking, 1-tap evidence upload, visitation check-in, and strengths-based child milestones across a 4-stage continuum (Danielle, Jason, Angela, Maria).
 - **Caregiver Journey Model**: Multi-dimensional modeling of caregiver households across 8 lifecycle stages, 8 household structures, and 9 approved caregiving pathways.
 - **Circles of Care & Relationship Center**: 4 concentric support tiers (Core DCF Team, Legal & Advocacy, Health & School, Extended Village/Mentors) with communication logs and zero-leakage privacy boundary controls.
 - **Life Journey & Milestone Center**: Trauma-informed child keepsake and achievement catalog preserving positive childhood milestones, artwork, reading progress, and portable care transition packets.
 - **Two-Step Smart Logger**: High-speed journal, pediatric medical visit, school IEP conference, and family time visitation logging completed in under 15 seconds.
 - **Vermont Compliance (FS-221A & CHINS Stepper)**: Built-in milestone tracker for provisional home studies, annual safety drills, 90-day fingerprint deadlines, and Title 33 CHINS court hearing milestones.
 - **VCWTP Training & Mileage Tracking**: Real-time logging of Vermont Child Welfare Training Partnership hours and automated State Form FS-334B travel reimbursement generation at the official standard rate ($0.67/mi).
+- **Automated Verification Baseline**: **212 / 212 tests passing (100%)** across 5 automated test suites.
 
 ---
 

@@ -17,18 +17,19 @@ You are standing in **Sprout v3.2 Mental Model Enforced (Sprint Complete)**.
   - **MME-02 (Quarantine Founder Overview from Practice Roles):** Removed "1. Founder Overview" from Persona Launcher and Training Catalog. Practice roles strictly feature authentic child welfare caregivers (Sarah &rarr; Liam, Eleanor &rarr; Aiden/Emma, Angela &rarr; Emma, Samantha &rarr; Liam). Silent database mode mutation to `local` eliminated.
   - **MME-03 (Dedicated Sandbox Gateway Airlock & Clean Dock):** Initial sandbox landing features the Layer 2 Gateway Airlock (`#sandboxGatewayAirlock`) declaring 100% synthetic safety and 3 clear doors (Door A: 5-Min Tour, Door B: Choose Practice Role, Door C: Explore Flight School). Mission Control is stripped of 35+ button paralysis, functioning strictly as the daily care cockpit with a 6-button Quick Action Dock (Review Mode removed from dock). Unstyled browser alerts replaced with in-app modal cards (`#sandboxInfoModal`).
   - **MME-04 (Anchor Active Child in Sticky Header):** Anchored `#childSelect` inside `#placedChildBadgeContainer` within `#topHeader`, guaranteeing permanent visibility on 100% of screens (Mission Control, Dashboard, Binder, Medical, Timeline).
-- **The Entire System Is 100% Tested:** Automated test suites pass **178/178 tests (100%)**:
+- **The Entire System Is 100% Tested:** Automated test suites pass **212/212 tests (100%)**:
   - `test_e2e_flows.py`: 73/73
   - `test_phase13b_governance.py`: 46/46
   - `test_parent_workspace_integration.py`: 30/30
   - `test_operational_readiness.py`: 29/29
+  - `test_trainer_two_datasets.py`: 34/34
 - **Release Readiness & Human Walkthrough Verified (PASS):** 4 real-world user personas completed all primary journeys with zero detective work.
 - **Founder Acceptance Walkthrough Signed Off:** Candy Chevalier verified all 4 operating journeys. Captured **0 confusion, 0 hesitation, 0 unexpected behavior, 0 missing information**.
 - **Role-Based Training Validation Completed (PASS):** Executed comprehensive cognitive understanding walkthrough across **10 key roles** across all 12 core domains (9.34/10 ease-of-use).
 - **Sandbox Mental Model Decision Canonical Standard Enforced:** All 5 layers (Review Mode, Sandbox Gateway, Persona Launcher, Mission Control, Training Hub) are rigorously separated in UI and behavior.
 - **Concept Governance Register Established (Authoritative Semantic Standard):** Created [`CONCEPT_GOVERNANCE_REGISTER.md`](CONCEPT_GOVERNANCE_REGISTER.md) defining canonical categories.
 - **Drift Accountability Review Completed (Authoritative Foundation Truth):** Created [`DRIFT_ACCOUNTABILITY_REPORT.md`](DRIFT_ACCOUNTABILITY_REPORT.md) answering *"Why are we having the same conversation repeatedly?"*. Pruned taxonomy down to 3 real software decisions (ROLE, WORKSPACE, STATE), retired AUDIENCE, PURPOSE, and WORKFLOW from software governance, confirmed the reality of the 7 figures, and locked **The 10 Things Every Future AI Must Never Forget**.
-- **Trainer Validation Requirement & Video Walkthrough Audit (Reality Reconciled):** Created [`TRAINER_VALIDATION_REQUIREMENT.md`](TRAINER_VALIDATION_REQUIREMENT.md) based on video review (`Recording 2026-10-16 185103.mp4`). Documented Defects D-001 (PII Shield), D-002 (Dead State Lockout), D-003 (Parent Contamination) and established the **Two-Dataset Architecture** (Dataset A: Day 1 Onboarding vs. Dataset B: 90-Day Established) across Foster, Kinship, Parent, and Respite.
+- **Trainer Validation Requirement & Video Walkthrough Audit (Implemented & Committed `20dc1ac`):** Created [`TRAINER_VALIDATION_REQUIREMENT.md`](TRAINER_VALIDATION_REQUIREMENT.md) based on video review (`Recording 2026-10-16 185103.mp4`). Repaired Defects D-001 (PII Shield), D-002 (Dead State Lockout), D-003 (Parent Contamination) and implemented the **Two-Dataset Architecture** (Dataset A: Day 1 Onboarding vs. Dataset B: 90-Day Established) across Foster, Kinship, Parent, and Respite with a 1-click sandbox reset.
 
 ---
 
@@ -42,12 +43,12 @@ You are standing in **Sprout v3.2 Mental Model Enforced (Sprint Complete)**.
 | **Kinship Cognitive Load** | **PASS** | 1-tap plain-English benefits triage ($350 fund, Reach Up, Dr. Dynasaur) & welfare acronym decoder. |
 | **Parent Cognitive Load** | **PASS** | Isolated 4-module dignity workspace (roadmap, shared moments, check-in, certificates). Zero state claims/licensing. |
 | **Respite Cognitive Load** | **PASS** | 1-tap Care & Safety Sheet with allergies, meds, comforting, and emergency numbers in <30s. |
-| **Founder Cognitive Load** | **PASS** | Single source-of-truth home (`FOUNDER_ORIENTATION_DASHBOARD.md` & `PROJECT_STATE.md`). 178/178 tests passing. |
+| **Founder Cognitive Load** | **PASS** | Single source-of-truth home (`FOUNDER_ORIENTATION_DASHBOARD.md` & `PROJECT_STATE.md`). 212/212 tests passing. |
 | **Founder Acceptance** | **ACCEPTED** | Candy completed all 4 primary operating journeys without becoming the detective. |
 | **Mental Model Enforcement** | **ENFORCED & PASS (MME-01 through MME-04)** | Review Mode vs Persona Launcher split; Founder quarantined from training roles; Gateway Airlock & 3 Doors mounted; Active Child permanently anchored in sticky header. |
 | **Concept Governance** | **ESTABLISHED & AUTHORITATIVE (7 Categories)** | Master semantic register locked in `CONCEPT_GOVERNANCE_REGISTER.md`. Permanent rule: Audience ≠ Role, Role ≠ Tool, Tool ≠ Workspace, Workspace ≠ Purpose, Workflow ≠ Role. |
 | **Drift Accountability** | **PRUNED & IMMUTABLE (3 Core Truths, 10 Commandments)** | Root cause of repeated drift solved in `DRIFT_ACCOUNTABILITY_REPORT.md`. Spectators retired from software; child restored as undeniable center. |
-| **Test Verification Baseline** | **178/178 PASSING (100%)** | 4 full verification suites passing with zero failures. |
+| **Test Verification Baseline** | **212/212 PASSING (100%)** | 5 full verification suites passing with zero failures. |
 
 ---
 
