@@ -105,8 +105,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   applyPrivacyBlurState();
 
   await loadChildren();
-  const initialSection = localStorage.getItem('mainSection') || 'dashboard';
+  const initialSection = localStorage.getItem('mainSection') || 'mission_control';
   switchMainSection(initialSection);
+  updateActCardsActiveState();
+  updatePlacedChildBadge();
   lucide.createIcons();
   
   // Set default date picker to today
@@ -510,6 +512,97 @@ function updatePlacedChildBadge() {
       badgeEl.className = 'hidden sm:inline-flex text-[9px] font-bold px-2 py-0.5 rounded-full bg-slate-700/50 text-slate-400 border border-slate-600 uppercase';
     }
   }
+
+  // Sync Top Header Caregiver and Child Context Displays
+  const headerChild = document.getElementById('headerChildDisplay');
+  if (headerChild) {
+    if (activeChild) {
+      const cName = activeChild.preferred_name || `${activeChild.first_name || ''} ${activeChild.last_name || ''}`.trim() || activeChild.alias;
+      const cRel = activeChild.relationship_type || 'Foster Care';
+      headerChild.textContent = `${cName} (${activeChild.alias || 'LB'} • ${cRel})`;
+    } else {
+      headerChild.textContent = 'No Child Currently Placed';
+    }
+  }
+
+  const headerCaregiver = document.getElementById('headerCaregiverDisplay');
+  if (headerCaregiver) {
+    const rawUser = activeCaregiverUser || getActiveCaregiver() || 'Sarah Jenkins';
+    const cleanUser = rawUser.replace(/^(Sample Caregiver \(|Parent Participant \(|\))/g, '');
+    headerCaregiver.textContent = cleanUser;
+  }
+}
+
+function toggleHeaderToolsDropdown() {
+  const dd = document.getElementById('headerToolsDropdown');
+  if (dd) {
+    dd.classList.toggle('hidden');
+    if (window.lucide) lucide.createIcons();
+  }
+}
+
+// Close tools dropdown on clicking outside
+document.addEventListener('click', (e) => {
+  const dd = document.getElementById('headerToolsDropdown');
+  const btn = document.getElementById('btnHeaderToolsMenu');
+  if (dd && !dd.classList.contains('hidden')) {
+    if (!dd.contains(e.target) && (!btn || !btn.contains(e.target))) {
+      dd.classList.add('hidden');
+    }
+  }
+});
+
+
+// 4-Act Curriculum Presentation Stage Handlers
+function updateActCardsActiveState() {
+  const cards = [1, 2, 3, 4];
+  cards.forEach(num => {
+    const el = document.getElementById(`actCard-${num}`);
+    if (!el) return;
+    el.classList.remove('ring-2', 'ring-emerald-400', 'bg-emerald-950/90', 'border-emerald-400', 'border-2');
+    el.classList.add('bg-slate-800/80', 'border-slate-700', 'border');
+  });
+
+  // Determine active act based on state
+  let activeAct = 2; // Default to Act 2 (Liam Brooks baseline)
+  if (currentSproutDataset === 'b') {
+    activeAct = 3;
+  }
+  const activeEl = document.getElementById(`actCard-${activeAct}`);
+  if (activeEl) {
+    activeEl.classList.remove('bg-slate-800/80', 'border-slate-700', 'border');
+    activeEl.classList.add('bg-emerald-950/90', 'border-emerald-400', 'border-2', 'ring-2', 'ring-emerald-400');
+  }
+}
+
+async function activateTrainingAct(actNumber) {
+  if (actNumber === 1) {
+    openGuidedOnboardingModal('foster');
+    return;
+  }
+  if (actNumber === 2) {
+    currentSproutDataset = 'a';
+    localStorage.setItem('sproutDataset', 'a');
+    updateDatasetBadgeUI();
+    await loadChildren();
+    setCanonicalChildForPersona('Liam');
+    updateActCardsActiveState();
+    switchMainSection('dashboard');
+    return;
+  }
+  if (actNumber === 3) {
+    currentSproutDataset = 'b';
+    localStorage.setItem('sproutDataset', 'b');
+    updateDatasetBadgeUI();
+    await loadChildren();
+    updateActCardsActiveState();
+    switchMainSection('dashboard');
+    return;
+  }
+  if (actNumber === 4) {
+    openCaregiverProfilesModal();
+    return;
+  }
 }
 
 function onChildChange() {
@@ -521,6 +614,7 @@ function onChildChange() {
   renderChildSnapshot();
   loadTabContent();
 }
+
 
 // Render Tab 0 Snapshot
 async function renderChildSnapshot() {
@@ -741,6 +835,8 @@ function switchMainSection(sectionKey) {
   }
 
   renderChildSnapshot();
+  updateActCardsActiveState();
+  updatePlacedChildBadge();
   loadTabContent();
 }
 
@@ -1296,11 +1392,16 @@ async function renderSettingsView(container) {
   container.innerHTML = html;
 }
 
-// Family Dashboard View
+// Family Dashboard View — Calm, Spacious Day 1 Baseline Cockpit
 async function renderDashboardView(container) {
-  const child = childrenList.find(c => c.id === currentChildId);
-  const recRes = await fetch(`/api/children/${currentChildId}/records?category=all`);
-  const records = await recRes.json();
+  const child = childrenList.find(c => c.id === currentChildId) || (childrenList.length > 0 ? childrenList[0] : null);
+  let records = [];
+  try {
+    const recRes = await fetch(`/api/children/${currentChildId}/records?category=all`);
+    records = await recRes.json();
+  } catch (e) {
+    records = [];
+  }
   const followUps = records.filter(r => r.follow_up_needed && !r.is_completed);
   const pendingComms = records.filter(r => (r.dcf_draft_text || r.gal_draft_text) && r.communication_status !== 'Sent');
 
@@ -1313,575 +1414,210 @@ async function renderDashboardView(container) {
     households = activeHouseholdsCache || [];
   }
 
-  const alias = child ? (child.alias || 'CD') : 'Child';
-  const topFollowUp = followUps[0];
-  const secondFollowUp = followUps[1];
-  const activeUser = getActiveCaregiver() || 'Candy Chevalier';
-  const isSample = currentSproutMode === 'sample';
+  const childName = child ? (child.preferred_name || `${child.first_name || ''} ${child.last_name || ''}`.trim() || child.alias || 'Liam Brooks') : 'Liam Brooks';
+  const childAlias = child ? (child.alias || 'LB') : 'LB';
+  const childRel = child ? (child.relationship_type || 'Foster Care') : 'Foster Care';
+  const childGoal = child ? (child.permanency_goal || 'Reunification') : 'Reunification';
+  const rawUser = activeCaregiverUser || getActiveCaregiver() || 'Sarah Jenkins';
+  const cleanUser = rawUser.replace(/^(Sample Caregiver \(|Parent Participant \(|\))/g, '');
+  const caregiverFirstName = cleanUser.split(' ')[0] || 'Caregiver';
 
   container.innerHTML = `
-    <div class="space-y-5">
+    <div class="space-y-6 animate-fadeIn pb-10">
 
-      <!-- ========================================== -->
-      <!-- P1.1 DAILY BRIEFING CENTER (Morning Command Copilot) -->
-      <!-- ========================================== -->
-      <div class="bg-gradient-to-r from-emerald-800 via-teal-800 to-indigo-900 rounded-2xl p-5 text-white shadow-md space-y-4 border border-emerald-700/80">
-        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-b border-white/10 pb-3">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-amber-400 text-slate-900 flex items-center justify-center font-bold text-lg shadow-sm">
-              ☀️
+      <!-- ===================================================================== -->
+      <!-- 1. CALM HERO BRIEFING: DIGNIFIED IDENTITY & HERO ACTIONS             -->
+      <!-- ===================================================================== -->
+      <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 rounded-3xl p-6 sm:p-7 text-white shadow-lg border border-slate-700/80 relative overflow-hidden">
+        <div class="absolute -right-8 -bottom-8 w-60 h-60 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5">
+          <div class="space-y-2">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 flex items-center gap-1">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i> Day 1 Safety Baseline Active
+              </span>
+              <span class="text-xs text-slate-300">
+                Caregiver: <strong class="text-white">${cleanUser}</strong> • Placement: <strong class="text-emerald-200">${childRel}</strong>
+              </span>
             </div>
-            <div>
-              <div class="flex items-center gap-2">
-                <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-300">Morning Copilot Briefing</span>
-                <span class="text-[10px] bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 px-2 py-0.2 rounded-full font-semibold">Live Guidance</span>
-              </div>
-              <h2 class="text-base font-extrabold text-white mt-0.5">GOOD MORNING CANDY • Active In Care: ${alias}</h2>
-            </div>
+
+            <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">
+              Good morning, ${caregiverFirstName}
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
+              Active in care: <strong class="text-emerald-300 privacy-sensitive">${childName}</strong> (Age 4 • Permanency Goal: ${childGoal}). 
+              Zero bureaucratic drag—all 15-second routine check-ins automatically protect you and file to the state timeline.
+            </p>
           </div>
 
-          <div class="flex items-center gap-3 text-xs bg-black/20 px-3.5 py-2 rounded-xl border border-white/10">
-            <div>
-              <span class="text-[10px] uppercase font-bold text-emerald-300 block">Est. Admin Time</span>
-              <span class="font-bold text-white text-xs">8 Minutes Today</span>
-            </div>
-            <div class="w-px h-6 bg-white/20"></div>
-            <div>
-              <span class="text-[10px] uppercase font-bold text-emerald-300 block">Compliance</span>
-              <span class="font-bold text-emerald-300 text-xs">98% Current</span>
-            </div>
-          </div>
-        </div>
+          <!-- Hero Action Buttons: 24-Hr Care Sheet & 15-Sec Note -->
+          <div class="flex flex-wrap items-center gap-3 shrink-0 w-full lg:w-auto">
+            <button onclick="openEmergencyHandoffCard()" class="flex-1 sm:flex-initial px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer border border-blue-400/60" title="Instant 1-page printable care sheet for babysitters, doctors, and caseworkers">
+              <i data-lucide="file-text" class="w-4 h-4"></i>
+              <span>View 24-Hr Care Sheet</span>
+            </button>
 
-        <!-- 3 Dynamic Priority Action Cards (P1.1) -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-slate-800">
-          
-          <!-- Priority 1: Medication Protocol -->
-          <div class="bg-white rounded-xl p-3.5 flex flex-col justify-between space-y-2.5 shadow-sm border border-slate-200">
-            <div>
-              <div class="flex items-center justify-between">
-                <span class="font-bold text-blue-900 uppercase text-[10px] tracking-wider flex items-center gap-1">
-                  <i data-lucide="pill" class="w-3.5 h-3.5 text-blue-700"></i> 1. Health Priority
-                </span>
-                <span class="text-[10px] bg-blue-100 text-blue-800 font-bold px-1.5 py-0.2 rounded">8:00 AM Due</span>
-              </div>
-              <div class="font-bold text-slate-900 mt-1">Daily Medication Administration</div>
-              <p class="text-slate-600 text-[11px] mt-0.5">Administer prescribed morning routine and record 1-tap confirmation.</p>
-            </div>
-            <button onclick="logTodayMedDose('Morning Routine Dose')" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 rounded-lg shadow-2xs flex items-center justify-center gap-1 transition">
-              <i data-lucide="check" class="w-3.5 h-3.5"></i> 1-Tap Administer
+            <button onclick="openRecordModal()" class="flex-1 sm:flex-initial px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black rounded-xl text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer border border-emerald-300" title="Log a quick daily check-in in under 15 seconds">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i>
+              <span>+ Log 15-Sec Note</span>
             </button>
           </div>
-
-          <!-- Priority 2: Immediate Follow-Up / Family Visit / EPSDT Clock -->
-          <div class="bg-white rounded-xl p-3.5 flex flex-col justify-between space-y-2.5 shadow-sm border border-slate-200">
-            <div>
-              <div class="flex items-center justify-between">
-                <span class="font-bold text-amber-900 uppercase text-[10px] tracking-wider flex items-center gap-1">
-                  <i data-lucide="calendar" class="w-3.5 h-3.5 text-amber-700"></i> 2. Family Visit / Tasks
-                </span>
-                <span class="text-[10px] bg-amber-100 text-amber-900 font-bold px-1.5 py-0.2 rounded">Active Target</span>
-              </div>
-              <div class="font-bold text-slate-900 mt-1 truncate" title="${topFollowUp ? topFollowUp.title : 'Family Visit at Easterseals'}">
-                ${topFollowUp ? topFollowUp.title : 'Family Time Visit at Easterseals'}
-              </div>
-              <p class="text-slate-600 text-[11px] mt-0.5 line-clamp-1">
-                ${topFollowUp ? (topFollowUp.follow_up_notes || topFollowUp.summary) : 'Supervised visit preparation and 18.0 mi transportation ($12.06).'}
-              </p>
-            </div>
-            <button onclick="${topFollowUp ? `openEditRecordModal(${topFollowUp.id})` : `quickOpenAction('family_time', 'Family Time Visit — Easterseals', 'Supervised family time visit completed. Child transported.')`}" class="w-full bg-amber-700 hover:bg-amber-800 text-white font-bold py-2 rounded-lg shadow-2xs flex items-center justify-center gap-1 transition">
-              <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> ${topFollowUp ? 'Review & Resolve' : '1-Tap Complete Visit'}
-            </button>
-          </div>
-
-          <!-- Priority 3: DCF Claim Ready for Submission ($0.67/mi) -->
-          <div class="bg-white rounded-xl p-3.5 flex flex-col justify-between space-y-2.5 shadow-sm border border-slate-200">
-            <div>
-              <div class="flex items-center justify-between">
-                <span class="font-bold text-emerald-900 uppercase text-[10px] tracking-wider flex items-center gap-1">
-                  <i data-lucide="send" class="w-3.5 h-3.5 text-emerald-700"></i> 3. State Claim Payout
-                </span>
-                <span class="text-[10px] bg-emerald-100 text-emerald-900 font-bold px-1.5 py-0.2 rounded">Payout Ready</span>
-              </div>
-              <div class="font-bold text-slate-900 mt-1 truncate">
-                ${pendingComms.length > 0 ? 'DCF Notification Ready' : 'Vermont Mileage Claim (FS-334B)'}
-              </div>
-              <p class="text-slate-600 text-[11px] mt-0.5 line-clamp-1">
-                ${pendingComms.length > 0 ? pendingComms[0].title : 'Official Word travel reimbursement pre-filled at $0.67/mile.'}
-              </p>
-            </div>
-            <button onclick="${pendingComms.length > 0 ? `switchTab('communications')` : `generateDcfClaimForm('FS-334B')`}" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2 rounded-lg shadow-2xs flex items-center justify-center gap-1 transition">
-              <i data-lucide="${pendingComms.length > 0 ? 'send' : 'download'}" class="w-3.5 h-3.5"></i> ${pendingComms.length > 0 ? 'Review & Send' : '1-Click Export Form FS-334B'}
-            </button>
-          </div>
-
-        </div>
-
-        <!-- Upcoming Horizon Ticker -->
-        <div class="pt-2 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-[11px] text-emerald-100">
-          <div class="flex items-center gap-3">
-            <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3 text-amber-300"></i> Court Review in 6 Days</span>
-            <span class="text-white/30">•</span>
-            <span class="flex items-center gap-1"><i data-lucide="heart" class="w-3 h-3 text-rose-300"></i> EPSDT Initial Screening: Compliant (14 Days Safe)</span>
-          </div>
-          <span class="italic text-emerald-200">Vermont DCF Policy 75 Kinship Standard</span>
         </div>
       </div>
 
-      <!-- 1. Caregiver Household & Team Command Banner -->
-      <div class="bg-gradient-to-r ${isSample ? 'from-slate-900 via-indigo-950 to-slate-900 border-indigo-800' : 'from-emerald-950 via-emerald-900 to-teal-950 border-emerald-800'} text-white rounded-2xl p-5 shadow-sm border space-y-4">
-        <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-          <div class="flex items-center gap-3.5">
-            <div class="p-3 ${isSample ? 'bg-indigo-800/80 text-indigo-300 border-indigo-700/60' : 'bg-emerald-800/80 text-emerald-300 border-emerald-700/60'} rounded-2xl border shadow-inner">
-              <i data-lucide="${isSample ? 'user-check' : 'home'}" class="w-6 h-6"></i>
+      <!-- ===================================================================== -->
+      <!-- 2. LIAM'S DAY 1 IMMEDIATE CARE ESSENTIALS (3 CALM DOMAINS)           -->
+      <!-- ===================================================================== -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+        <!-- Card 1: Medical & Allergies -->
+        <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-xs flex flex-col justify-between space-y-3">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-black uppercase tracking-wider text-rose-800 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+                <i data-lucide="heart-pulse" class="w-3.5 h-3.5 text-rose-600"></i> Medical & Allergies
+              </span>
+              <span class="text-[10px] font-bold text-slate-400">Critical Info</span>
             </div>
-            <div>
-              <div class="flex flex-wrap items-center gap-2">
-                <span class="text-[10px] uppercase font-bold tracking-widest ${isSample ? 'text-indigo-300' : 'text-emerald-300'}">Caregiver Operations</span>
-                <span class="text-[10px] ${isSample ? 'bg-indigo-700/60 text-indigo-100 border-indigo-600' : 'bg-emerald-700/60 text-emerald-100 border-emerald-600'} px-2 py-0.5 rounded-full border">
-                  ${isSample ? 'Demonstration / Sample Profile' : 'Vermont Kinship & Foster Care'}
-                </span>
+            <h3 class="font-bold text-slate-900 text-sm">Critical Health Protocol</h3>
+            <div class="text-xs text-slate-600 space-y-1 pt-1">
+              <div class="flex items-center gap-1.5 text-rose-700 font-bold">
+                <span>⚠️ Allergy:</span> Penicillin (Severe Reaction)
               </div>
-              <h2 class="text-lg font-bold text-white mt-0.5">${activeUser} • Caregiver Command Center</h2>
-              <p class="text-xs ${isSample ? 'text-indigo-200/90' : 'text-emerald-200/90'} mt-0.5">
-                Care Team: ${isSample ? 'Sample Caregiver (Primary Caregiver) • Sample Secondary Applicant (Mallory Wheeler) • Sample Resource & Home Owner (Robin Davis)' : 'Candy Chevalier (Primary Caregiver) • Mallory Wheeler (Secondary Applicant) • Robin Davis (Home Owner & Resource)'}
-              </p>
+              <div><strong>Pediatrician:</strong> Dr. Robert Chen (Champlain Pediatrics)</div>
+              <div class="text-[11px] text-slate-500">Inhaler stored in hallway cabinet (as-needed).</div>
             </div>
           </div>
+          <button onclick="logTodayMedDose('Morning Health Check')" class="w-full py-2 bg-blue-50 hover:bg-blue-100 text-blue-900 font-bold text-xs rounded-xl border border-blue-200 transition flex items-center justify-center gap-1.5 cursor-pointer">
+            <i data-lucide="check" class="w-3.5 h-3.5 text-blue-700"></i>
+            <span>1-Tap Med Check-In</span>
+          </button>
+        </div>
 
-          <!-- In Care Child Pills + Add Child -->
-          <div class="flex items-center gap-2 overflow-x-auto w-full lg:w-auto pb-1 lg:pb-0">
-            <span class="text-[11px] text-emerald-300 font-bold uppercase shrink-0">In Care:</span>
-            ${childrenList.map(ch => {
-              const chAlias = ch.alias || `${ch.first_name || ''} ${ch.last_name || ''}`.trim() || 'Child';
-              const chRel = ch.relationship_type || 'Kinship Placement';
-              const isSelected = ch.id === currentChildId;
-              return `
-                <button onclick="currentChildId = ${ch.id}; if(document.getElementById('childSelect')) document.getElementById('childSelect').value = ${ch.id}; renderChildSnapshot(); loadTabContent();" class="px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 ${isSelected ? 'bg-white text-emerald-950 shadow ring-2 ring-emerald-400' : 'bg-emerald-800/70 hover:bg-emerald-800 text-emerald-100 border border-emerald-700'}">
-                  <span class="w-2 h-2 rounded-full ${isSelected ? 'bg-emerald-600' : 'bg-emerald-400'}"></span>
-                  <span>${chAlias}</span>
-                  <span class="text-[10px] px-1.5 py-0.2 bg-black/20 rounded font-normal opacity-90">${chRel}</span>
-                </button>
-              `;
-            }).join('')}
-            <button onclick="openNewChildModal()" class="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-800/40 hover:bg-emerald-800 text-emerald-200 border border-dashed border-emerald-600 flex items-center gap-1 shrink-0">
-              <i data-lucide="user-plus" class="w-3.5 h-3.5"></i> Add Child
-            </button>
+        <!-- Card 2: Bedtime & Comfort Routine -->
+        <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-xs flex flex-col justify-between space-y-3">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-black uppercase tracking-wider text-teal-800 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+                <i data-lucide="moon" class="w-3.5 h-3.5 text-teal-600"></i> Bedtime & Comfort
+              </span>
+              <span class="text-[10px] font-bold text-slate-400">Routine</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">Soothing Plan & Habits</h3>
+            <div class="text-xs text-slate-600 space-y-1 pt-1">
+              <div><strong>Target Bedtime:</strong> 7:30 PM (Wind down at 7:00 PM)</div>
+              <div><strong>Comfort Item:</strong> Stuffed bear "Barnaby" (in intake duffel)</div>
+              <div class="text-[11px] text-slate-500">Needs hallway nightlight on; loves 5-min calm bedtime story.</div>
+            </div>
           </div>
+          <button onclick="quickOpenAction('daily', 'Evening Soothing & Bedtime', 'Liam had his warm bath, took stuffed bear Barnaby, and settled quietly into bed at 7:30 PM.')" class="w-full py-2 bg-teal-50 hover:bg-teal-100 text-teal-900 font-bold text-xs rounded-xl border border-teal-200 transition flex items-center justify-center gap-1.5 cursor-pointer">
+            <i data-lucide="check" class="w-3.5 h-3.5 text-teal-700"></i>
+            <span>1-Tap Routine Log</span>
+          </button>
         </div>
 
-        <!-- Household Addresses & Status Grid (4 Registered Households with E911 & Mailing Addresses) -->
-        <div class="pt-3 border-t border-emerald-800/80">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-[11px] uppercase tracking-wider font-bold text-emerald-300 flex items-center gap-1.5">
-              <i data-lucide="map-pin" class="w-3.5 h-3.5"></i> Registered Households (${households.length}):
-            </span>
-            <button onclick="switchMainSection('households')" class="text-[11px] text-emerald-200 hover:text-white underline font-semibold">
-              Manage in Caregiver & Households →
-            </button>
+        <!-- Card 3: DCF & State Protection -->
+        <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-xs flex flex-col justify-between space-y-3">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-black uppercase tracking-wider text-indigo-800 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+                <i data-lucide="scale" class="w-3.5 h-3.5 text-indigo-600"></i> DCF & Protection
+              </span>
+              <span class="text-[10px] font-bold text-slate-400">Compliance</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">Case Worker & Mileage</h3>
+            <div class="text-xs text-slate-600 space-y-1 pt-1">
+              <div><strong>Caseworker:</strong> Sarah Miller (802-555-0199)</div>
+              <div><strong>Mileage Rate:</strong> $0.67/mile state reimbursement</div>
+              <div class="text-[11px] text-slate-500">Preset: 18.0 mi round-trip to Easterseals ($12.06 auto-credited).</div>
+            </div>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs">
-            ${households.map(h => `
-              <div onclick="openHouseholdModal(${h.id})" class="bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-700/80 rounded-xl p-3 space-y-1.5 cursor-pointer transition group">
-                <div class="flex items-start justify-between gap-1">
-                  <span class="font-bold text-white text-xs group-hover:text-emerald-300 block truncate" title="${h.name}">
-                    ${h.name}
-                  </span>
-                  <span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${h.status.includes('Active') ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'} shrink-0">
-                    ${h.status.includes('Active') ? 'Active' : 'Prior'}
-                  </span>
-                </div>
-                <div class="text-[11px] text-emerald-200 space-y-0.5">
-                  <div class="truncate" title="${h.e911_address || h.address}"><strong>E911:</strong> ${h.e911_address || h.address}</div>
-                  <div class="truncate text-emerald-300/80" title="${h.mailing_address || h.address}"><strong>Mail:</strong> ${h.mailing_address || h.address}</div>
-                </div>
-                ${h.secondary_caregiver || h.home_owner ? `
-                  <div class="text-[10px] text-emerald-300/70 truncate pt-0.5 border-t border-emerald-800/60">
-                    ${h.secondary_caregiver ? `Sec: ${h.secondary_caregiver}` : ''} ${h.home_owner ? `• Owner: ${h.home_owner}` : ''}
-                  </div>
-                ` : ''}
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      </div>
-      
-      <!-- 2. 1-TAP FAST ACTIONS BAR (Instant 15-second logging) -->
-      <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
-        <div class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2.5 flex items-center justify-between">
-          <span class="flex items-center gap-1.5"><i data-lucide="zap" class="w-4 h-4 text-amber-500"></i> Fast Caregiver Actions (1-Tap 15-Second Logging):</span>
-          <span class="text-[11px] font-semibold text-slate-400 lowercase">click any button to open pre-filled logger</span>
-        </div>
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-          <button onclick="quickOpenAction('medical', 'Medication Given / Refilled', 'Daily prescription administered on schedule.')" class="flex items-center gap-2.5 p-3 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-950 font-bold text-xs transition text-left shadow-xs">
-            <span class="text-xl">💊</span>
-            <div>
-              <div>Log Meds</div>
-              <div class="text-[11px] text-blue-700 font-normal">Dose / Refill</div>
-            </div>
-          </button>
-
-          <button onclick="quickOpenAction('daily', 'Infant Feeding / Meal Routine', '🍼 Formula feeding or meal logged by caregiver.')" class="flex items-center gap-2.5 p-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-950 font-bold text-xs transition text-left shadow-xs">
-            <span class="text-xl">🍼</span>
-            <div>
-              <div>Feeding</div>
-              <div class="text-[11px] text-emerald-700 font-normal">Formula / Meal</div>
-            </div>
-          </button>
-
-          <button onclick="quickOpenAction('communication', 'DCF Caseworker Contact', 'Call / email with Family Services Worker regarding child.')" class="flex items-center gap-2.5 p-3 rounded-xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-950 font-bold text-xs transition text-left shadow-xs">
-            <span class="text-xl">📞</span>
-            <div>
-              <div>DCF Call</div>
-              <div class="text-[11px] text-indigo-700 font-normal">Worker update</div>
-            </div>
-          </button>
-
-          <button onclick="quickOpenAction('family_time', 'Family Time Visit & Mileage', 'Supervised family visit attended. Transported child.')" class="flex items-center gap-2.5 p-3 rounded-xl bg-teal-50 hover:bg-teal-100 border border-teal-200 text-teal-950 font-bold text-xs transition text-left shadow-xs">
-            <span class="text-xl">🚗</span>
-            <div>
-              <div>Family Visit</div>
-              <div class="text-[11px] text-teal-700 font-normal">Visit & Mileage</div>
-            </div>
-          </button>
-
-          <button onclick="quickOpenAction('medical', 'Pediatric Appointment / Checkup', 'Well-child visit attended.')" class="flex items-center gap-2.5 p-3 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-950 font-bold text-xs transition text-left shadow-xs">
-            <span class="text-xl">🩺</span>
-            <div>
-              <div>Doctor Visit</div>
-              <div class="text-[11px] text-amber-700 font-normal">Vitals / Checkup</div>
-            </div>
-          </button>
-
-          <button onclick="quickOpenAction('incident', 'Incident / Behavioral Note', 'Unusual event or behavioral challenge observed.')" class="flex items-center gap-2.5 p-3 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-950 font-bold text-xs transition text-left shadow-xs">
-            <span class="text-xl">⚠️</span>
-            <div>
-              <div>Incident</div>
-              <div class="text-[11px] text-rose-700 font-normal">Behavior / Safety</div>
-            </div>
+          <button onclick="quickOpenAction('family_time', 'Supervised Family Visit — Easterseals', 'Transported child to Easterseals for scheduled family time visit. 18.0 miles round trip.')" class="w-full py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-900 font-bold text-xs rounded-xl border border-indigo-200 transition flex items-center justify-center gap-1.5 cursor-pointer">
+            <i data-lucide="navigation" class="w-3.5 h-3.5 text-indigo-700"></i>
+            <span>Log Visit & Mileage</span>
           </button>
         </div>
+
       </div>
 
-      <!-- 3. Care Relationships & Episodes Grid (In Home, Current Respite, Upcoming, Former) -->
-      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+      <!-- ===================================================================== -->
+      <!-- 3. TODAY'S LIVE CARE LOG (CHRONOLOGICAL 15-SECOND ENTRIES)            -->
+      <!-- ===================================================================== -->
+      <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs space-y-4">
         <div class="flex items-center justify-between pb-3 border-b border-slate-100">
           <div>
-            <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
-              <i data-lucide="home" class="w-4 h-4 text-emerald-700"></i> Care Relationships & Episodes Overview
+            <h3 class="font-extrabold text-slate-900 text-sm flex items-center gap-2">
+              <i data-lucide="clock" class="w-4 h-4 text-emerald-600"></i>
+              Liam's Day 1 Chronology & Observations
             </h3>
-            <p class="text-[11px] text-slate-500">Continuity across primary placements, temporary stays, upcoming assignments, and former resources.</p>
+            <p class="text-xs text-slate-500 mt-0.5">
+              Every 15-second observation entered here automatically creates an evidentiary timeline for court and caseworker reviews.
+            </p>
           </div>
-          <button onclick="openNewChildModal()" class="text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold px-3 py-1.5 rounded-lg border border-emerald-200 flex items-center gap-1">
-            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Care Episode
-          </button>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
-          <!-- 1. Children Living In My Home (Primary & Kinship Placement) -->
-          <div class="bg-emerald-50/70 border border-emerald-200 rounded-xl p-3.5 space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="font-bold text-emerald-950 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                <i data-lucide="home" class="w-3.5 h-3.5 text-emerald-700"></i> Living In My Home
-              </span>
-              <span class="text-[10px] font-bold bg-emerald-200 text-emerald-900 px-1.5 py-0.2 rounded-full">
-                ${childrenList.filter(c => ['Primary Placement', 'Kinship Placement', 'Kinship Care', 'Foster Care'].includes(c.relationship_type) || !c.relationship_type).length}
-              </span>
-            </div>
-            <div class="divide-y divide-emerald-200/60">
-              ${childrenList.filter(c => ['Primary Placement', 'Kinship Placement', 'Kinship Care', 'Foster Care'].includes(c.relationship_type) || !c.relationship_type).length === 0 ? `
-                <p class="text-[11px] text-emerald-800/70 py-2">No primary placements currently recorded.</p>
-              ` : childrenList.filter(c => ['Primary Placement', 'Kinship Placement', 'Kinship Care', 'Foster Care'].includes(c.relationship_type) || !c.relationship_type).map(ch => `
-                <div onclick="currentChildId = ${ch.id}; renderChildSnapshot(); loadTabContent();" class="py-2 flex items-center justify-between cursor-pointer hover:bg-emerald-100/60 rounded px-1 transition ${ch.id === currentChildId ? 'font-bold text-emerald-950' : 'text-emerald-900'}">
-                  <div>
-                    <div class="font-bold">${ch.alias || 'Child'}</div>
-                    <div class="text-[10px] text-emerald-700 font-normal">${ch.relationship_type || 'Primary Placement'}</div>
-                  </div>
-                  <span class="text-[10px] bg-emerald-200/80 px-1.5 py-0.5 rounded font-semibold">Active</span>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-
-          <!-- 2. Current Respite (Temporary & Emergency Respite active right now) -->
-          <div class="bg-purple-50/70 border border-purple-200 rounded-xl p-3.5 space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="font-bold text-purple-950 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-purple-700"></i> Current Respite
-              </span>
-              <span class="text-[10px] font-bold bg-purple-200 text-purple-900 px-1.5 py-0.2 rounded-full">
-                ${childrenList.filter(c => ['Temporary Respite', 'Emergency Respite', 'Respite Care', 'Emergency Placement'].includes(c.relationship_type) && c.episode_status !== 'Former').length}
-              </span>
-            </div>
-            <div class="divide-y divide-purple-200/60">
-              ${childrenList.filter(c => ['Temporary Respite', 'Emergency Respite', 'Respite Care', 'Emergency Placement'].includes(c.relationship_type) && c.episode_status !== 'Former').length === 0 ? `
-                <p class="text-[11px] text-purple-800/70 py-2">No children currently in temporary respite care.</p>
-              ` : childrenList.filter(c => ['Temporary Respite', 'Emergency Respite', 'Respite Care', 'Emergency Placement'].includes(c.relationship_type) && c.episode_status !== 'Former').map(ch => `
-                <div onclick="currentChildId = ${ch.id}; renderChildSnapshot(); loadTabContent();" class="py-2 flex items-center justify-between cursor-pointer hover:bg-purple-100/60 rounded px-1 transition ${ch.id === currentChildId ? 'font-bold text-purple-950' : 'text-purple-900'}">
-                  <div>
-                    <div class="font-bold">${ch.alias || 'Child'}</div>
-                    <div class="text-[10px] text-purple-700 font-normal">${ch.episode_start_date ? `${ch.episode_start_date} - ${ch.episode_end_date || 'Now'}` : ch.relationship_type}</div>
-                  </div>
-                  <span class="text-[10px] bg-purple-200 px-1.5 py-0.5 rounded font-semibold text-purple-900">In Care</span>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-
-          <!-- 3. Upcoming Respite (Temporary stays arriving in the future) -->
-          <div class="bg-amber-50/70 border border-amber-200 rounded-xl p-3.5 space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="font-bold text-amber-950 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                <i data-lucide="calendar" class="w-3.5 h-3.5 text-amber-700"></i> Upcoming Respite
-              </span>
-              <span class="text-[10px] font-bold bg-amber-200 text-amber-900 px-1.5 py-0.2 rounded-full">
-                ${childrenList.filter(c => c.episode_status === 'Temporary' && c.episode_start_date && c.episode_start_date > new Date().toISOString().split('T')[0]).length}
-              </span>
-            </div>
-            <div class="divide-y divide-amber-200/60">
-              ${childrenList.filter(c => c.episode_status === 'Temporary' && c.episode_start_date && c.episode_start_date > new Date().toISOString().split('T')[0]).length === 0 ? `
-                <p class="text-[11px] text-amber-800/70 py-2">No future respite stays currently scheduled.</p>
-              ` : childrenList.filter(c => c.episode_status === 'Temporary' && c.episode_start_date && c.episode_start_date > new Date().toISOString().split('T')[0]).map(ch => `
-                <div onclick="currentChildId = ${ch.id}; renderChildSnapshot(); loadTabContent();" class="py-2 flex items-center justify-between cursor-pointer hover:bg-amber-100/60 rounded px-1 transition ${ch.id === currentChildId ? 'font-bold text-amber-950' : 'text-amber-900'}">
-                  <div>
-                    <div class="font-bold">${ch.alias || 'Child'}</div>
-                    <div class="text-[10px] text-amber-700 font-normal">${ch.episode_start_date} - ${ch.episode_end_date || 'TBD'}</div>
-                  </div>
-                  <span class="text-[10px] bg-amber-200 px-1.5 py-0.5 rounded font-semibold text-amber-900">Upcoming</span>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-
-          <!-- 4. Former Placements (Preserved continuity & transition resource) -->
-          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="font-bold text-slate-800 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                <i data-lucide="archive" class="w-3.5 h-3.5 text-slate-500"></i> Former Placements
-              </span>
-              <span class="text-[10px] font-bold bg-slate-200 text-slate-700 px-1.5 py-0.2 rounded-full">
-                ${childrenList.filter(c => c.relationship_type === 'Former Placement' || c.episode_status === 'Former' || c.episode_status === 'Former / Transitioned').length}
-              </span>
-            </div>
-            <div class="divide-y divide-slate-200/60">
-              ${childrenList.filter(c => c.relationship_type === 'Former Placement' || c.episode_status === 'Former' || c.episode_status === 'Former / Transitioned').length === 0 ? `
-                <p class="text-[11px] text-slate-500 py-2">No former placement records.</p>
-              ` : childrenList.filter(c => c.relationship_type === 'Former Placement' || c.episode_status === 'Former' || c.episode_status === 'Former / Transitioned').map(ch => `
-                <div onclick="currentChildId = ${ch.id}; renderChildSnapshot(); loadTabContent();" class="py-2 flex items-center justify-between cursor-pointer hover:bg-slate-100 rounded px-1 transition ${ch.id === currentChildId ? 'font-bold text-slate-900' : 'text-slate-600'}">
-                  <div>
-                    <div class="font-bold">${ch.alias || 'Child'}</div>
-                    <div class="text-[10px] text-slate-400 font-normal">Past Care Resource</div>
-                  </div>
-                  <span class="text-[10px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded font-semibold">Archived</span>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick Metrics Strip -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Child Reference ID</div>
-          <div class="text-base font-bold text-slate-800 mt-1">${child ? (child.child_code || `CH-${child.id || '001'}`) : 'CH-001'}</div>
-          <div class="text-[11px] text-emerald-700 font-semibold mt-0.5">Alias: ${alias}</div>
-        </div>
-
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Placement Target</div>
-          <div class="text-base font-bold text-emerald-800 mt-1 flex items-center gap-1">
-            <i data-lucide="calendar" class="w-4 h-4"></i> <span class="privacy-sensitive">${child.placement_date || 'Wed Oct 14'}</span>
-          </div>
-          <div class="text-[11px] text-slate-500 mt-0.5">Status: ${child.status}</div>
-        </div>
-
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Action Follow-Ups</div>
-          <div class="text-base font-bold ${followUps.length > 0 ? 'text-amber-700' : 'text-slate-800'} mt-1">${followUps.length} Pending</div>
-          <div class="text-[11px] text-slate-500 mt-0.5">Requires attention</div>
-        </div>
-
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Communication Drafts</div>
-          <div class="text-base font-bold ${pendingComms.length > 0 ? 'text-indigo-700' : 'text-slate-800'} mt-1">${pendingComms.length} Ready</div>
-          <div class="text-[11px] text-slate-500 mt-0.5">DCF / GAL review</div>
-        </div>
-      </div>
-
-      <!-- Daily Medication & Wellness Administration Check-Off (1-Tap Safety Record) -->
-      <div class="bg-gradient-to-r from-blue-50/90 via-sky-50/70 to-indigo-50/80 rounded-2xl border border-blue-200 p-5 shadow-xs space-y-3">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-blue-200/60 pb-2.5">
-          <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold shadow-xs">
-              <i data-lucide="pill" class="w-4 h-4"></i>
-            </div>
-            <div>
-              <h4 class="font-bold text-blue-950 text-sm flex items-center gap-1.5">
-                <span>Daily Medication Administration & Health Log — ${alias}</span>
-                <span class="text-[10px] bg-blue-100 text-blue-800 border border-blue-300 font-bold px-2 py-0.5 rounded-full uppercase">3-Sec Confirmation</span>
-              </h4>
-              <p class="text-xs text-blue-900/80">Confirm morning, noon, and evening doses or administration with a single click.</p>
-            </div>
-          </div>
-          <div class="flex items-center gap-2">
-            <button onclick="logTodayMedDose('Morning Dose')" class="px-3 py-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1 transition">
-              <i data-lucide="check" class="w-3.5 h-3.5"></i> Mark Dose Administered
-            </button>
-            <button onclick="quickOpenAction('medical', 'Medication Refill / Change', 'Prescription refilled or dosage adjusted.')" class="px-2.5 py-1.5 bg-white hover:bg-blue-50 text-blue-900 border border-blue-300 font-semibold text-xs rounded-xl shadow-xs transition">
-              Refill / Log Details
-            </button>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs pt-1">
-          <div class="bg-white/90 p-3 rounded-xl border border-blue-100 flex items-center justify-between">
-            <div>
-              <span class="font-bold text-slate-800 block text-xs">Morning Schedule</span>
-              <span class="text-[11px] text-slate-500">With breakfast / 8:00 AM</span>
-            </div>
-            <button onclick="logTodayMedDose('Morning Dose')" class="px-2.5 py-1 rounded-lg font-bold text-xs bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100 flex items-center gap-1">
-              <i data-lucide="check-circle" class="w-3 h-3 text-emerald-600"></i> Done
-            </button>
-          </div>
-
-          <div class="bg-white/90 p-3 rounded-xl border border-blue-100 flex items-center justify-between">
-            <div>
-              <span class="font-bold text-slate-800 block text-xs">Mid-Day / School</span>
-              <span class="text-[11px] text-slate-500">Nurse protocol / 12:00 PM</span>
-            </div>
-            <button onclick="logTodayMedDose('Mid-Day Dose')" class="px-2.5 py-1 rounded-lg font-bold text-xs bg-blue-50 text-blue-800 border border-blue-300 hover:bg-blue-100 flex items-center gap-1">
-              <i data-lucide="check-circle" class="w-3 h-3 text-blue-600"></i> Log
-            </button>
-          </div>
-
-          <div class="bg-white/90 p-3 rounded-xl border border-blue-100 flex items-center justify-between">
-            <div>
-              <span class="font-bold text-slate-800 block text-xs">Evening / Bedtime</span>
-              <span class="text-[11px] text-slate-500">With dinner / 7:30 PM</span>
-            </div>
-            <button onclick="logTodayMedDose('Evening Dose')" class="px-2.5 py-1 rounded-lg font-bold text-xs bg-purple-50 text-purple-800 border border-purple-300 hover:bg-purple-100 flex items-center gap-1">
-              <i data-lucide="check-circle" class="w-3 h-3 text-purple-600"></i> Log
-            </button>
-          </div>
-        </div>
-
-        <!-- Prescription Refill Countdown & Inventory Alert -->
-        <div class="mt-3 pt-2.5 border-t border-blue-200/60 flex flex-wrap items-center justify-between gap-2 text-xs">
-          <div class="flex items-center gap-2">
-            <span class="font-bold text-slate-700 text-[11px] flex items-center gap-1">
-              <i data-lucide="package" class="w-3.5 h-3.5 text-blue-600"></i> Active Prescription Supply:
-            </span>
-            <span class="px-2 py-0.5 rounded font-bold bg-emerald-100 text-emerald-800 text-[10px]">
-              18 Days Remaining
-            </span>
-            <span class="text-[11px] text-slate-500">Refill Due: Oct 31, 2026</span>
-          </div>
-          <button onclick="quickOpenAction('medical', 'Pediatric Prescription Refill Request', 'Contacted pediatrician / pharmacy for routine prescription renewal refill.')" class="text-xs font-semibold text-blue-700 hover:text-blue-900 underline">
-            + Log Pharmacy Refill
-          </button>
-        </div>
-      </div>
-
-      <!-- Two-Column Priority Command Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Open Follow-Ups -->
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-          <div class="flex items-center justify-between pb-3 border-b">
-            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-              <i data-lucide="check-square" class="w-4 h-4 text-amber-600"></i> Outstanding Action Items
-            </h4>
-            <span class="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">${followUps.length} Open</span>
-          </div>
-          <div class="divide-y divide-slate-100 mt-2">
-            ${followUps.length === 0 ? '<p class="text-xs text-slate-400 py-6 text-center">No outstanding tasks right now. All caught up!</p>' : ''}
-            ${followUps.map(f => `
-              <div class="py-3 flex items-start justify-between gap-3">
-                <div class="flex items-start gap-2.5">
-                  <input type="checkbox" onchange="toggleTaskComplete(${f.id})" title="Mark task completed" class="mt-0.5 rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer" />
-                  <div>
-                    <div class="text-xs font-bold text-slate-900">${f.title}</div>
-                    <div class="text-xs text-amber-900 font-medium mt-0.5">${f.follow_up_notes || 'Action required'}</div>
-                    <div class="text-[10px] text-slate-400 mt-0.5">Date: ${f.event_date}</div>
-                  </div>
-                </div>
-                <div class="flex items-center gap-2">
-                  <button onclick="openEditRecordModal(${f.id})" class="text-xs text-slate-400 hover:text-emerald-700 font-semibold" title="Edit entry">
-                    <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
-                  </button>
-                  <button onclick="switchTab('timeline')" class="text-xs text-emerald-700 hover:underline font-semibold shrink-0">View</button>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-
-        <!-- Smart Communication Inbox -->
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-          <div class="flex items-center justify-between pb-3 border-b">
-            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-              <i data-lucide="send" class="w-4 h-4 text-indigo-600"></i> Smart Communication Ready
-            </h4>
-            <button onclick="switchTab('communications')" class="text-xs text-indigo-700 hover:underline font-semibold">Open Center</button>
-          </div>
-          <div class="divide-y divide-slate-100 mt-2 text-xs">
-            ${pendingComms.length === 0 ? '<p class="text-xs text-slate-400 py-6 text-center">No pending drafts to review.</p>' : ''}
-            ${pendingComms.map(pc => `
-              <div class="py-3 flex items-start justify-between gap-2">
-                <div>
-                  <div class="font-bold text-slate-900">${pc.title}</div>
-                  <div class="text-[11px] text-slate-500 mt-0.5 line-clamp-1">${pc.summary}</div>
-                  <div class="text-[10px] text-indigo-600 font-semibold mt-1">Recommended: Notify DCF</div>
-                </div>
-                <button onclick="switchTab('communications')" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-800 font-bold px-2.5 py-1 rounded-lg border border-indigo-200 shrink-0">
-                  Review
-                </button>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      </div>
-
-      <!-- Today In Our Home — Live Activity & Daily Continuity Feed -->
-      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3">
-        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-          <div>
-            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-              <i data-lucide="activity" class="w-4 h-4 text-emerald-600"></i> Today In Our Home — Daily Care Log
-            </h4>
-            <p class="text-[11px] text-slate-500">Continuity feed across all meals, behaviors, visits, medications, and observations logged today.</p>
-          </div>
-          <button onclick="openRecordModal()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1">
-            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Daily Note
+          <button onclick="openRecordModal()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition flex items-center gap-1.5 shadow-2xs cursor-pointer">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            <span>+ Add Note</span>
           </button>
         </div>
 
         <div class="divide-y divide-slate-100">
-          ${records.slice(0, 5).map(r => {
-            let catColor = 'bg-slate-100 text-slate-700';
-            if (r.category === 'medical') catColor = 'bg-blue-100 text-blue-800';
-            if (r.category === 'daily') catColor = 'bg-teal-100 text-teal-800';
-            if (r.category === 'family_time') catColor = 'bg-green-100 text-green-800';
-            if (r.category === 'incident') catColor = 'bg-rose-100 text-rose-800';
+          ${records.length === 0 ? `
+            <div class="py-8 text-center text-slate-400 space-y-2">
+              <i data-lucide="book-open" class="w-8 h-8 text-slate-300 mx-auto"></i>
+              <p class="text-xs font-semibold">No notes recorded yet today for Liam.</p>
+              <button onclick="openRecordModal()" class="text-xs text-emerald-700 font-bold hover:underline">
+                Click here to log your first 15-second observation
+              </button>
+            </div>
+          ` : records.slice(0, 5).map(r => {
+            let catBadge = 'bg-slate-100 text-slate-700 border-slate-200';
+            if (r.category === 'medical') catBadge = 'bg-blue-50 text-blue-800 border-blue-200';
+            if (r.category === 'daily') catBadge = 'bg-teal-50 text-teal-800 border-teal-200';
+            if (r.category === 'family_time') catBadge = 'bg-emerald-50 text-emerald-800 border-emerald-200';
+            if (r.category === 'incident') catBadge = 'bg-rose-50 text-rose-800 border-rose-200';
             return `
-              <div class="py-3 flex items-start justify-between gap-3 text-xs">
+              <div class="py-3.5 flex items-start justify-between gap-3 text-xs group">
                 <div class="space-y-1">
                   <div class="flex items-center gap-2">
-                    <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${catColor}">
+                    <span class="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md border ${catBadge}">
                       ${r.category.replace('_', ' ')}
                     </span>
                     <span class="font-bold text-slate-900">${r.title}</span>
-                    <span class="text-[11px] text-slate-400">(${r.event_date})</span>
+                    <span class="text-[11px] text-slate-400 font-medium">(${r.event_date})</span>
                   </div>
-                  <p class="text-slate-600 leading-relaxed">${r.summary || 'Observation recorded.'}</p>
-                  ${r.participants ? `<span class="text-[10px] text-slate-400 block">Participants: ${r.participants}</span>` : ''}
+                  <p class="text-slate-600 leading-relaxed text-xs">${r.summary || 'Observation recorded.'}</p>
+                  ${r.participants ? `<span class="text-[10px] text-slate-400 block font-medium">Participants: ${r.participants}</span>` : ''}
                 </div>
-                <button onclick="switchTab('journal')" class="text-xs text-emerald-700 hover:underline font-semibold shrink-0">Open Journal</button>
+                <div class="flex items-center gap-2 shrink-0">
+                  <button onclick="openEditRecordModal(${r.id})" class="text-xs text-slate-400 hover:text-emerald-700 p-1.5 rounded-lg hover:bg-slate-50 transition" title="Edit entry">
+                    <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+                  </button>
+                  <button onclick="switchMainSection('journal')" class="text-xs text-emerald-700 font-bold hover:underline shrink-0">
+                    Journal →
+                  </button>
+                </div>
               </div>
             `;
           }).join('')}
         </div>
       </div>
+
+      <!-- ===================================================================== -->
+      <!-- 4. HOUSEHOLD CONTINUITY & RESIDENCES (CLEAN COLLAPSIBLE DRAWER)       -->
+      <!-- ===================================================================== -->
+      <div class="border border-slate-200 rounded-3xl p-4 bg-slate-50/80">
+        <div class="flex items-center justify-between text-xs">
+          <div class="flex items-center gap-2 text-slate-600 font-semibold">
+            <i data-lucide="home" class="w-4 h-4 text-slate-500"></i>
+            <span>Registered Family Household: <strong>${households[0] ? households[0].name : '41 Elmwood Drive (Primary Residence)'}</strong></span>
+          </div>
+          <button onclick="switchMainSection('households')" class="text-xs font-bold text-emerald-800 hover:underline">
+            Manage Household & Licensing →
+          </button>
+        </div>
+      </div>
+
     </div>
   `;
   lucide.createIcons();
@@ -7293,7 +7029,7 @@ async function renderMissionControlView(container) {
           </div>
 
           <!-- Act 2: Day 1 Shift -->
-          <div onclick="openEmergencyHandoffCard()" class="bg-blue-950/50 hover:bg-blue-950/80 border border-blue-500/60 hover:border-blue-400 p-3.5 rounded-2xl cursor-pointer transition flex flex-col justify-between gap-2.5 shadow-md group">
+          <div onclick="activateTrainingAct(2)" class="bg-blue-950/50 hover:bg-blue-950/80 border border-blue-500/60 hover:border-blue-400 p-3.5 rounded-2xl cursor-pointer transition flex flex-col justify-between gap-2.5 shadow-md group">
             <div>
               <div class="flex items-center justify-between mb-1">
                 <span class="text-[9px] font-black uppercase tracking-wider text-blue-300 bg-blue-500/20 px-2 py-0.5 rounded-md">Act 2 • Foster Baseline</span>
@@ -7303,7 +7039,7 @@ async function renderMissionControlView(container) {
               <p class="text-[10px] text-blue-200/90 leading-tight mt-1">Printable 1-page summary: meds, doctor, bedtime routine, soothing plan.</p>
             </div>
             <div class="text-[11px] font-black text-blue-300 flex items-center gap-1 group-hover:text-white transition pt-1 border-t border-blue-800/50">
-              <span>View Care Sheet</span>
+              <span>Enter Day 1 Baseline</span>
               <i data-lucide="arrow-right" class="w-3 h-3"></i>
             </div>
           </div>
