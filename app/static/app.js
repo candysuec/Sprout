@@ -671,25 +671,66 @@ document.addEventListener('click', (e) => {
 });
 
 
+// Universal HTML sanitizer
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 // 4-Act Curriculum Presentation Stage Handlers
 function updateActCardsActiveState() {
   const cards = [1, 2, 3, 4];
   cards.forEach(num => {
     const el = document.getElementById(`actCard-${num}`);
     if (!el) return;
-    el.classList.remove('ring-2', 'ring-emerald-400', 'bg-emerald-950/90', 'border-emerald-400', 'border-2');
+    el.classList.remove('ring-2', 'ring-emerald-400', 'ring-teal-400', 'bg-emerald-950/90', 'bg-teal-950/90', 'border-emerald-400', 'border-teal-400', 'border-2', 'opacity-40', 'grayscale-50');
     el.classList.add('bg-slate-800/80', 'border-slate-700', 'border');
   });
 
-  // Determine active act based on state
-  let activeAct = 2; // Default to Act 2 (Liam Brooks baseline)
+  const p1 = document.getElementById('actStatusPill-1');
+  const p2 = document.getElementById('actStatusPill-2');
+  const p3 = document.getElementById('actStatusPill-3');
+  const p4 = document.getElementById('actStatusPill-4');
+
   if (currentSproutDataset === 'b') {
-    activeAct = 3;
-  }
-  const activeEl = document.getElementById(`actCard-${activeAct}`);
-  if (activeEl) {
-    activeEl.classList.remove('bg-slate-800/80', 'border-slate-700', 'border');
-    activeEl.classList.add('bg-emerald-950/90', 'border-emerald-400', 'border-2', 'ring-2', 'ring-emerald-400');
+    // Act 3 (Day 90 Established Case) Active
+    const el3 = document.getElementById('actCard-3');
+    if (el3) {
+      el3.classList.remove('bg-slate-800/80', 'border-slate-700', 'border');
+      el3.classList.add('bg-teal-950/95', 'border-teal-400', 'border-2', 'ring-2', 'ring-teal-400');
+    }
+    if (p3) p3.innerHTML = '✓ ACTIVE SCENARIO: DAY 90 (Emma Vance)';
+    
+    // Dim & gray out non-active scenario acts (Clean Slate & Day 1 Baseline)
+    const el1 = document.getElementById('actCard-1');
+    const el2 = document.getElementById('actCard-2');
+    if (el1) el1.classList.add('opacity-40', 'grayscale-50');
+    if (el2) el2.classList.add('opacity-40', 'grayscale-50');
+    if (p1) p1.textContent = 'Day 0 (Not Active)';
+    if (p2) p2.textContent = 'Day 1 (Not Active)';
+    if (p4) p4.textContent = 'Open 15 Homes Gallery';
+  } else {
+    // Act 2 (Day 1 Liam Brooks baseline) Active
+    const el2 = document.getElementById('actCard-2');
+    if (el2) {
+      el2.classList.remove('bg-slate-800/80', 'border-slate-700', 'border');
+      el2.classList.add('bg-emerald-950/90', 'border-emerald-400', 'border-2', 'ring-2', 'ring-emerald-400');
+    }
+    if (p2) p2.innerHTML = '✓ ACTIVE SCENARIO: DAY 1 BASELINE (Liam Brooks)';
+
+    // Dim & gray out non-active scenario acts
+    const el1 = document.getElementById('actCard-1');
+    const el3 = document.getElementById('actCard-3');
+    if (el1) el1.classList.add('opacity-40', 'grayscale-50');
+    if (el3) el3.classList.add('opacity-40', 'grayscale-50');
+    if (p1) p1.textContent = 'Day 0 (Clean Slate)';
+    if (p3) p3.textContent = 'Day 90 (Not Active)';
+    if (p4) p4.textContent = 'Open 15 Homes Gallery';
   }
 }
 
@@ -705,7 +746,7 @@ async function activateTrainingAct(actNumber) {
     await loadChildren();
     setCanonicalChildForPersona('Liam');
     updateActCardsActiveState();
-    switchMainSection('dashboard');
+    switchMainSection('children');
     return;
   }
   if (actNumber === 3) {
@@ -713,8 +754,9 @@ async function activateTrainingAct(actNumber) {
     localStorage.setItem('sproutDataset', 'b');
     updateDatasetBadgeUI();
     await loadChildren();
+    setCanonicalChildForPersona('Emma');
     updateActCardsActiveState();
-    switchMainSection('dashboard');
+    switchMainSection('children');
     return;
   }
   if (actNumber === 4) {
@@ -958,6 +1000,17 @@ function switchMainSection(sectionKey, pushHistory = true) {
     } else {
       subNav.classList.add('hidden');
     }
+  }
+
+  // Toggle visibility of Header Care Sheet & Quick Note buttons (hidden on Training Hub / Mission Control)
+  const headerCareSheetBtn = document.getElementById('headerCareSheetBtn');
+  const headerQuickNoteBtn = document.getElementById('headerQuickNoteBtn');
+  if (sectionKey === 'training' || sectionKey === 'mission_control') {
+    if (headerCareSheetBtn) headerCareSheetBtn.classList.add('hidden');
+    if (headerQuickNoteBtn) headerQuickNoteBtn.classList.add('hidden');
+  } else {
+    if (headerCareSheetBtn) headerCareSheetBtn.classList.remove('hidden');
+    if (headerQuickNoteBtn) headerQuickNoteBtn.classList.remove('hidden');
   }
 
   renderChildSnapshot();
@@ -1581,13 +1634,18 @@ async function renderDashboardView(container) {
               Good morning, ${caregiverFirstName}
             </h2>
             <p class="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
-              Active in care: <strong class="text-emerald-300 privacy-sensitive">${childName}</strong> (Age 4 • Permanency Goal: ${childGoal}). 
+              Active in care: <strong class="text-emerald-300 privacy-sensitive hover:underline cursor-pointer" onclick="switchMainSection('children')" title="Click to view child's complete profile">${childName}</strong> (Age 4 • Permanency Goal: ${childGoal}). 
               Zero bureaucratic drag—all 15-second routine check-ins automatically protect you and file to the state timeline.
             </p>
           </div>
 
-          <!-- Hero Action Buttons: 24-Hr Care Sheet & 15-Sec Note -->
+          <!-- Hero Action Buttons: Child File, 24-Hr Care Sheet & 15-Sec Note -->
           <div class="flex flex-wrap items-center gap-3 shrink-0 w-full lg:w-auto">
+            <button onclick="switchMainSection('children')" class="flex-1 sm:flex-initial px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-emerald-300 hover:text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer border border-emerald-400/40" title="Go directly to child's complete profile and case binder">
+              <i data-lucide="user-check" class="w-4 h-4 text-emerald-400"></i>
+              <span>Child Records & Profile</span>
+            </button>
+
             <button onclick="openEmergencyHandoffCard()" class="flex-1 sm:flex-initial px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer border border-blue-400/60" title="Instant 1-page printable care sheet for babysitters, doctors, and caseworkers">
               <i data-lucide="file-text" class="w-4 h-4"></i>
               <span>View 24-Hr Care Sheet</span>
@@ -1739,23 +1797,39 @@ async function renderDashboardView(container) {
       </div>
 
       <!-- ===================================================================== -->
-      <!-- 4. HOUSEHOLD CONTINUITY & RESIDENCES (CLEAN COLLAPSIBLE DRAWER)       -->
+      <!-- 4. HOUSEHOLD CONTINUITY & CARE TEAM ROSTER                            -->
       <!-- ===================================================================== -->
-      <div class="border border-slate-200 rounded-3xl p-4 bg-slate-50/80">
-        <div class="flex items-center justify-between text-xs">
-          <div class="flex items-center gap-2 text-slate-600 font-semibold">
-            <i data-lucide="home" class="w-4 h-4 text-slate-500"></i>
-            <span>Registered Family Household: <strong>${households[0] ? households[0].name : '41 Elmwood Drive (Primary Residence)'}</strong></span>
+      <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs space-y-4">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+          <div>
+            <h3 class="font-extrabold text-slate-900 text-sm flex items-center gap-2">
+              <i data-lucide="home" class="w-4 h-4 text-emerald-600"></i>
+              Household & Care Team Roster: <strong>${households[0] ? households[0].name : 'Primary Residence'}</strong>
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">
+              Approved caregivers, resident adults, and family members living in this home.
+            </p>
           </div>
-          <button onclick="switchMainSection('households')" class="text-xs font-bold text-emerald-800 hover:underline">
-            Manage Household & Licensing →
-          </button>
+          <div class="flex items-center gap-2">
+            <button onclick="openHouseholdMembersModal(${households[0] ? households[0].id : 1}, '${households[0] ? escapeHtml(households[0].name) : 'Primary Residence'}')" class="px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs transition flex items-center gap-1.5 shadow-2xs cursor-pointer">
+              <i data-lucide="users" class="w-3.5 h-3.5"></i>
+              <span>+ Manage Household Members</span>
+            </button>
+            <button onclick="switchMainSection('households')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition flex items-center gap-1 cursor-pointer">
+              <span>All Homes & Licensing →</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="dashboardHouseholdRosterList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+          <div class="col-span-full py-3 text-center text-slate-400 text-xs">Loading household members...</div>
         </div>
       </div>
 
     </div>
   `;
   lucide.createIcons();
+  loadDashboardHouseholdMembers(households[0] ? households[0].id : 1);
 }
 
 function quickOpenAction(category, defaultTitle, defaultSummary) {
@@ -2287,10 +2361,13 @@ async function renderCaregiverAndHouseholdsView(container) {
           </div>
 
           <div class="flex flex-wrap items-center gap-2">
-            <button onclick="openHouseholdModal()" class="px-3.5 py-2 ${isSample ? 'bg-blue-800 hover:bg-blue-700' : 'bg-emerald-800 hover:bg-emerald-700'} text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+            <button onclick="openHouseholdMembersModal(${primaryHome ? primaryHome.id : 1}, '${primaryHome ? escapeHtml(primaryHome.name) : 'Primary Home'}')" class="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm cursor-pointer">
+              <i data-lucide="users" class="w-3.5 h-3.5"></i> Manage Household Members
+            </button>
+            <button onclick="openHouseholdModal()" class="px-3.5 py-2 ${isSample ? 'bg-blue-800 hover:bg-blue-700' : 'bg-slate-800 hover:bg-slate-700'} text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm cursor-pointer">
               <i data-lucide="home" class="w-3.5 h-3.5"></i> Add / Edit Household
             </button>
-            <button onclick="openNewLicensingModal()" class="px-3.5 py-2 bg-teal-700 hover:bg-teal-600 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+            <button onclick="openNewLicensingModal()" class="px-3.5 py-2 bg-teal-700 hover:bg-teal-600 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm cursor-pointer">
               <i data-lucide="award" class="w-3.5 h-3.5"></i> Log Training / Safety Drill
             </button>
           </div>
@@ -2406,6 +2483,12 @@ async function renderCaregiverAndHouseholdsView(container) {
                 <div><strong>Primary Caregiver:</strong> ${h.primary_caregiver || 'Candy Chevalier'}</div>
                 ${h.secondary_caregiver ? `<div><strong>Secondary Applicant:</strong> ${h.secondary_caregiver}</div>` : ''}
                 ${h.home_owner ? `<div><strong>Household Owner / Resource:</strong> ${h.home_owner}</div>` : ''}
+              </div>
+
+              <div class="pt-1 flex items-center justify-between">
+                <button onclick="openHouseholdMembersModal(${h.id}, '${escapeHtml(h.name)}')" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold rounded-lg border border-emerald-300 text-xs flex items-center gap-1.5 transition cursor-pointer">
+                  <i data-lucide="users" class="w-3.5 h-3.5 text-emerald-700"></i> Manage Household Members
+                </button>
               </div>
 
               ${h.notes ? `<p class="text-[11px] text-slate-500 italic">${h.notes}</p>` : ''}
@@ -3940,6 +4023,207 @@ async function handleNewHouseholdSubmit(e) {
 
   closeHouseholdModal();
   await loadTabContent();
+}
+
+// ==============================================================================
+// HOUSEHOLD MEMBERS MANAGEMENT CONTROLLERS
+// ==============================================================================
+let currentHouseholdForMembers = null;
+
+async function openHouseholdMembersModal(householdId, householdName) {
+  const modal = document.getElementById('householdMembersModal');
+  if (!modal) return;
+  
+  if (!householdId) {
+    if (activeHouseholdsCache && activeHouseholdsCache.length > 0) {
+      householdId = activeHouseholdsCache[0].id;
+      householdName = activeHouseholdsCache[0].name;
+    } else {
+      householdId = 1;
+      householdName = 'Primary Family Household';
+    }
+  }
+  
+  currentHouseholdForMembers = householdId;
+  const targetInput = document.getElementById('hmTargetHhId');
+  if (targetInput) targetInput.value = householdId;
+  
+  const titleEl = document.getElementById('hmModalTitle');
+  const subEl = document.getElementById('hmModalSubtitle');
+  if (titleEl) titleEl.textContent = `Household Members: ${householdName || 'Family Household'}`;
+  if (subEl) subEl.textContent = `Active residents, caregivers & approved adults (Household #${householdId})`;
+
+  modal.classList.remove('hidden');
+  await loadHouseholdMembers(householdId);
+  if (window.lucide) lucide.createIcons();
+}
+
+function closeHouseholdMembersModal() {
+  const modal = document.getElementById('householdMembersModal');
+  if (modal) modal.classList.add('hidden');
+  if (currentMainSection === 'dashboard' || currentMainSection === 'households') {
+    loadTabContent();
+  }
+}
+
+async function loadHouseholdMembers(householdId) {
+  const listEl = document.getElementById('hmMembersList');
+  if (!listEl) return;
+  listEl.innerHTML = `<div class="py-4 text-center text-slate-400 text-xs">Loading members...</div>`;
+
+  try {
+    const res = await apiFetch(`/api/households/${householdId}/members`);
+    const members = await res.json();
+    
+    if (!members || members.length === 0) {
+      listEl.innerHTML = `
+        <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl text-center text-slate-500 text-xs">
+          No members registered yet in this household. Use the form below to add caregivers, residents, or relatives.
+        </div>
+      `;
+      return;
+    }
+
+    listEl.innerHTML = members.map(m => {
+      const name = escapeHtml(m.name || 'Unnamed');
+      const role = escapeHtml(m.role || 'Resident');
+      const rel = escapeHtml(m.relationship || '');
+      const ageStr = m.age ? `Age ${m.age}` : '';
+      const notes = m.notes ? escapeHtml(m.notes) : '';
+      const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'HM';
+      
+      let badgeColor = 'bg-slate-100 text-slate-800 border-slate-200';
+      if (role.toLowerCase().includes('primary')) badgeColor = 'bg-emerald-100 text-emerald-900 border-emerald-300 font-black';
+      else if (role.toLowerCase().includes('secondary') || role.toLowerCase().includes('caregiver')) badgeColor = 'bg-blue-100 text-blue-900 border-blue-300 font-bold';
+      else if (role.toLowerCase().includes('child') || role.toLowerCase().includes('minor')) badgeColor = 'bg-purple-100 text-purple-900 border-purple-300';
+
+      return `
+        <div class="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl shadow-2xs hover:border-slate-300 transition">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-slate-800 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+              ${initials}
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-900 text-xs">${name}</span>
+                <span class="px-2 py-0.2 rounded-md text-[10px] border ${badgeColor}">${role}</span>
+              </div>
+              <div class="text-[11px] text-slate-500 flex items-center gap-2 mt-0.5">
+                ${rel ? `<span>Relationship: <strong class="text-slate-700">${rel}</strong></span>` : ''}
+                ${rel && ageStr ? `<span>•</span>` : ''}
+                ${ageStr ? `<span>${ageStr}</span>` : ''}
+                ${notes ? `<span>• <em>${notes}</em></span>` : ''}
+              </div>
+            </div>
+          </div>
+          <button onclick="removeHouseholdMember(${householdId}, ${m.id}, '${name}')" class="text-rose-600 hover:text-rose-800 hover:bg-rose-50 p-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition cursor-pointer" title="Remove person from household">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            <span class="hidden sm:inline">Remove</span>
+          </button>
+        </div>
+      `;
+    }).join('');
+    if (window.lucide) lucide.createIcons();
+  } catch (err) {
+    listEl.innerHTML = `<div class="py-3 text-center text-rose-500 text-xs">Failed to load members: ${err.message}</div>`;
+  }
+}
+
+async function handleNewHouseholdMemberSubmit(e) {
+  e.preventDefault();
+  const hhId = document.getElementById('hmTargetHhId').value || currentHouseholdForMembers || 1;
+  const nameInput = document.getElementById('hmMemberName');
+  const roleSelect = document.getElementById('hmMemberRole');
+  const relSelect = document.getElementById('hmMemberRel');
+  const ageInput = document.getElementById('hmMemberAge');
+
+  const payload = {
+    name: nameInput.value.trim(),
+    role: roleSelect.value,
+    relationship: relSelect.value,
+    age: ageInput.value ? parseInt(ageInput.value) : null
+  };
+
+  try {
+    const res = await apiFetch(`/api/households/${hhId}/members`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      alert('Error adding member: ' + (err.error || 'Server error'));
+      return;
+    }
+    nameInput.value = '';
+    ageInput.value = '';
+    await loadHouseholdMembers(hhId);
+  } catch (err) {
+    alert('Failed to add member: ' + err.message);
+  }
+}
+
+async function removeHouseholdMember(hhId, memberId, memberName) {
+  if (!confirm(`Are you sure you want to remove ${memberName} from this household?`)) {
+    return;
+  }
+  try {
+    const res = await apiFetch(`/api/households/${hhId}/members/${memberId}`, {
+      method: 'DELETE'
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      alert('Error removing member: ' + (err.error || 'Server error'));
+      return;
+    }
+    await loadHouseholdMembers(hhId);
+  } catch (err) {
+    alert('Failed to remove member: ' + err.message);
+  }
+}
+
+async function loadDashboardHouseholdMembers(householdId) {
+  const container = document.getElementById('dashboardHouseholdRosterList');
+  if (!container) return;
+  try {
+    const res = await apiFetch(`/api/households/${householdId}/members`);
+    const members = await res.json();
+    if (!members || members.length === 0) {
+      container.innerHTML = `
+        <div class="col-span-full py-4 text-center text-slate-400 text-xs">
+          No members registered yet. Click "+ Manage Household Members" to add residents.
+        </div>
+      `;
+      return;
+    }
+    container.innerHTML = members.map(m => {
+      const name = escapeHtml(m.name || 'Caregiver');
+      const role = escapeHtml(m.role || 'Resident');
+      const rel = escapeHtml(m.relationship || '');
+      const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'HM';
+      let badgeStyle = 'bg-slate-100 text-slate-700 border-slate-200';
+      if (role.toLowerCase().includes('primary')) badgeStyle = 'bg-emerald-100 text-emerald-900 border-emerald-300 font-black';
+      else if (role.toLowerCase().includes('secondary') || role.toLowerCase().includes('caregiver')) badgeStyle = 'bg-blue-100 text-blue-900 border-blue-300 font-bold';
+
+      return `
+        <div class="p-3 bg-slate-50 border border-slate-200/90 rounded-2xl flex items-center justify-between gap-2.5">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-8 h-8 rounded-xl bg-slate-800 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+              ${initials}
+            </div>
+            <div class="min-w-0">
+              <span class="font-bold text-slate-900 text-xs block truncate">${name}</span>
+              <span class="text-[10px] text-slate-500 block truncate">${rel || role}</span>
+            </div>
+          </div>
+          <span class="px-2 py-0.5 rounded-md text-[9px] border shrink-0 ${badgeStyle}">${role.split(' ')[0]}</span>
+        </div>
+      `;
+    }).join('');
+    if (window.lucide) lucide.createIcons();
+  } catch (e) {
+    container.innerHTML = `<div class="col-span-full py-2 text-slate-400 text-xs">Unable to load members</div>`;
+  }
 }
 
 // VT DCF Compliance & Reimbursement Widget Loader
@@ -7111,94 +7395,7 @@ async function renderMissionControlView(container) {
         </div>
       </div>
 
-      <!-- ===================================================================== -->
-      <!-- SECTION 2: 4 TRAINING & SHIFT LAUNCHPADS (DAY 0, DAY 1, 90D, 15 HOMES)-->
-      <!-- ===================================================================== -->
-      <div id="sandboxGatewayAirlock" class="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 rounded-3xl p-5 sm:p-6 text-white shadow-xl border-2 border-emerald-500/40 relative overflow-hidden space-y-4">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-blue-800/60 pb-3">
-          <div class="space-y-0.5">
-            <div class="flex items-center gap-2">
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 flex items-center gap-1">
-                <i data-lucide="shield-check" class="w-3 h-3 text-emerald-400"></i> Practice Sandbox • 100% Synthetic
-              </span>
-              <span class="text-xs text-blue-200">Choose a starting point for your shift or training walkthrough:</span>
-            </div>
-          </div>
-          <div class="flex items-center gap-2 shrink-0">
-            <button onclick="launchQuickStartTour(5)" class="px-3 py-1.5 bg-blue-900/60 hover:bg-blue-800 text-blue-200 hover:text-white font-bold rounded-xl text-xs border border-blue-600/60 transition flex items-center gap-1 cursor-pointer" title="5-Minute Quick Tour">
-              <i data-lucide="zap" class="w-3 h-3 text-amber-400"></i>
-              <span>5-Min Tour</span>
-            </button>
-          </div>
-        </div>
 
-        <!-- The 4 Training Pillars (Day 0, Day 1, Day 90, 15 Scenarios) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          <!-- Act 1: Day 0 Setup -->
-          <div onclick="openGuidedOnboardingModal('foster')" class="bg-emerald-950/50 hover:bg-emerald-950/80 border-2 border-emerald-500/60 hover:border-emerald-400 p-3.5 rounded-2xl cursor-pointer transition flex flex-col justify-between gap-2.5 shadow-md group">
-            <div>
-              <div class="flex items-center justify-between mb-1">
-                <span class="text-[9px] font-black uppercase tracking-wider text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-md">Act 1 • Clean Slate</span>
-                <span class="text-[9px] font-black text-emerald-400">Day 0</span>
-              </div>
-              <h3 class="font-black text-white text-xs">+ Set Up New Person</h3>
-              <p class="text-[10px] text-emerald-200/90 leading-tight mt-1">4-step wizard: Choose role, add child, verify allergies, set priority.</p>
-            </div>
-            <div class="text-[11px] font-black text-emerald-300 flex items-center gap-1 group-hover:text-white transition pt-1 border-t border-emerald-800/50">
-              <span>Start Day 0</span>
-              <i data-lucide="arrow-right" class="w-3 h-3"></i>
-            </div>
-          </div>
-
-          <!-- Act 2: Day 1 Shift -->
-          <div onclick="activateTrainingAct(2)" class="bg-blue-950/50 hover:bg-blue-950/80 border border-blue-500/60 hover:border-blue-400 p-3.5 rounded-2xl cursor-pointer transition flex flex-col justify-between gap-2.5 shadow-md group">
-            <div>
-              <div class="flex items-center justify-between mb-1">
-                <span class="text-[9px] font-black uppercase tracking-wider text-blue-300 bg-blue-500/20 px-2 py-0.5 rounded-md">Act 2 • Foster Baseline</span>
-                <span class="text-[9px] font-bold text-blue-300">Day 1</span>
-              </div>
-              <h3 class="font-black text-white text-xs">Liam's 24-Hr Care Sheet</h3>
-              <p class="text-[10px] text-blue-200/90 leading-tight mt-1">Printable 1-page summary: meds, doctor, bedtime routine, soothing plan.</p>
-            </div>
-            <div class="text-[11px] font-black text-blue-300 flex items-center gap-1 group-hover:text-white transition pt-1 border-t border-blue-800/50">
-              <span>Enter Day 1 Baseline</span>
-              <i data-lucide="arrow-right" class="w-3 h-3"></i>
-            </div>
-          </div>
-
-          <!-- Act 3: Day 90 Established Case -->
-          <div onclick="toggleDatasetModeHeader()" class="bg-teal-950/50 hover:bg-teal-950/80 border border-teal-500/60 hover:border-teal-400 p-3.5 rounded-2xl cursor-pointer transition flex flex-col justify-between gap-2.5 shadow-md group">
-            <div>
-              <div class="flex items-center justify-between mb-1">
-                <span class="text-[9px] font-black uppercase tracking-wider text-teal-300 bg-teal-500/20 px-2 py-0.5 rounded-md">Act 3 • Established</span>
-                <span class="text-[9px] font-bold text-teal-300">Day 90</span>
-              </div>
-              <h3 class="font-black text-white text-xs">Dataset B: 90-Day Case</h3>
-              <p class="text-[10px] text-teal-200/90 leading-tight mt-1">3 months of medical history, school IEP progress, and court evidence.</p>
-            </div>
-            <div class="text-[11px] font-black text-teal-300 flex items-center gap-1 group-hover:text-white transition pt-1 border-t border-teal-800/50">
-              <span>Switch to 90 Days</span>
-              <i data-lucide="arrow-right" class="w-3 h-3"></i>
-            </div>
-          </div>
-
-          <!-- Act 4: 15 Scenarios Gallery -->
-          <div onclick="openCaregiverProfilesModal()" class="bg-indigo-950/50 hover:bg-indigo-950/80 border border-indigo-500/60 hover:border-indigo-400 p-3.5 rounded-2xl cursor-pointer transition flex flex-col justify-between gap-2.5 shadow-md group">
-            <div>
-              <div class="flex items-center justify-between mb-1">
-                <span class="text-[9px] font-black uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-md">Act 4 • 4 Roles</span>
-                <span class="text-[9px] font-bold text-indigo-300">15 Homes</span>
-              </div>
-              <h3 class="font-black text-white text-xs">15 Model Households</h3>
-              <p class="text-[10px] text-indigo-200/90 leading-tight mt-1">Kinship grandparents, 48-hr Respite care, and Bio-Parent reunification cases.</p>
-            </div>
-            <div class="text-[11px] font-black text-indigo-300 flex items-center gap-1 group-hover:text-white transition pt-1 border-t border-indigo-800/50">
-              <span>Browse 15 Homes</span>
-              <i data-lucide="arrow-right" class="w-3 h-3"></i>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <!-- WHAT WOULD YOU LIKE TO DO TODAY? (4 Primary Quadrants) -->
       <div class="space-y-4">
@@ -8660,7 +8857,8 @@ async function launchPersonaReview(persona, dataset) {
     updateSproutTheme();
     await loadChildren();
     setCanonicalChildForPersona('Liam');
-    switchMainSection('mission_control');
+    updateActCardsActiveState();
+    switchMainSection('children');
   } else if (persona === 'kinship') {
     // 2. Kinship Caregiver View (Eleanor & Arthur Vance -> Emma Vance)
     activeCaregiverUser = 'Sample Caregiver (Eleanor & Arthur Vance)';
@@ -8670,7 +8868,8 @@ async function launchPersonaReview(persona, dataset) {
     updateSproutTheme();
     await loadChildren();
     setCanonicalChildForPersona('Emma');
-    switchMainSection('mission_control');
+    updateActCardsActiveState();
+    switchMainSection('children');
     if (currentSproutDataset === 'a') {
       setTimeout(() => openKinshipFastTrackModal(), 300);
     }
@@ -8715,7 +8914,8 @@ async function launchPersonaReview(persona, dataset) {
     updateSproutTheme();
     await loadChildren();
     setCanonicalChildForPersona('Liam');
-    switchMainSection('mission_control');
+    updateActCardsActiveState();
+    switchMainSection('children');
     setTimeout(() => openEmergencyHandoffCard(), 300);
   }
   if (window.lucide) lucide.createIcons();
@@ -8878,8 +9078,12 @@ async function toggleDatasetModeHeader() {
 // =============================================================================
 let guidedCurrentRole = 'foster';
 let guidedCurrentStep = 1;
+let onboardingOpenedFromLauncher = false;
 
-function openGuidedOnboardingModal(role) {
+function openGuidedOnboardingModal(role, fromLauncher = false) {
+  const launcherModal = document.getElementById('personaLauncherModal');
+  onboardingOpenedFromLauncher = fromLauncher || (launcherModal && !launcherModal.classList.contains('hidden'));
+
   closePersonaLauncherModal();
   closeReviewModeConsoleModal();
   closeFounderReviewModal();
@@ -8906,6 +9110,10 @@ function openGuidedOnboardingModal(role) {
 function closeGuidedOnboardingModal() {
   const modal = document.getElementById('guidedOnboardingModal');
   if (modal) modal.classList.add('hidden');
+  if (onboardingOpenedFromLauncher) {
+    onboardingOpenedFromLauncher = false;
+    openPersonaLauncherModal();
+  }
 }
 
 function setGuidedRole(role) {

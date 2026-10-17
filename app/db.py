@@ -20,10 +20,48 @@ for _d in (DATA_DIR, UPLOAD_DIR, EXPORT_DIR, BACKUP_DIR):
 DB_PATH = os.path.join(DATA_DIR, "foster_binder.db")
 
 
+def ensure_extended_tables(conn):
+    """Idempotently ensures household_members table and seed data exist."""
+    c = conn.cursor()
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS household_members (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        household_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        role TEXT NOT NULL DEFAULT 'Member',
+        relationship TEXT NOT NULL DEFAULT 'Other',
+        age INTEGER,
+        dob TEXT,
+        phone TEXT,
+        email TEXT,
+        notes TEXT,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (household_id) REFERENCES households(id) ON DELETE CASCADE
+    )
+    """)
+    try:
+        hh = c.execute("SELECT id FROM households WHERE address LIKE '%Elmwood%' LIMIT 1").fetchone()
+        if hh:
+            hh_id = hh[0]
+            count = c.execute("SELECT COUNT(*) FROM household_members WHERE household_id = ?", (hh_id,)).fetchone()[0]
+            if count == 0:
+                c.execute("""
+                    INSERT INTO household_members (household_id, name, role, relationship, notes)
+                    VALUES 
+                    (?, 'Candy Chevalier', 'Primary Caregiver', 'Self', 'Licensed Kinship & Foster Caregiver'),
+                    (?, 'Mallory Wheeler', 'Secondary Caregiver', 'Adult Family Member', 'Secondary Applicant & Caregiver'),
+                    (?, 'Robin Davis', 'Household Resource', 'Homeowner', 'Property Owner & Support Resource')
+                """, (hh_id, hh_id, hh_id))
+                conn.commit()
+    except Exception:
+        pass
+
+
 def get_connection():
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
+    ensure_extended_tables(conn)
     return conn
 
 

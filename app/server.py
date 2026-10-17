@@ -382,6 +382,157 @@ def update_household(hh_id):
     return json_res({"message": "Household updated successfully"})
 
 
+# --- HOUSEHOLD MEMBERS ROSTER API ---
+SAMPLE_HOUSEHOLD_MEMBERS_EXTRA = {}
+SAMPLE_HOUSEHOLD_MEMBERS_REMOVED = set()
+
+@app.route('/api/households/<hh_id:int>/members', method=['GET'])
+def get_household_members(hh_id):
+    caregiver = (request.headers.get('X-Caregiver') or '').strip()
+    sprout_mode = (request.headers.get('X-Sprout-Mode') or 'local').strip().lower()
+    is_sample = ('Sample' in caregiver) or (sprout_mode == 'sample')
+    
+    if is_sample:
+        import sample_dataset as sd
+        selected_hh_id = None
+        for adm in sd.ADULT_MEMBERS:
+            if adm['Name'] in caregiver:
+                selected_hh_id = adm['HouseholdID']
+                break
+        if not selected_hh_id:
+            selected_hh_id = f"HH-{hh_id}" if hh_id >= 100 else f"HH-1{hh_id:02d}"
+        
+        base_members = []
+        for m in sd.ADULT_MEMBERS:
+            if m['HouseholdID'] == selected_hh_id:
+                m_id = str(m.get('AdultID', ''))
+                if m_id not in SAMPLE_HOUSEHOLD_MEMBERS_REMOVED:
+                    base_members.append({
+                        "id": m_id,
+                        "household_id": hh_id,
+                        "name": m['Name'],
+                        "role": m['Role'],
+                        "relationship": m.get('RelationshipCategory', 'Caregiver'),
+                        "age": 52 if 'Grandparent' in m.get('RelationshipCategory', '') or 'Vance' in m['Name'] else 38,
+                        "notes": "Verified Household Member"
+                    })
+        
+        extra = SAMPLE_HOUSEHOLD_MEMBERS_EXTRA.get(selected_hh_id, [])
+        return json_res(base_members + extra)
+
+    # Local Mode
+    conn = get_connection()
+    try:
+        rows = [dict(r) for r in conn.execute("SELECT * FROM household_members WHERE household_id = ? ORDER BY id ASC", (hh_id,)).fetchall()]
+    finally:
+        conn.close()
+    return json_res(rows)
+
+
+@app.route('/api/households/<hh_id:int>/members', method=['POST'])
+def add_household_member(hh_id):
+    data = request.json or {}
+    name = (data.get('name') or '').strip()
+    if not name:
+        return json_res({"error": "Member name is required."}, 400)
+    role = (data.get('role') or 'Adult Household Member').strip()
+    relationship = (data.get('relationship') or 'Other Relative').strip()
+    age = data.get('age') or None
+    notes = (data.get('notes') or '').strip()
+
+    caregiver = (request.headers.get('X-Caregiver') or '').strip()
+    sprout_mode = (request.headers.get('X-Sprout-Mode') or 'local').strip().lower()
+    is_sample = ('Sample' in caregiver) or (sprout_mode == 'sample')
+
+    if is_sample:
+        import sample_dataset as sd
+        selected_hh_id = None
+        for adm in sd.ADULT_MEMBERS:
+            if adm['Name'] in caregiver:
+                selected_hh_id = adm['HouseholdID']
+                break
+        if not selected_hh_id:
+            selected_hh_id = f"HH-{hh_id}" if hh_id >= 100 else f"HH-1{hh_id:02d}"
+
+        new_id = f"NEW-{len(SAMPLE_HOUSEHOLD_MEMBERS_EXTRA.get(selected_hh_id, [])) + 1}"
+        new_member = {
+            "id": new_id,
+            "household_id": hh_id,
+            "name": name,
+            "role": role,
+            "relationship": relationship,
+            "age": age,
+            "notes": notes or "Added in training session"
+        }
+        if selected_hh_id not in SAMPLE_HOUSEHOLD_MEMBERS_EXTRA:
+            SAMPLE_HOUSEHOLD_MEMBERS_EXTRA[selected_hh_id] = []
+        SAMPLE_HOUSEHOLD_MEMBERS_EXTRA[selected_hh_id].append(new_member)
+        return json_res({
+            "id": new_id,
+            "household_id": hh_id,
+            "name": name,
+            "role": role,
+            "relationship": relationship,
+            "age": age,
+            "notes": notes or "Added in training session",
+            "message": "Member added to household"
+        })
+
+    conn = get_connection()
+    try:
+        c = conn.cursor()
+        c.execute("""
+            INSERT INTO household_members (household_id, name, role, relationship, age, notes)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (hh_id, name, role, relationship, age, notes))
+        new_id = c.lastrowid
+        conn.commit()
+    finally:
+        conn.close()
+    return json_res({
+        "id": new_id,
+        "household_id": hh_id,
+        "name": name,
+        "role": role,
+        "relationship": relationship,
+        "age": age,
+        "notes": notes,
+        "message": "Household member added successfully"
+    })
+
+
+@app.route('/api/households/<hh_id:int>/members/<member_id>', method=['DELETE'])
+def remove_household_member(hh_id, member_id):
+    caregiver = (request.headers.get('X-Caregiver') or '').strip()
+    sprout_mode = (request.headers.get('X-Sprout-Mode') or 'local').strip().lower()
+    is_sample = ('Sample' in caregiver) or (sprout_mode == 'sample')
+
+    if is_sample:
+        import sample_dataset as sd
+        selected_hh_id = None
+        for adm in sd.ADULT_MEMBERS:
+            if adm['Name'] in caregiver:
+                selected_hh_id = adm['HouseholdID']
+                break
+        if not selected_hh_id:
+            selected_hh_id = f"HH-{hh_id}" if hh_id >= 100 else f"HH-1{hh_id:02d}"
+
+        SAMPLE_HOUSEHOLD_MEMBERS_REMOVED.add(str(member_id))
+        if selected_hh_id in SAMPLE_HOUSEHOLD_MEMBERS_EXTRA:
+            SAMPLE_HOUSEHOLD_MEMBERS_EXTRA[selected_hh_id] = [
+                m for m in SAMPLE_HOUSEHOLD_MEMBERS_EXTRA[selected_hh_id] if str(m['id']) != str(member_id)
+            ]
+        return json_res({"success": True, "message": "Member removed from household"})
+
+    conn = get_connection()
+    try:
+        conn.execute("DELETE FROM household_members WHERE id = ? AND household_id = ?", (member_id, hh_id))
+        conn.commit()
+    finally:
+        conn.close()
+    return json_res({"success": True, "message": "Household member removed successfully"})
+
+
 # --- COMPLIANCE CHECKLIST API ---
 @app.route('/api/compliance', method=['GET'])
 def get_compliance_items():
