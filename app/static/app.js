@@ -527,8 +527,8 @@ async function renderChildSnapshot() {
   const card = document.getElementById('snapshotCard');
   if (!card) return;
 
-  // On the main Dashboard, keep the view clean and un-redundant (dashboard has its own comprehensive layout)
-  if (currentMainSection === 'dashboard') {
+  // On the main Dashboard or Mission Control, keep the view clean and un-redundant (they have their own comprehensive layouts)
+  if (currentMainSection === 'dashboard' || currentMainSection === 'mission_control') {
     card.classList.add('hidden');
     card.innerHTML = '';
     return;
