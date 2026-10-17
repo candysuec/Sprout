@@ -18,6 +18,33 @@ If documentation claims a feature is passing, but Founder walkthrough reveals fr
 
 ---
 
+## 1B. MANDATORY REVIEW GATE: THE 4 PERSONA QUESTIONS
+
+**OPERATING RULE FOR THE NEXT REVIEW CYCLE:**
+No work may be proposed unless it is strictly tied to one of the **8 sandbox personas**.
+
+Every finding, ticket, and proposal MUST answer all four questions:
+
+1. **Which persona?** (Must be one of the 8 canonical sandbox personas below).
+2. **What training objective?** (What specific competency or scenario is Candy trying to teach/demonstrate?).
+3. **What prevented training?** (What friction, defect, error, or missing element blocked the demonstration?).
+4. **What caused Candy to become the detective?** (What inconsistency or missing link forced Candy to hunt, explain, work around, or apologize for the software?).
+
+> [!CAUTION]
+> **Enforcement:** REJECT any proposal, finding, or task that cannot clearly answer all 4 questions.
+
+### The 8 Canonical Sandbox Personas:
+* **Dataset A (New to Sprout / Day 1 Onboarding):**
+  1. `New Foster Caregiver`: Sarah Jenkins & Liam Brooks (Infant, 6 mos • Day 1 Placement Clock • Clean Intake)
+  2. `New Kinship Caregiver`: Eleanor Vance & Emma Vance (Toddler, 3 yrs • Day 1 Placement Clock • $350 Emergency Fund)
+  3. `New Parent Participant`: Danielle Miller & Noah Miller (Elementary, 8 yrs • Day 1 Provisional Access • Initial Supervised Visit)
+  4. `New Respite Provider`: Samantha Price & Liam Brooks (Infant • Day 1 Care & Safety Sheet Readiness)
+* **Dataset B (Established 90-Day Users / Full Capabilities):**
+  5. `Established Foster Caregiver`: Sarah Jenkins & Liam Brooks (90 Days • EPSDT Exam on file • $184.20 Mileage Claim)
+  6. `Established Kinship Caregiver`: Eleanor Vance & Emma Vance (90 Days • Dr. Dynasaur / Reach Up Benefits • Head Start)
+  7. `Established Parent Participant`: Angela Davis & Emma Vance (90 Days • 75% Complete Roadmap • 3 Verified Court Certificates)
+  8. `Established Respite Provider`: Samantha Price & Liam Brooks (90 Days • 4 Completed Stays • Medication MAR History)
+
 ## 2. PART A: DEFECTS (DISCOVERED IN VIDEO WALKTHROUGH)
 
 ### DEFECT D-001: PII SHIELD FAILURE

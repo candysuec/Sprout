@@ -64,8 +64,16 @@ Only three things matter right now:
    - **Q4:** How does this help answer: *Where am I? What matters? What is next? What is blocked?*
    - **Q5:** Does this introduce new terminology, categories, or conceptual layers? *(If yes: Justify with concrete operational impact).*
    - **Q6:** Would a future AI need this to avoid making a wrong decision? *(If no: Do not add it).*
-2. **Protecting Caregiver Cognitive Load:** Never make Candy or any caregiver act as the integration layer, memory clerk, detective, or debugger. Every screen must answer: *Where am I? What is next?*
-3. **Execution Without Regression:** Preserving 100% test pass rate and backward compatibility with local workspace data.
+2. **The 4 Persona Questions Gate (Mandatory for Review Cycle):**
+   - **No work may be proposed unless tied strictly to one of the 8 canonical sandbox personas.**
+   - Every proposal/finding must answer:
+     1. *Which persona?*
+     2. *What training objective?*
+     3. *What prevented training?*
+     4. *What caused Candy to become the detective?*
+   - **Reject any proposal that cannot answer all 4 questions.**
+3. **Protecting Caregiver Cognitive Load:** Never make Candy or any caregiver act as the integration layer, memory clerk, detective, or debugger. Every screen must answer: *Where am I? What is next?*
+4. **Execution Without Regression:** Preserving 100% test pass rate and backward compatibility with local workspace data.
 
 ---
 
